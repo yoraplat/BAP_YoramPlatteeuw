@@ -9,16 +9,17 @@ import { FirestoreProvider } from './Services';
 import { AuthProvider } from './Services';
 import firebaseConfig from './Firebase/config'
 
-export default function App() {  
+export default function App() {
   // firebase.initializeApp(firebaseConfig);
 
-     return (
-       <NavigationContainer>
+
+  return (
+    <NavigationContainer>
       <FirestoreProvider>
         <AuthProvider>
-          <AppScreen/>
+          <AppScreen />
         </AuthProvider>
       </FirestoreProvider>
-      </NavigationContainer>
-    );
-  }
+    </NavigationContainer>
+  );
+}

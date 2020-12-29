@@ -2,8 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b1897c40-3a16-45e4-bafe-fe3ff8630b7a" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/service.auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/Services/service.auth.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/service.firestore.js" beforeDir="false" afterPath="$PROJECT_DIR$/Services/service.firestore.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/MapBox/ItemsList.js" beforeDir="false" afterPath="$PROJECT_DIR$/components/MapBox/ItemsList.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/MapBox/Map.js" beforeDir="false" afterPath="$PROJECT_DIR$/components/MapBox/Map.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/MapBox/OverlayButtons.js" beforeDir="false" afterPath="$PROJECT_DIR$/components/MapBox/OverlayButtons.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/screens/AppScreen/AppScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/screens/AppScreen/AppScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/screens/AuthScreen/LoginScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/screens/AuthScreen/LoginScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/screens/HomeScreen/HomeScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/screens/HomeScreen/HomeScreen.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -43,17 +52,17 @@
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.js" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="289" y="93" width="774" height="847" key="AVDManager" timestamp="1608814100237">
+    <state x="107" y="82" width="774" height="847" key="AVDManager" timestamp="1609259906285">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="289" y="93" width="774" height="847" key="AVDManager/0.0.1920.1040@0.0.1920.1040" timestamp="1608814100237" />
+    <state x="107" y="82" width="774" height="847" key="AVDManager/0.0.1920.1040@0.0.1920.1040" timestamp="1609259906285" />
     <state x="922" y="168" key="SettingsEditor" timestamp="1608621185870">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="922" y="168" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1608621185870" />
-    <state x="1103" y="230" width="672" height="678" key="search.everywhere.popup" timestamp="1608814063725">
+    <state x="1103" y="230" width="672" height="678" key="search.everywhere.popup" timestamp="1609160428133">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1103" y="230" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1608814063725" />
+    <state x="1103" y="230" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1609160428133" />
   </component>
 </project>

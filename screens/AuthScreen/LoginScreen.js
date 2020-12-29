@@ -10,9 +10,10 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useAuth } from '../../Services';
 import { RegisterScreen } from './RegisterScreen';
 import AppScreen from "../AppScreen/AppScreen";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const LoginScreen = () => {
-  const { CheckUserState } = useAuth();
+  const { currentUser } = useAuth();
   const Stack = createStackNavigator();
   
   let [fontsLoaded] = useFonts({
@@ -34,6 +35,14 @@ export const LoginScreen = () => {
     );
   }
 
+  const storeData = async (data) => {
+    try {
+      await AsyncStorage.setItem('@NoWaste_User', JSON.stringify(data));
+    } catch (error) {
+      alert(error)
+    }
+  }
+
   function Login({ navigation }) {
     const [email, setEmail ] = useState('');
     const [password, setPassword ] = useState('');
@@ -41,7 +50,7 @@ export const LoginScreen = () => {
     const HandleLogin = () => {
       firebase.auth()
               .signInWithEmailAndPassword(email.email, password.password)
-              .then(() => navigation.navigate('AppScreen'))
+              .then(() => storeData(firebase.auth().currentUser), navigation.navigate('AppScreen'))
               .catch(error => console.log(error))
     }
     

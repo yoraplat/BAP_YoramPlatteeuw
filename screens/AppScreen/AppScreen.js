@@ -11,17 +11,10 @@ import { faComment, faCommentAlt, faMap, faPlusSquare, faUser } from '@fortaweso
 import { HomeScreen } from '../HomeScreen/HomeScreen';
 import { LoginScreen } from '../AuthScreen/LoginScreen';
 import { ProfileScreen } from '../ProfileScreen/ProfileScreen';
-
-
+import { AddScreen } from '../AddScreen/AddScreen';
 import { useAuth } from '../../Services';
 
-function NewItemScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>New Item!</Text>
-    </View>
-  );
-}
+
 
 function ChatScreen() {
   return (
@@ -34,8 +27,9 @@ function ChatScreen() {
 const Tab = createBottomTabNavigator();
 
 export default function AppScreen() {
+  
   const { currentUser } = useAuth();
-  if (currentUser()) {
+  if (currentUser() != null) {
       return (
          <Tab.Navigator
            screenOptions= {({ route }) => ({
@@ -57,7 +51,7 @@ export default function AppScreen() {
            })}
          >
            <Tab.Screen name="Home" component={HomeScreen} options={{tabBarLabel: () => { return null}}}  />
-           <Tab.Screen name="NewItem" component={NewItemScreen} options={{tabBarLabel: () => { return null}}} />
+           <Tab.Screen name="NewItem" component={AddScreen} options={{tabBarLabel: () => { return null}}} />
            <Tab.Screen name="Chat" component={ChatScreen} options={{tabBarLabel: () => { return null}}} />
            <Tab.Screen name="Profile" component={ProfileScreen} options={{tabBarLabel: () => { return null}}} />
          </Tab.Navigator>

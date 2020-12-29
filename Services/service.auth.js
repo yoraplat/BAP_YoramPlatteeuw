@@ -7,31 +7,32 @@ const useAuth = () => useContext(AuthContext);
 
 const AuthProvider = ({children}) => {
 
-  const checkUserState = async () => {
+  const currentUser = async () => {
     try {
-      const value = await AsyncStorage.getItem('NoWaste_user')
+      const value = await AsyncStorage.getItem('@NoWaste_User')
       if(value != null) {
-        return true;
+        return value;
       }
     } catch(e) {
       return false;
     }
   };
   
-  const currentUser = () => {
-    if(firebase.auth().currentUser != null) {
-      return firebase.auth().currentUser;
-    } else {
-      return false;
-    }
-  };
+  // const currentUser = () => {
+  //   if(firebase.auth().currentUser != null) {
+  //     return firebase.auth().currentUser;
+  //   } else {
+  //     return false;
+  //   }
+  // };
 
   const logout = () => {
+    AsyncStorage.removeItem('@NoWaste_User');
     firebase.auth().signOut();
   }
 
     return (
-      <AuthContext.Provider value={{ checkUserState, currentUser, logout }}>
+      <AuthContext.Provider value={{currentUser, logout }}>
         {children}
       </AuthContext.Provider>
     );

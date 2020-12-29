@@ -1,0 +1,4 @@
+New post:   address does not change when edited after attempted post creation
+            Geocode errors
+
+HomeScreen: Fix space between tabselectors
