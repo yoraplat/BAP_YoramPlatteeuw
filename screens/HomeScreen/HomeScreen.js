@@ -2,14 +2,20 @@ import React, { useState, useEffect } from "react";
 import { SafeAreaView, Text, StatusBar, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faLeaf, faMap, faSlidersH, faStream } from '@fortawesome/free-solid-svg-icons'
-import { useFirestore } from '../../Services/service.firestore';
 // Components
 import { Map } from "../../components/MapBox/Map";
-import { ItemsList } from "../../components/MapBox/ItemsList";
+import ItemsList from "../../components/MapBox/ItemsList";
+import { useFirestore } from '../../Services';
 
 export const HomeScreen = () => {
 
   const [currentTab, setCurrentTab] = useState(1)
+  const { fetchAllPosts } = useFirestore();
+  const [allPosts, setAllPosts] = useState();
+
+  useEffect(() => {
+    setAllPosts(fetchAllPosts);
+  }, [fetchAllPosts]);
 
   const selectTab = (id) => {
     if (currentTab == 2) {
@@ -62,8 +68,8 @@ export const HomeScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       {currentTab == 1
-        ? <Map />
-        : <ItemsList />
+        ? <Map posts={allPosts}/>
+        : <ItemsList posts={allPosts} />
       }
       <>
         <TouchableOpacity style={styles.overlayTopLeft}>

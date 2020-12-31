@@ -1,4 +1,5 @@
-New post:   address does not change when edited after attempted post creation
-            Geocode errors
+New post:   Check if address has specified a city
 
 HomeScreen: Fix space between tabselectors
+            itemsList: calculate distance to post address
+            listen for updates in items, update map

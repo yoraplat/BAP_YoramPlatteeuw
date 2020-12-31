@@ -1,10 +1,10 @@
-import * as React from 'react';
+import React, { useState, useEffect } from "react";
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 import { StyleSheet, View, Text, SafeAreaView, Dimensions } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faMapMarker } from '@fortawesome/free-solid-svg-icons';
 
-export function Map() {
+export function Map({ posts }) {
 
   const generatedMapStyle = [
     {
@@ -61,22 +61,32 @@ export function Map() {
     }
   ]
 
-  const markers = [
-    {
-      title: "Marker 1",
-      coordinate: {
-        latitude: 51.041114239744644,
-        longitude: 3.715269560500076,
-      },
-    },
-    {
-      title: "Marker 2",
-      coordinate: {
-        latitude: 51.04515884500312,
-        longitude: 3.728881750809316,
-      },
-    },
-  ]
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    posts != undefined ? loadCoordinates() : '';
+  }, [posts]);
+
+  const loadCoordinates = () => {
+    const coordinatesList = [];
+    posts.forEach(post => {
+      const postObject = {
+        title: post.title,
+        description: post.description,
+        type: post.type,
+        address: {
+          latitude: parseFloat(post.address.latitude),
+          longitude: parseFloat(post.address.longitude),
+          string: post.address.string,
+        },
+      };
+      // console.log(postObject)
+      coordinatesList.push(postObject)
+    });
+
+    setData(coordinatesList)
+  }
+
   return (
     <SafeAreaView>
       <MapView
@@ -90,15 +100,15 @@ export function Map() {
         provider={PROVIDER_GOOGLE}
         customMapStyle={generatedMapStyle}
       >
-        {markers && markers.map((marker, index) => (
+        {data && data.map((marker, index) => (
           <Marker
             key={index}
             coordinate={{
-              latitude: marker.coordinate.latitude,
-              longitude: marker.coordinate.longitude,
+              latitude: marker.address.latitude,
+              longitude: marker.address.longitude,
             }}
             title={marker.title}
-            description={"marked"}
+            description={marker.description}
           >
             <FontAwesomeIcon icon={faMapMarker} style={{ color: "#6C0102" }} />
           </Marker>
