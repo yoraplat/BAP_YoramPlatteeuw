@@ -7,15 +7,14 @@ const useAuth = () => useContext(AuthContext);
 
 const AuthProvider = ({children}) => {
 
-  const currentUser = async () => {
-    try {
-      const value = await AsyncStorage.getItem('@NoWaste_User')
+  const currentUser = () => {
+    
+      const value = AsyncStorage.getItem('@NoWaste_User')
       if(value != null) {
         return value;
+      } else {
+        return null;
       }
-    } catch(e) {
-      return false;
-    }
   };
   
   // const currentUser = () => {

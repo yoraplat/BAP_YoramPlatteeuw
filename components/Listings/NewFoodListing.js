@@ -10,8 +10,13 @@ import { CheckBox } from 'react-native-elements';
 import * as ImagePicker from 'expo-image-picker';
 import { faCalendarAlt, faCamera, faClock } from '@fortawesome/free-solid-svg-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useFirestore } from '../../Services/service.firestore';
+import { useFirestore } from '../../Services';
 import * as Location from 'expo-location';
+
+// Firestore
+import * as firebase from 'firebase';
+import 'firebase/firestore';
+import uuid from 'uuid-random';
 
 export function NewFoodListing() {
 
@@ -20,6 +25,7 @@ export function NewFoodListing() {
     const [date, setDate] = useState(new Date());
     const [title, setTitle] = useState(null);
     const [address, setAddress] = useState(null);
+    // const [address, setAddress] = useState('Voskenslaan 105, 9000 Gent');
     const [description, setDescription] = useState(null);
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
@@ -28,7 +34,11 @@ export function NewFoodListing() {
     const [terms, setTerms] = useState(false);
     const [inProgress, setInProgress] = useState(false);
     const [geocodeResult, setGeocodeResult] = useState(null);
+    const [locationError, setLocationError] = useState(null);
     const { createPost } = useFirestore();
+
+
+    const db = firebase.firestore();
 
     useEffect(() => {
         (async () => {
@@ -109,64 +119,111 @@ export function NewFoodListing() {
         return <SafeAreaView style={styles.container} ><AppLoading /></SafeAreaView>
     }
 
-    const Geocode = async () => {
+    const makePost = async () => {
         setInProgress(true);
-        let error = null;
+        setLocationError(null);
         try {
             let result = await Location.geocodeAsync(address);
             setGeocodeResult(result);
-            setInProgress(false);
-            
-            return geocodeResult
         } catch (e) {
-            error = e.message;
-            return false
+            console.log(e.message)
         }
-    }
 
-    const makePost = async () => {
+        console.log(JSON.stringify(geocodeResult))
 
-        const location = await Geocode();
-
-        if (location != false) {
+        if (geocodeResult != null) {
+            
             const newPost = {
                 type: "food",
                 title: title,
                 description: description,
                 price: price,
-                diet: {
-                    veggie: veggie,
-                    vegan: vegan,
-                },
+                veggie: veggie,
+                vegan: vegan,
                 image: image,
                 pickup: date,
-                address: {
-                    string: address,
-                    latitude: JSON.stringify(location[0].latitude),
-                    longitude: JSON.stringify(location[0].longitude),
-                },
+                address: address,
+                latitude: geocodeResult[0].latitude,
+                longitude: geocodeResult[0].longitude,
                 create_at: new Date(),
+                id: null
             }
-            // alert(JSON.stringify(newPost))
 
             if (newPost.title && newPost.description && newPost.image && newPost.pickup && newPost.address !== null) {
                 if (terms == true) {
+                    console.log("Trying to create post...")
                     try {
-                        createPost(newPost.type, newPost)
+                        await createPost(newPost)
+                        setInProgress(false);
                     } catch (e) {
-                        alert(e)
+                        console.log("Creating post failed")
+                        console.warn(e.message)
+                    } finally {
+                        console.log('Setting progress to false')
+                        setInProgress(false);
                     }
+                    // createPost(newPost.type, newPost)
                 } else {
                     alert('Gelieve de voorwaarden te accepteren.')
+                    setInProgress(false);
                 }
             } else {
                 alert('Gelieve alle velden in te vullen.')
+                setInProgress(false);
             }
         } else {
+            setInProgress(false);
             alert('Gelieve een geldig adres in te geven.')
         }
-
     }
+
+    // const makePost = () => {
+
+    //     Geocode().then((result) => {
+    //         console.log(typeof (result))
+    //         console.log(JSON.stringify(result))
+    //     })
+    // if (location != null) {
+    //     const newPost = {
+    //         type: "food",
+    //         title: title,
+    //         description: description,
+    //         price: price,
+    //         veggie: veggie,
+    //         vegan: vegan,
+    //         // diet: {
+    //         //     veggie: veggie,
+    //         //     vegan: vegan,
+    //         // },
+    //         image: image,
+    //         pickup: date,
+    //         address: address,
+    //         // latitude: JSON.stringify(location.latitude),
+    //         // longitude: JSON.stringify(location.longitude),
+    //         latitude: location[0].latitude,
+    //         longitude: location[0].longitude,
+    //         create_at: new Date(),
+    //     }
+    //     alert(JSON.stringify(newPost))
+
+    //     if (newPost.title && newPost.description && newPost.image && newPost.pickup && newPost.address !== null) {
+    //         if (terms == true) {
+    //             try {
+    //                 console.log(newPost)
+    //                 // createPost(newPost.type, newPost)
+    //             } catch (e) {
+    //                 alert(e)
+    //             }
+    //         } else {
+    //             alert('Gelieve de voorwaarden te accepteren.')
+    //         }
+    //     } else {
+    //         alert('Gelieve alle velden in te vullen.')
+    //     }
+    // } else {
+    //     alert('Gelieve een geldig adres in te geven.')
+    // }
+    // }
 
     return (
         <SafeAreaView style={styles.container} >
@@ -258,7 +315,6 @@ export function NewFoodListing() {
                             style={styles.txtInput}
                             placeholder="Adres"
                             placeholderTextColor={'#C48086'}
-                            // value='Muinkkaai 20, 9000 Gent'
                             onChangeText={val => setAddress(val)}
                         />
                     </View>
@@ -272,7 +328,7 @@ export function NewFoodListing() {
 
                     <TouchableOpacity disabled={inProgress ? true : false} style={styles.submitButton} onPress={() => makePost()}>
                         {inProgress
-                            ? <ActivityIndicator size="large" color="white"/>
+                            ? <ActivityIndicator size="large" color="white" />
                             : <Text style={styles.submitButtonTxt}>Voeding Aanbieden</Text>
                         }
                     </TouchableOpacity>

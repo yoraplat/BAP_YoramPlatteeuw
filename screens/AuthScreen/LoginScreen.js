@@ -38,6 +38,7 @@ export const LoginScreen = () => {
   const storeData = async (data) => {
     try {
       await AsyncStorage.setItem('@NoWaste_User', JSON.stringify(data));
+      console.log(data.uid)
     } catch (error) {
       alert(error)
     }

@@ -32,42 +32,22 @@ export default function ItemsList( {posts} ) {
         return <SafeAreaView style={styles.container} ><AppLoading /></SafeAreaView>
     }
 
-    const convertDate = (date) => {
-        const months = {
-            0: 'januari',
-            1: 'februari',
-            2: 'maart',
-            3: 'april',
-            4: 'mei',
-            5: 'juni',
-            6: 'juli',
-            7: 'augustus',
-            8: 'september',
-            9: 'oktober',
-            10: 'november',
-            11: 'december'
-        }
-        const d = new Date(date * 1000);
-        const day = d.getDay();
-        const month = months[d.getMonth()];
-        const hour = d.getHours();
-        const minutes = d.getMinutes();
-        return `${day} ${month}, ${hour}:${minutes}u`
-    }
-
     return (
         <SafeAreaView style={styles.container} >
             <ScrollView style={styles.list}>
                 {posts && posts.map((post, index) => (
                     <ListItem
+                        postData={post}
                         key={index}
-                        title={post.title}
-                        description={post.description}
-                        pickup={convertDate(post.pickup.seconds)}
-                        address={post.address.string}
-                        amount={post.amount}
-                        price={post.price > 0 ? "€" + post.price : "Gratis"}
-                        hasImage={post.image ? true : false}
+                        // title={post.title}
+                        // description={post.description}
+                        // pickup={convertDate(post.pickup.seconds)}
+                        // address={post.address.string}
+                        // amount={post.amount}
+                        // veggie={post.veggie}
+                        // vegan={post.vegan}
+                        // price={post.price > 0 ? "€" + post.price : "Gratis"}
+                        // hasImage={post.image ? true : false}
                     />
                 ))}
             </ScrollView>

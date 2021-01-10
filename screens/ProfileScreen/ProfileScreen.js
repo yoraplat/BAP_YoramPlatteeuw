@@ -10,8 +10,8 @@ export const ProfileScreen = () => {
 
     const navigation = useNavigation();
 
-    function singOut() {
-        logout();
+    const singOut = async () => {
+        await logout();
         navigation.navigate('Login'); 
     }
     return (

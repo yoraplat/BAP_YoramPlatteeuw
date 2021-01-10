@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { SafeAreaView, Text, StatusBar, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faLeaf, faMap, faSlidersH, faStream } from '@fortawesome/free-solid-svg-icons'
+import { faLeaf, faMap, faSlidersH, faStream, faFilter, faSeedling } from '@fortawesome/free-solid-svg-icons'
 // Components
 import { Map } from "../../components/MapBox/Map";
 import ItemsList from "../../components/MapBox/ItemsList";
@@ -12,6 +12,7 @@ export const HomeScreen = () => {
   const [currentTab, setCurrentTab] = useState(1)
   const { fetchAllPosts } = useFirestore();
   const [allPosts, setAllPosts] = useState();
+  const [qFilter, setQFilter] = useState(2);
 
   useEffect(() => {
     setAllPosts(fetchAllPosts);
@@ -20,7 +21,6 @@ export const HomeScreen = () => {
   const selectTab = (id) => {
     if (currentTab == 2) {
       setCurrentTab(1)
-
     }
     setCurrentTab(id)
   }
@@ -44,6 +44,7 @@ export const HomeScreen = () => {
       }
     }
   }
+
   const getStyleColor = function (id, buttonId) {
     if (id == 1 && buttonId == 1) {
       return {
@@ -65,15 +66,43 @@ export const HomeScreen = () => {
     }
   }
 
+  const quickFilter = () => {
+    if (qFilter == 2) {
+      setQFilter(0)
+    } else {
+      setQFilter(qFilter + 1)
+    }
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       {currentTab == 1
-        ? <Map posts={allPosts}/>
+        ?
+        <>
+          <Map posts={allPosts} selectedQuickFilter={qFilter}/>
+          {/* <MapItemOverlay/> */}
+        </>
         : <ItemsList posts={allPosts} />
       }
       <>
-        <TouchableOpacity style={styles.overlayTopLeft}>
-          <FontAwesomeIcon icon={faLeaf} style={{ color: 'rgba(255, 255, 255, 1)', backgroundColor: '#940203' }} size={25} />
+        <TouchableOpacity style={[styles.overlayTopLeft, qFilter > 0 ? { backgroundColor: '#709B0B'}: null]} onPress={() => quickFilter()}>
+          {
+            qFilter == 0
+              ?
+              <FontAwesomeIcon icon={faFilter} style={{ color: 'rgba(255, 255, 255, 1)' }} size={20} />
+              : null
+          }
+          {
+            qFilter == 1
+              ? <FontAwesomeIcon icon={faLeaf} style={{ color: 'rgba(255, 255, 255, 1)'}} size={25} />
+              : null
+          }
+          {
+            qFilter == 2
+              ? <FontAwesomeIcon icon={faSeedling} style={{ color: 'rgba(255, 255, 255, 1)'}} size={25} />
+              : null
+
+          }
         </TouchableOpacity>
         <TouchableOpacity style={[styles.overlayTopMiddleLeft, getStyle(currentTab, 1)]} onPress={() => selectTab(1)}>
           <FontAwesomeIcon icon={faMap} style={getStyleColor(currentTab, 1)} size={35} />
@@ -89,7 +118,6 @@ export const HomeScreen = () => {
                 <Text style={styles.textBlack}>Bottom Button</Text>
           </TouchableOpacity> */}
       </>
-
     </SafeAreaView>
   );
 };

@@ -27,38 +27,48 @@ function ChatScreen() {
 const Tab = createBottomTabNavigator();
 
 export default function AppScreen() {
-  
+
   const { currentUser } = useAuth();
-  if (currentUser() != null) {
-      return (
-         <Tab.Navigator
-           screenOptions= {({ route }) => ({
-             tabBarIcon: ({ focused, color, size }) => {
-               let iconName;
-               iconName = focused 
-                   ? color='rgba(148, 2, 3, 1)'
-                   : color='rgba(217, 72, 73, 1)'
-               if (route.name === 'Home') {
-                   return <FontAwesomeIcon icon={faMap} size={size} color={color} />;
-                 } else if (route.name === 'NewItem') {
-                   return <FontAwesomeIcon icon={faPlusSquare}  size={size} color={color} />;
-                 } else if (route.name === 'Chat') {
-                   return <FontAwesomeIcon icon={faCommentAlt}  size={size} color={color} />;
-                 } else if (route.name === 'Profile') {
-                   return <FontAwesomeIcon icon={faUser}  size={size} color={color} />;
-                 }
-             }
-           })}
-         >
-           <Tab.Screen name="Home" component={HomeScreen} options={{tabBarLabel: () => { return null}}}  />
-           <Tab.Screen name="NewItem" component={AddScreen} options={{tabBarLabel: () => { return null}}} />
-           <Tab.Screen name="Chat" component={ChatScreen} options={{tabBarLabel: () => { return null}}} />
-           <Tab.Screen name="Profile" component={ProfileScreen} options={{tabBarLabel: () => { return null}}} />
-         </Tab.Navigator>
-     );
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+      (async function getUser() {
+        // console.log(JSON.stringify(await currentUser()))
+        setUser(await currentUser());
+      }) ();
+  }, [currentUser]);
+
+  if (user != null) {
+    return (
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+            iconName = focused
+              ? color = 'rgba(148, 2, 3, 1)'
+              : color = 'rgba(217, 72, 73, 1)'
+            if (route.name === 'Home') {
+              return <FontAwesomeIcon icon={faMap} size={size} color={color} />;
+            } else if (route.name === 'NewItem') {
+              return <FontAwesomeIcon icon={faPlusSquare} size={size} color={color} />;
+            } else if (route.name === 'Chat') {
+              return <FontAwesomeIcon icon={faCommentAlt} size={size} color={color} />;
+            } else if (route.name === 'Profile') {
+              return <FontAwesomeIcon icon={faUser} size={size} color={color} />;
+            }
+          }
+        })}
+      >
+        <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: () => { return null } }} />
+        <Tab.Screen name="NewItem" component={AddScreen} options={{ tabBarLabel: () => { return null } }} />
+        <Tab.Screen name="Chat" component={ChatScreen} options={{ tabBarLabel: () => { return null } }} />
+        <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: () => { return null } }} />
+      </Tab.Navigator>
+    );
   } else {
-      return (
-        <LoginScreen/>
-      )
+    return (
+      <LoginScreen />
+    )
   }
-  }
+}

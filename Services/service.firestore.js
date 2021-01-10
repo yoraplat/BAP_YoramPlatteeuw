@@ -14,23 +14,31 @@ const FirestoreProvider = ({ children }) => {
 
   const db = firebase.firestore();
 
-  const createPost = (type, data) => {
-    db.collection('posts' + '/types/' + type).doc(uuid()).set(data)
+  const createPost = async (data) => {
+    const newId = uuid();
+    data.id = newId;
+    await db.collection('posts').doc(newId).set(data)
+      .then(() => {
+        // setInProgress(false);
+        console.log("Created post")
+      })
   }
 
   const fetchAllPosts = () => {
-    const meals = [];
+    // const meals = [];
     const food = [];
-    db.collection('/posts/types/meal').onSnapshot((snapshot) => {
-      snapshot.forEach((doc) => meals.push({ ...doc.data() }))
+    db.collection('/posts').onSnapshot((snapshot) => {
+      snapshot.forEach((doc) => {
+        food.push({ ...doc.data() })
+      })
+      setAllPosts(food)
     })
 
-    db.collection('/posts/types/food').onSnapshot((snapshot) => {
-      snapshot.forEach((doc) => food.push({ ...doc.data() }))
-      const allItems = meals.concat(food);
-      // console.log(allItems) 
-      setAllPosts(Object.values(allItems))
-    })
+    // db.collection('/posts/types/food').onSnapshot((snapshot) => {
+    //   snapshot.forEach((doc) => food.push({ ...doc.data() }))
+    //   const allItems = meals.concat(food);
+    //   setAllPosts(Object.values(allItems))
+    // })
 
     return allPosts
 
