@@ -6,6 +6,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faComment, faCommentAlt, faMap, faPlusSquare, faUser } from '@fortawesome/free-solid-svg-icons'
+import theme from '../../Theme/theme.style';
 
 // Screens
 import { HomeScreen } from '../HomeScreen/HomeScreen';
@@ -46,8 +47,8 @@ export default function AppScreen() {
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
             iconName = focused
-              ? color = 'rgba(148, 2, 3, 1)'
-              : color = 'rgba(217, 72, 73, 1)'
+              ? color = theme.FOCUS
+              : color = theme.NO_FOCUS
             if (route.name === 'Home') {
               return <FontAwesomeIcon icon={faMap} size={size} color={color} />;
             } else if (route.name === 'NewItem') {

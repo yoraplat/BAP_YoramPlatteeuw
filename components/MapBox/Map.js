@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
-import { StyleSheet, Modal, Text, View, Animated, SafeAreaView, TouchableOpacity, TouchableHighlight, Dimensions } from 'react-native';
+import { StyleSheet, Modal, Image, Text, View, Animated, SafeAreaView, TouchableOpacity, TouchableHighlight, Dimensions } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faMapMarker, faShoppingBasket, faTimesCircle, faSeedling, faLeaf } from '@fortawesome/free-solid-svg-icons';
 import overlayStyles from './overlayStyles'
 import { MapItemOverlay } from './MapItemOverlay';
 import moment from 'moment';
+import { useFirestore } from '../../Services';
+import theme from '../../Theme/theme.style';
 
-export function Map({ posts, selectedQuickFilter, updateFilter }) {
+export function Map({ posts, selectedQuickFilter }) {
 
   const generatedMapStyle = [
     {
@@ -63,12 +65,15 @@ export function Map({ posts, selectedQuickFilter, updateFilter }) {
       ]
     }
   ]
+  const [imageUrl, setImageUrl] = useState(null);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [data, setData] = useState(null);
   const [modalData, setModalData] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
   const [quickFilter, setQuickFilter] = useState(selectedQuickFilter);
+
+  const { buyItem, checkAvailable, createPickupCode, imageDownloadUrl } = useFirestore();
 
   const fadeAnim = useRef(new Animated.Value(0.01)).current;
 
@@ -78,8 +83,17 @@ export function Map({ posts, selectedQuickFilter, updateFilter }) {
   }, [posts]);
 
 
-  const getDetails = (index) => {
+  const getDetails = async (index) => {
     setSelectedPost(index + 1)
+
+    // console.log("Index: " + index)
+
+    if (data[index].image != false) {
+      let id = data[index].id
+      const response = await imageDownloadUrl(id)
+      setImageUrl(response)
+    }
+
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 500,
@@ -87,28 +101,6 @@ export function Map({ posts, selectedQuickFilter, updateFilter }) {
     }).start();
   }
 
-  // const convertDate = (date) => {
-  //   const months = {
-  //     0: 'januari',
-  //     1: 'februari',
-  //     2: 'maart',
-  //     3: 'april',
-  //     4: 'mei',
-  //     5: 'juni',
-  //     6: 'juli',
-  //     7: 'augustus',
-  //     8: 'september',
-  //     9: 'oktober',
-  //     10: 'november',
-  //     11: 'december'
-  //   }
-  //   const d = new Date(date * 1000);
-  //   const day = d.getDay();
-  //   const month = months[d.getMonth()];
-  //   const hour = d.getHours();
-  //   const minutes = d.getMinutes();
-  //   return `${day} ${month}, ${hour}:${minutes}u`
-  // }
 
   const closeOverlay = () => {
     setSelectedPost(null)
@@ -116,16 +108,43 @@ export function Map({ posts, selectedQuickFilter, updateFilter }) {
 
   const openModal = () => {
     setModalData(data[selectedPost - 1]);
+
+    // console.log("Selected post: " + (selectedPost - 1))
+
     closeOverlay();
     setModalVisible(true)
-    // console.log("Filter: " + quickFilter)
   }
 
+  const confirmPurchase = async (listingId) => {
+    try {
+      // Check if still available
+      console.log("Checking if available")
+      const available = await checkAvailable(listingId)
+
+      if (available != false) {
+        // Create a pickup code
+        await createPickupCode(listingId)
+        console.log("Created pickup code")
+        
+        // Buy the item
+        await buyItem(listingId)
+        console.log("Bought item")
+        
+        // console.log("Creating code and buying item")
+        setModalVisible(!modalVisible)
+      }
+      
+      
+    } catch (e) {
+      console.log(e.message)
+      setModalVisible(!modalVisible)
+      // alert("Item is niet meer beschikbaar.")
+    }
+  }
 
   const loadCoordinates = () => {
     const coordinatesList = [];
-    posts.forEach(post => {
-
+    posts.forEach((post) => {
       const postObject = {
         title: post.title,
         description: post.description,
@@ -135,11 +154,13 @@ export function Map({ posts, selectedQuickFilter, updateFilter }) {
         pickup: post.pickup,
         veggie: post.veggie,
         vegan: post.vegan,
-        latitude: parseFloat(post.latitude),
-        longitude: parseFloat(post.longitude),
+        latitude: parseFloat(post.coordinates.latitude),
+        longitude: parseFloat(post.coordinates.longitude),
         address: post.address,
-        id: post.id
+        id: post.id,
+        image: post.image
       };
+
 
 
       // Check if qfilter is veggie
@@ -151,6 +172,7 @@ export function Map({ posts, selectedQuickFilter, updateFilter }) {
         coordinatesList.push(postObject)
       }
     });
+
     setData(coordinatesList)
 
   }
@@ -177,7 +199,7 @@ export function Map({ posts, selectedQuickFilter, updateFilter }) {
             }}
             onPress={() => getDetails(index)}
           >
-            <FontAwesomeIcon icon={faMapMarker} style={{ color: "#6C0102" }} />
+            <FontAwesomeIcon icon={faMapMarker} style={{ color: theme.MAP_MARKER }} />
           </Marker>
         ))}
       </MapView>
@@ -197,7 +219,6 @@ export function Map({ posts, selectedQuickFilter, updateFilter }) {
             animationType="slide"
             transparent={true}
             visible={modalVisible}
-            transparent={true}
           >
             <View style={overlayStyles.centeredView}>
               <View style={overlayStyles.modalView}>
@@ -214,31 +235,32 @@ export function Map({ posts, selectedQuickFilter, updateFilter }) {
                   }
 
                   <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
-                    <FontAwesomeIcon icon={faTimesCircle} style={{ color: 'rgba(148, 2, 3, 1)' }} size={30} />
+                    <FontAwesomeIcon icon={faTimesCircle} style={{ color: theme.PRIMARY_COLOR }} size={30} />
                   </TouchableOpacity>
                 </View>
                 <Text style={overlayStyles.description}>{modalData.description}</Text>
                 <View style={overlayStyles.info}>
                   <View style={overlayStyles.infoBuyList}>
                     <Text style={overlayStyles.infoBuyItem}>Prijs: {modalData.price}</Text>
-                    {/* {
-                      modalData.price == 'Gratis' && modalData.amount > 1
-                      ? <Text style={overlayStyles.infoBuyItem}>Totale prijs: {modalData.price}</Text>
-                      : <Text style={overlayStyles.infoBuyItem}>Totale prijs: {modalData.price * modalData.amount}</Text>
-                    } */}
                     <Text style={overlayStyles.infoBuyItem}>Aantal: {modalData.amount}</Text>
                     <Text style={overlayStyles.infoBuyItem}>Afhalen: {moment((modalData.pickup).toDate()).format('DD/MM/YYYY' + ', ' + 'hh:mm')}u</Text>
-                    {/* <Text style={overlayStyles.infoItem}>1,3 km</Text> */}
                     <Text style={overlayStyles.infoBuyItem}>Adres: {modalData.address}</Text>
+                    {modalData.image != null
+                      ? <Image
+                        style={[overlayStyles.contentImage, overlayStyles.infoBuyItemImage]}
+                        resizeMode={"contain"}
+                        source={{
+                          uri: modalData.image ? imageUrl : null
+                        }}
+                      />
+                      : null
+                    }
                   </View>
-                  <TouchableOpacity style={overlayStyles.button}>
-                    <FontAwesomeIcon icon={faShoppingBasket} style={{ color: 'white' }} size={30} />
-                  </TouchableOpacity>
                 </View>
                 <TouchableHighlight
                   style={overlayStyles.submitButton}
                   onPress={() => {
-                    setModalVisible(!modalVisible);
+                    confirmPurchase(modalData.id);
                   }}>
                   <Text style={overlayStyles.submitButtonTxt}>Voeding Redden</Text>
                 </TouchableHighlight>
@@ -255,7 +277,7 @@ export function Map({ posts, selectedQuickFilter, updateFilter }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.NEUTRAL_BACKGROUND,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -6,6 +6,7 @@ import AppLoading from 'expo-app-loading'; import { TextInput } from "react-nati
 import { Button } from 'react-native-elements';
 import * as firebase from 'firebase';
 import { useNavigation } from '@react-navigation/native';
+import theme from '../../Theme/theme.style';
 
 // Firebase
 // import 'firebase/firestore';
@@ -32,8 +33,14 @@ export const RegisterScreen = () => {
       .then((user) => {
         firebase.firestore().collection('users').doc(user.user.uid).set({
           username: username.username,
+          email: email.email,
+          account_number: null,
           created_listings: null,
-          bought_listings: null
+          bought_listings: null,
+          settings: {
+            only_veggie: false,
+            only_vegan: false,
+          }
         })
         navigation.navigate('Login')
       })
@@ -95,7 +102,7 @@ export const RegisterScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ACC8FF",
+    backgroundColor: theme.SECONDARY_COLOR,
     alignItems: 'center',
   },
   logoContainer: {
@@ -123,8 +130,8 @@ const styles = StyleSheet.create({
     width: 300,
     padding: 10,
     borderWidth: 1,
-    backgroundColor: '#D94849',
-    borderColor: '#D94849',
+    backgroundColor: theme.TERTIARY_COLOR,
+    borderColor: theme.TERTIARY_COLOR,
     marginBottom: 15,
     fontFamily: 'Poppins_400Regular'
   },
@@ -133,7 +140,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     padding: 10,
     textAlign: 'center',
-    backgroundColor: 'rgba(148, 2, 3, 1)',
+    backgroundColor: theme.PRIMARY_COLOR,
     fontFamily: 'Poppins_700Bold'
   },
   loginOptions: {
@@ -144,7 +151,7 @@ const styles = StyleSheet.create({
   },
   optionTxt: {
     fontFamily: 'Poppins_400Regular',
-    color: 'rgba(148, 2, 3, 1)',
+    color: theme.PRIMARY_COLOR,
     borderColor: '#D94849',
     borderWidth: 0,
     fontSize: 15

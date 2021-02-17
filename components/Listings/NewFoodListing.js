@@ -12,33 +12,35 @@ import { faCalendarAlt, faCamera, faClock } from '@fortawesome/free-solid-svg-ic
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useFirestore } from '../../Services';
 import * as Location from 'expo-location';
+import theme from '../../Theme/theme.style';
 
 // Firestore
 import * as firebase from 'firebase';
 import 'firebase/firestore';
-import uuid from 'uuid-random';
 
 export function NewFoodListing() {
 
-    const [price, setPrice] = useState(0);
-    const [image, setImage] = useState(null);
-    const [date, setDate] = useState(new Date());
-    const [title, setTitle] = useState(null);
-    const [address, setAddress] = useState(null);
-    // const [address, setAddress] = useState('Voskenslaan 105, 9000 Gent');
-    const [description, setDescription] = useState(null);
+    const [post, setPost] = useState({
+        price: 0,
+        image: false,
+        pickup: new Date(),
+        title: null,
+        address: null,
+        description: null,
+        veggie: false,
+        vegan: false,
+        terms: false,
+        bought_at: false,
+        coordinates: false,
+        type: 'food'
+    });
+
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
-    const [veggie, setVeggie] = useState(false);
-    const [vegan, setVegan] = useState(false);
-    const [terms, setTerms] = useState(false);
+
     const [inProgress, setInProgress] = useState(false);
-    const [geocodeResult, setGeocodeResult] = useState(null);
-    const [locationError, setLocationError] = useState(null);
+
     const { createPost } = useFirestore();
-
-
-    const db = firebase.firestore();
 
     useEffect(() => {
         (async () => {
@@ -46,41 +48,39 @@ export function NewFoodListing() {
                 let { mediaPermission } = await ImagePicker.requestMediaLibraryPermissionsAsync();
                 let { locationPermission } = await Location.requestPermissionsAsync();
                 if (mediaPermission || locationPermission !== 'granted') {
-                    //   alert('Om deze app te kunnen gebruiken ');
+                    //   alert('Om deze app te kunnen gebruiken hebben we toegang nodig tot je locatie en foto\'s');
                 }
             }
         })();
     }, []);
 
     const changeTerms = () => {
-        if (terms == false) {
-            setTerms(true)
+        if (post.terms == false) {
+            setPost({ ...post, terms: true })
         } else {
-            setTerms(false)
+            setPost({ ...post, terms: false })
         }
     }
     const changeVeggie = () => {
-        if (veggie == false) {
-            setVeggie(true)
+        if (post.veggie == false) {
+            setPost({ ...post, veggie: true })
         } else {
-            setVeggie(false)
-            setVegan(false)
+            setPost({ ...post, veggie: false, vegan: false })
         }
     }
 
     const changeVegan = () => {
-        if (vegan == false) {
-            setVegan(true)
-            setVeggie(true)
+        if (post.vegan == false) {
+            setPost({ ...post, veggie: true, vegan: true })
         } else {
-            setVegan(false)
+            setPost({ ...post, vegan: false })
         }
     }
 
     const onChange = (event, selectedDate) => {
-        const currentDate = selectedDate || date;
+        const currentDate = selectedDate || post.pickup;
         setShow(Platform.OS === 'ios');
-        setDate(currentDate);
+        setPost({ ...post, pickup: currentDate })
     };
     const showMode = (currentMode) => {
         setShow(true);
@@ -94,18 +94,18 @@ export function NewFoodListing() {
     const showTimepicker = () => {
         showMode('time');
     };
+
     const pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
+        // let result = await ImagePicker.launchImageLibraryAsync({
+        let result = await ImagePicker.launchCameraAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
             aspect: [4, 3],
             quality: 1,
         });
 
-        console.log(result);
-
         if (!result.cancelled) {
-            setImage(result.uri);
+            setPost({ ...post, image: result.uri })
         }
     };
 
@@ -121,110 +121,59 @@ export function NewFoodListing() {
 
     const makePost = async () => {
         setInProgress(true);
-        setLocationError(null);
         try {
-            let result = await Location.geocodeAsync(address);
-            setGeocodeResult(result);
+            await Location.geocodeAsync(post.address).then((result) => {
+                // Quick fix for testing purposes, geocode doesn't always work on virtual device
+                const response = result
+                // const response = {
+                //     "accuracy": 0,
+                //     "altitude": 0,
+                //     "altitudeAccuracy": 0,
+                //     "heading": 0,
+                //     "latitude": 51.0547962,
+                //     "longitude": 3.7077666,
+                //     "speed": 0,
+                // }
+
+
+                if (Object.keys(response).length > 0) {
+                    // Validate all fields
+                    let validation = [];
+                    for (let key in post) {
+                        if (post[key] === null || post[key] === "") {
+                            validation.push(false)
+                        } else {
+                            validation.push(true)
+                        }
+                    }
+
+
+                    // When validated create the post
+                    const isValid = arr => arr.every(Boolean)
+                    if (isValid(validation)) {
+                        console.log("All fields are filled in, creating post")
+
+                        // let data = post
+                        // let dataToPost = { ...data, coordinates: response }
+                        // console.log(dataToPost)
+
+                        let dataToPost = post
+
+                        // Takes too long if coordinates are added
+                        createPost(dataToPost).then(() => {
+                            setInProgress(false);
+                        })
+                    }
+
+                } else {
+                    alert("Dit adres kon niet gevonden worden.")
+                    setInProgress(false);
+                }
+            })
         } catch (e) {
             console.log(e.message)
         }
-
-        console.log(JSON.stringify(geocodeResult))
-
-        if (geocodeResult != null) {
-            
-            const newPost = {
-                type: "food",
-                title: title,
-                description: description,
-                price: price,
-                veggie: veggie,
-                vegan: vegan,
-                image: image,
-                pickup: date,
-                address: address,
-                latitude: geocodeResult[0].latitude,
-                longitude: geocodeResult[0].longitude,
-                create_at: new Date(),
-                id: null
-            }
-
-            if (newPost.title && newPost.description && newPost.image && newPost.pickup && newPost.address !== null) {
-                if (terms == true) {
-                    console.log("Trying to create post...")
-                    try {
-                        await createPost(newPost)
-                        setInProgress(false);
-                    } catch (e) {
-                        console.log("Creating post failed")
-                        console.warn(e.message)
-                    } finally {
-                        console.log('Setting progress to false')
-                        setInProgress(false);
-                    }
-                    // createPost(newPost.type, newPost)
-                } else {
-                    alert('Gelieve de voorwaarden te accepteren.')
-                    setInProgress(false);
-                }
-            } else {
-                alert('Gelieve alle velden in te vullen.')
-                setInProgress(false);
-            }
-        } else {
-            setInProgress(false);
-            alert('Gelieve een geldig adres in te geven.')
-        }
     }
-
-    // const makePost = () => {
-
-    //     Geocode().then((result) => {
-    //         console.log(typeof (result))
-    //         console.log(JSON.stringify(result))
-    //     })
-    // if (location != null) {
-    //     const newPost = {
-    //         type: "food",
-    //         title: title,
-    //         description: description,
-    //         price: price,
-    //         veggie: veggie,
-    //         vegan: vegan,
-    //         // diet: {
-    //         //     veggie: veggie,
-    //         //     vegan: vegan,
-    //         // },
-    //         image: image,
-    //         pickup: date,
-    //         address: address,
-    //         // latitude: JSON.stringify(location.latitude),
-    //         // longitude: JSON.stringify(location.longitude),
-    //         latitude: location[0].latitude,
-    //         longitude: location[0].longitude,
-    //         create_at: new Date(),
-    //     }
-    //     alert(JSON.stringify(newPost))
-
-    //     if (newPost.title && newPost.description && newPost.image && newPost.pickup && newPost.address !== null) {
-    //         if (terms == true) {
-    //             try {
-    //                 console.log(newPost)
-    //                 // createPost(newPost.type, newPost)
-    //             } catch (e) {
-    //                 alert(e)
-    //             }
-    //         } else {
-    //             alert('Gelieve de voorwaarden te accepteren.')
-    //         }
-    //     } else {
-    //         alert('Gelieve alle velden in te vullen.')
-    //     }
-    // } else {
-    //     alert('Gelieve een geldig adres in te geven.')
-    // }
-    // }
-
     return (
         <SafeAreaView style={styles.container} >
             <ScrollView contentContainerStyle={styles.list}>
@@ -234,72 +183,74 @@ export function NewFoodListing() {
                         <TextInput
                             style={styles.txtInput}
                             placeholder="Titel"
-                            placeholderTextColor={'#C48086'}
-                            onChangeText={val => setTitle(val)}
+                            placeholderTextColor={theme.TEXT_PLACEHOLDER}
+                            // onChangeText={val => setTitle(val)}
+                            onChangeText={val => setPost({ ...post, title: val })}
                         />
 
                         <TextInput
                             style={styles.txtInput}
                             placeholder="Korte Beschrijving"
-                            placeholderTextColor={'#C48086'}
-                            onChangeText={val => setDescription(val)}
+                            placeholderTextColor={theme.TEXT_PLACEHOLDER}
+                            // onChangeText={val => setDescription(val)}
+                            onChangeText={val => setPost({ ...post, description: val })}
                         />
                     </View>
                     <View style={styles.formItem}>
                         <Text style={styles.title}>Prijs</Text>
-                        {price == 0
+                        {post.price == 0
                             ? <Text style={styles.subtitle}>Gratis</Text>
-                            : <Text style={styles.subtitle}>€{price}</Text>
+                            : <Text style={styles.subtitle}>€{post.price}</Text>
                         }
                         <Slider
                             style={styles.slider}
                             step={0.5}
-                            onValueChange={val => setPrice(val)}
+                            onValueChange={val => setPost({ ...post, price: val })}
                             minimumValue={0}
                             maximumValue={10}
-                            thumbTintColor="#940203"
-                            minimumTrackTintColor="#940203"
-                            maximumTrackTintColor="#D94849"
+                            thumbTintColor={theme.PRIMARY_COLOR}
+                            minimumTrackTintColor={theme.PRIMARY_COLOR}
+                            maximumTrackTintColor={theme.TERTIARY_COLOR}
                         />
                     </View>
                     <View style={styles.formItem}>
                         <Text style={styles.title}>Voedingswijze</Text>
                         <CheckBox
                             title='Vegetarisch'
-                            checked={veggie}
+                            checked={post.veggie}
                             onPress={() => changeVeggie()}
                         />
                         <CheckBox
                             title='Veganistisch'
-                            checked={vegan}
+                            checked={post.vegan}
                             onPress={() => changeVegan()}
                         />
                     </View>
                     <View style={styles.formItem}>
                         <Text style={styles.title}>Foto</Text>
                         <TouchableOpacity style={styles.bigButton} onPress={pickImage}>
-                            {image != null
+                            {post.image != false
                                 ? <Text style={styles.bigButtonText}>Afbeelding Toegevoegd</Text>
                                 : <Text style={styles.bigButtonText}>Foto Toevoegen</Text>
                             }
-                            <FontAwesomeIcon icon={faCamera} size={25} style={{ color: '#C48086' }} />
+                            <FontAwesomeIcon icon={faCamera} size={25} style={{ color: theme.TEXT_PLACEHOLDER }} />
                         </TouchableOpacity>
                     </View>
                     <View style={styles.formItem}>
                         <Text style={styles.title}>Afhaal moment</Text>
                         <TouchableOpacity style={styles.bigButton} onPress={showDatepicker}>
-                            <Text style={styles.bigButtonText}>{date.getDate() + '/' + date.getMonth() + '/' + date.getFullYear()}</Text>
-                            <FontAwesomeIcon icon={faCalendarAlt} size={25} style={{ color: '#C48086' }} />
+                            <Text style={styles.bigButtonText}>{post.pickup.getDate() + '/' + post.pickup.getMonth() + '/' + post.pickup.getFullYear()}</Text>
+                            <FontAwesomeIcon icon={faCalendarAlt} size={25} style={{ color: theme.TEXT_PLACEHOLDER }} />
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.bigButton} onPress={showTimepicker}>
-                            <Text style={styles.bigButtonText}>{date.getHours() + ':' + date.getMinutes()}</Text>
-                            <FontAwesomeIcon icon={faClock} size={25} style={{ color: '#C48086' }} />
+                            <Text style={styles.bigButtonText}>{post.pickup.getHours() + ':' + post.pickup.getMinutes()}</Text>
+                            <FontAwesomeIcon icon={faClock} size={25} style={{ color: theme.TEXT_PLACEHOLDER }} />
                         </TouchableOpacity>
                         <View>
                             {show && (
                                 <DateTimePicker
                                     testID="dateTimePicker"
-                                    value={date}
+                                    value={post.pickup}
                                     mode={mode}
                                     is24Hour={true}
                                     display="default"
@@ -314,14 +265,15 @@ export function NewFoodListing() {
                         <TextInput
                             style={styles.txtInput}
                             placeholder="Adres"
-                            placeholderTextColor={'#C48086'}
-                            onChangeText={val => setAddress(val)}
+                            placeholderTextColor={theme.TEXT_PLACEHOLDER}
+                            // onChangeText={val => setAddress(val)}
+                            onChangeText={val => setPost({ ...post, address: val })}
                         />
                     </View>
                     <View style={styles.formItem}>
                         <CheckBox
                             title='De aangeboden voeding voldoet aan de voorwaarden'
-                            checked={terms}
+                            checked={post.terms}
                             onPress={() => changeTerms()}
                         />
                     </View>

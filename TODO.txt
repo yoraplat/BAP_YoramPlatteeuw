@@ -1,16 +1,25 @@
 New post:   Check if address has specified a city
             set max character for title and description
+            unable to set pickup date
 
-HomeScreen: Fix space between tabselectors
-            itemsList: calculate distance to post address
+HomeScreen: Fix space between tabselectors [DONE]
+            itemsList: calculate distance to post address [MAYBE]
             listen for updates in items, update map
-            Dateconvert() herzien
-            Blur background when buy modal is open
+
+            check if item is still available before finishing 
+            Set bought_at for post and add post id to users bought_posts
+
+            Prevent users to buy their own listings
 
 Logout button:  After logout redirect to login page
 
-check if item is still available before finishing 
 
 load items within region
 
-add id to fetched post to get post into buy screen [DONE]
+ProfileScreen:  createdItems do not load on when created tab is opened
+
+REMODEL create page for meals, take care of amount in profile screens 
+
+Code only works for single food items, meals with amounts need do not work yet
+
+validate all forms input

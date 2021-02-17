@@ -1,14 +1,30 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, SafeAreaView, Dimensions, StatusBar, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, SafeAreaView, StatusBar } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faShoppingBasket } from '@fortawesome/free-solid-svg-icons';
-import { faImage } from '@fortawesome/free-regular-svg-icons';
+import { faLeaf, faSeedling } from '@fortawesome/free-solid-svg-icons';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
-import { ListItem } from './ListItem';
-import theme from '../../Theme/theme.style';
+import ProfileItemsList from '../List/ProfileItemsList'
+import { useFirestore } from '../../../Services';
+import theme from '../../../Theme/theme.style';
 
-export default function ItemsList( {posts} ) {
+export default function OfferedTab() {
+
+    const [createdItems, setCreatedItems] = useState(null)
+
+    const { fetchCreatedItems } = useFirestore();
+    useEffect(() => {
+        const fetchData = () => {
+            fetchCreatedItems().then((response) => {
+                setCreatedItems(response);
+            })
+        }
+
+        if (createdItems == null || createdItems.length < 1) {
+            fetchData();
+        }
+
+    }, [createdItems]);
 
     let [fontsLoaded] = useFonts({
         Poppins_300Light,
@@ -22,16 +38,7 @@ export default function ItemsList( {posts} ) {
     }
 
     return (
-        <SafeAreaView style={styles.container} >
-            <ScrollView style={styles.list}>
-                {posts && posts.map((post, index) => (
-                    <ListItem
-                        postData={post}
-                        key={index}
-                    />
-                ))}
-            </ScrollView>
-        </SafeAreaView>
+        <ProfileItemsList posts={createdItems} />
     );
 }
 

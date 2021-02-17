@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, Text, StatusBar, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
+import { SafeAreaView, Text, View, StatusBar, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faLeaf, faMap, faSlidersH, faStream, faFilter, faSeedling } from '@fortawesome/free-solid-svg-icons'
 // Components
 import { Map } from "../../components/MapBox/Map";
 import ItemsList from "../../components/MapBox/ItemsList";
 import { useFirestore } from '../../Services';
+import theme from '../../Theme/theme.style';
 
 export const HomeScreen = () => {
 
   const [currentTab, setCurrentTab] = useState(1)
   const { fetchAllPosts } = useFirestore();
   const [allPosts, setAllPosts] = useState();
-  const [qFilter, setQFilter] = useState(2);
+  const [qFilter, setQFilter] = useState(0);
 
   useEffect(() => {
     setAllPosts(fetchAllPosts);
@@ -28,19 +29,19 @@ export const HomeScreen = () => {
   const getStyle = function (id, buttonId) {
     if (id == 1 && buttonId == 1) {
       return {
-        backgroundColor: 'rgba(148, 2, 3, 1)',
+        backgroundColor: theme.PRIMARY_COLOR,
       }
     } if (id == 1 && buttonId == 2) {
       return {
-        backgroundColor: 'rgba(255, 255, 255, 1)',
+        backgroundColor: theme.WHITE,
       }
     } if (id == 2 && buttonId == 1) {
       return {
-        backgroundColor: 'rgba(255, 255, 255, 1)',
+        backgroundColor: theme.WHITE,
       }
     } if (id == 2 && buttonId == 2) {
       return {
-        backgroundColor: 'rgba(148, 2, 3, 1)',
+        backgroundColor: theme.PRIMARY_COLOR,
       }
     }
   }
@@ -48,20 +49,20 @@ export const HomeScreen = () => {
   const getStyleColor = function (id, buttonId) {
     if (id == 1 && buttonId == 1) {
       return {
-        color: 'rgba(255, 255, 255, 1)'
+        color: theme.WHITE
       }
     } if (id == 1 && buttonId == 2) {
       return {
-        color: 'rgba(148, 2, 3, 1)',
+        color: theme.PRIMARY_COLOR,
       }
     } else {
     } if (id == 2 && buttonId == 1) {
       return {
-        color: 'rgba(148, 2, 3, 1)',
+        color: theme.PRIMARY_COLOR,
       }
     } if (id == 2 && buttonId == 2) {
       return {
-        color: 'rgba(255, 255, 255, 1)',
+        color: theme.WHITE,
       }
     }
   }
@@ -79,44 +80,46 @@ export const HomeScreen = () => {
       {currentTab == 1
         ?
         <>
-          <Map posts={allPosts} selectedQuickFilter={qFilter}/>
-          {/* <MapItemOverlay/> */}
+          <Map posts={allPosts} selectedQuickFilter={qFilter} />
         </>
         : <ItemsList posts={allPosts} />
       }
+
       <>
-        <TouchableOpacity style={[styles.overlayTopLeft, qFilter > 0 ? { backgroundColor: '#709B0B'}: null]} onPress={() => quickFilter()}>
-          {
-            qFilter == 0
-              ?
-              <FontAwesomeIcon icon={faFilter} style={{ color: 'rgba(255, 255, 255, 1)' }} size={20} />
-              : null
-          }
-          {
-            qFilter == 1
-              ? <FontAwesomeIcon icon={faLeaf} style={{ color: 'rgba(255, 255, 255, 1)'}} size={25} />
-              : null
-          }
-          {
-            qFilter == 2
-              ? <FontAwesomeIcon icon={faSeedling} style={{ color: 'rgba(255, 255, 255, 1)'}} size={25} />
-              : null
+        <View style={styles.tabsContainer}>
+          <TouchableOpacity style={[styles.overlayTopLeft, qFilter > 0 ? { backgroundColor: '#709B0B' } : null]} onPress={() => quickFilter()}>
+            {
+              qFilter == 0
+                ?
+                <FontAwesomeIcon icon={faFilter} style={{ color: theme.WHITE }} size={20} />
+                : null
+            }
+            {
+              qFilter == 1
+                ? <FontAwesomeIcon icon={faLeaf} style={{ color: theme.WHITE }} size={25} />
+                : null
+            }
+            {
+              qFilter == 2
+                ? <FontAwesomeIcon icon={faSeedling} style={{ color: theme.WHITE }} size={25} />
+                : null
 
-          }
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.overlayTopMiddleLeft, getStyle(currentTab, 1)]} onPress={() => selectTab(1)}>
-          <FontAwesomeIcon icon={faMap} style={getStyleColor(currentTab, 1)} size={35} />
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.overlayTopMiddleRight, getStyle(currentTab, 2)]} onPress={() => selectTab(2)}>
-          <FontAwesomeIcon icon={faStream} style={getStyleColor(currentTab, 2)} size={35} />
-        </TouchableOpacity>
+            }
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.overlayTopRight}>
-          <FontAwesomeIcon icon={faSlidersH} style={{ color: 'rgba(148, 2, 3, 1)' }} size={35} />
-        </TouchableOpacity>
-        {/* <TouchableOpacity style={styles.overlayBottom}>
-                <Text style={styles.textBlack}>Bottom Button</Text>
-          </TouchableOpacity> */}
+          <View style={styles.tabsCenter}>
+            <TouchableOpacity style={[styles.overlayTopMiddleLeft, getStyle(currentTab, 1)]} onPress={() => selectTab(1)}>
+              <FontAwesomeIcon icon={faMap} style={getStyleColor(currentTab, 1)} size={35} />
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.overlayTopMiddleRight, getStyle(currentTab, 2)]} onPress={() => selectTab(2)}>
+              <FontAwesomeIcon icon={faStream} style={getStyleColor(currentTab, 2)} size={35} />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity style={styles.overlayTopRight}>
+            <FontAwesomeIcon icon={faSlidersH} style={{ color: theme.PRIMARY_COLOR }} size={35} />
+          </TouchableOpacity>
+        </View>
       </>
     </SafeAreaView>
   );
@@ -126,60 +129,64 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  overlayTopLeft: {
+  tabsContainer: {
+    flexDirection: "row",
+    // flexWrap: 'nowrap',
     position: 'absolute',
-    marginTop: StatusBar.currentHeight,
+    width: '100%',
+    justifyContent: "space-between",
+    alignItems: "center",
+    top: StatusBar.currentHeight,
+  },
+  tabsCenter: {
+    width: '50%',
+    flexWrap: "nowrap",
+    flexDirection: "row",
+    justifyContent: "center"
+  },
+  overlayTopMiddleRight: {
+    top: 25,
+    padding: 15,
+    borderTopRightRadius: 15,
+    borderBottomRightRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  overlayTopMiddleLeft: {
+    top: 25,
+    padding: 15,
+    borderTopLeftRadius: 15,
+    borderBottomLeftRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  overlayTopLeft: {
     top: 30,
-    left: '5%',
+    left: '10%',
     padding: 20,
     width: 50,
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 100,
-    backgroundColor: 'rgba(148, 2, 3, 1)',
+    backgroundColor: theme.PRIMARY_COLOR,
   },
   overlayTopRight: {
-    position: 'absolute',
-    marginTop: StatusBar.currentHeight,
     top: 30,
-    right: '5%',
+    right: '10%',
     padding: 10,
     justifyContent: 'center',
-    // backgroundColor: 'rgba(255, 255, 255, 1)',
   },
 
-  overlayTopMiddleRight: {
-    position: 'absolute',
-    marginTop: StatusBar.currentHeight,
-    top: 25,
-    right: '31.5%',
-    padding: 15,
-    borderTopRightRadius: 15,
-    borderBottomRightRadius: 15,
-    justifyContent: 'center',
-    // backgroundColor: 'rgba(255, 255, 255, 1)',
-  },
-  overlayTopMiddleLeft: {
-    position: 'absolute',
-    marginTop: StatusBar.currentHeight,
-    top: 25,
-    left: '31.5%',
-    padding: 15,
-    borderTopLeftRadius: 15,
-    borderBottomLeftRadius: 15,
-    justifyContent: 'center',
-    // backgroundColor: 'rgba(148, 2, 3, 1)',
-  },
   overlayBottom: {
     position: 'absolute',
     bottom: StatusBar.currentHeight,
-    backgroundColor: 'rgba(255, 255, 255, 1)',
+    backgroundColor: theme.WHITE,
   },
   textWhite: {
-    color: 'rgba(255,255,255,1)'
+    color: theme.WHITE
   },
   textBlack: {
-    color: 'rgba(0,0,0,1)'
-  }
+    color: theme.BLACK
+  },
 });

@@ -1,5 +1,5 @@
 import { StyleSheet, StatusBar } from 'react-native';
-import theme from '../../Theme/theme.style';
+import theme from '../../../Theme/theme.style';
 
 const styles = StyleSheet.create({
   container: {
@@ -73,6 +73,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 20,
     fontFamily: "Poppins_400Regular",
+  },
+  starList: {
+    flex: 1,
+    flexDirection: 'row'
+  },
+  starListItem: {
+    fontSize: 100
   },
 });
 

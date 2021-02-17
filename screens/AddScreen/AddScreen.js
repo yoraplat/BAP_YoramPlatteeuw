@@ -3,10 +3,11 @@ import { SafeAreaView, Text, StatusBar, View, StyleSheet, TouchableOpacity, Dime
 import * as firebase from 'firebase';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 // import { useNavigation } from '@react-navigation/native';
-import { NewFoodListing } from '../../components/Listings/NewFoodListing'
+import { NewFoodListing } from '../../components/Listings/NewFoodListing';
 import { NewMealListing } from "../../components/Listings/NewMealListing";
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
+import theme from '../../Theme/theme.style';
 
 export const AddScreen = () => {
 
@@ -93,7 +94,7 @@ export const AddScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ACC8FF',
+    backgroundColor: theme.SECONDARY_COLOR,
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
