@@ -39,13 +39,18 @@ const AuthProvider = ({ children }) => {
     })
   }
 
+  const user_id = () => {
+    const uid = firebase.auth().currentUser.uid
+    return uid
+  }
+
   const logout = () => {
     AsyncStorage.removeItem('@NoWaste_User');
     firebase.auth().signOut();
   }
 
   return (
-    <AuthContext.Provider value={{ currentUser, logout, fetchUser, updateUser }}>
+    <AuthContext.Provider value={{ user_id, currentUser, logout, fetchUser, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

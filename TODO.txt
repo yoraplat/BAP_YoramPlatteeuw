@@ -1,25 +1,23 @@
 New post:   Check if address has specified a city
             set max character for title and description
-            unable to set pickup date
 
 HomeScreen: Fix space between tabselectors [DONE]
             itemsList: calculate distance to post address [MAYBE]
-            listen for updates in items, update map
-
-            check if item is still available before finishing 
-            Set bought_at for post and add post id to users bought_posts
-
+            Images not loading when filtered, or have wrong index
+            add ordering
             Prevent users to buy their own listings
+            Filter according to user preferences
+
+ChatScreen: Chat messages don't load without selecting a Chat
+            Delete chat when item is picked up
 
 Logout button:  After logout redirect to login page
 
 
 load items within region
 
-ProfileScreen:  createdItems do not load on when created tab is opened
-
-REMODEL create page for meals, take care of amount in profile screens 
-
-Code only works for single food items, meals with amounts need do not work yet
-
 validate all forms input
+
+Add payment method
+Users need to have an account number in order to post payed items
+Prevent all data fetches to return invalid data when there are no results 

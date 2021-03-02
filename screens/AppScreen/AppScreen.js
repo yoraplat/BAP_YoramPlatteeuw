@@ -12,18 +12,10 @@ import theme from '../../Theme/theme.style';
 import { HomeScreen } from '../HomeScreen/HomeScreen';
 import { LoginScreen } from '../AuthScreen/LoginScreen';
 import { ProfileScreen } from '../ProfileScreen/ProfileScreen';
+import { ChatScreen } from '../ChatScreen/ChatScreen';
 import { AddScreen } from '../AddScreen/AddScreen';
 import { useAuth } from '../../Services';
 
-
-
-function ChatScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Chat!</Text>
-    </View>
-  );
-}
 
 const Tab = createBottomTabNavigator();
 
@@ -31,17 +23,17 @@ export default function AppScreen() {
 
   const { currentUser } = useAuth();
 
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(currentUser());
 
   useEffect(() => {
-      (async function getUser() {
-        // console.log(JSON.stringify(await currentUser()))
-        setUser(await currentUser());
-      }) ();
+    (async function getUser() {
+      // console.log(await currentUser())
+      setUser(await currentUser());
+    })();
   }, [currentUser]);
 
-  if (user != null) {
-    return (
+  return (
+    user ?
       <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused, color, size }) => {
@@ -66,10 +58,7 @@ export default function AppScreen() {
         <Tab.Screen name="Chat" component={ChatScreen} options={{ tabBarLabel: () => { return null } }} />
         <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: () => { return null } }} />
       </Tab.Navigator>
-    );
-  } else {
-    return (
+      :
       <LoginScreen />
-    )
-  }
+  );
 }

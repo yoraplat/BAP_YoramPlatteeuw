@@ -21,42 +21,48 @@ export function ProfileListItem({ postData, indexKey, type }) {
     useEffect(() => {
 
         // Fetch pickup codes
-        const fetch = async () => {
-            const data = await fetchCodes(postData.id)
-            setCodeList(data)
-        }
-        // fetch()
-        if (codeList == null || codeList.length < 1) {
-            fetch();
+        if (type == 'bought') {
+            const fetch = async () => {
+                const data = await fetchCodes(postData.id)
+                setCodeList(data)
+            }
+            // fetch()
+            if (codeList == null || codeList.length < 1) {
+                fetch();
+            }
         }
     }, [codeList]);
 
-    const data = {
-        title: postData.title,
-        description: postData.description,
-        pickup: postData.pickup,
-        bought_at: postData.bought_at,
-        address: postData.address,
-        amount: postData.amount,
-        veggie: postData.veggie,
-        vegan: postData.vegan,
-        price: postData.price > 0 ? "€" + postData.price : "Gratis",
-        hasImage: postData.image ? true : false,
-        id: postData.id,
-        type: postData.type == "food" ? "Voeding" : "Maaltijd"
-    }
+
+    // const data = {
+    //     title: postData.title,
+    //     description: postData.description,
+    //     pickup: postData.pickup,
+    //     bought_at: postData.bought_at,
+    //     address: postData.address,
+    //     amount: postData.amount,
+    //     veggie: postData.veggie,
+    //     vegan: postData.vegan,
+    //     price: postData.price > 0 ? "€" + postData.price : "Gratis",
+    //     hasImage: postData.image ? true : false,
+    //     id: postData.id,
+    //     type: postData.type == "food" ? "Voeding" : "Maaltijd"
+    // }
 
     const confirmPickup = async () => {
         try {
             setCheckingCode(true)
 
             await checkCode(code).then((response) => {
-                setCheckResult(response)
-                setCheckingCode(false)
 
-                if (response != false && response.is_used != true) {
+                if (response != false && response.is_used != true && response.listing_id == postData.id) {
+                    setCheckResult(response)
                     updateCodeState(code, true)
+                } else {
+                    setCheckResult(false)
+                    console.log("Code is not valid for this post")
                 }
+                setCheckingCode(false)
             })
         } catch (e) {
             console.log(e.message)
@@ -78,31 +84,28 @@ export function ProfileListItem({ postData, indexKey, type }) {
 
     return (
         <View style={styles.listItem}>
+            { postData != null ?
+            <>
             <View style={styles.topLine}>
-                <Text style={styles.title}>{data.title} <Text style={{ fontFamily: "Poppins_300Light", fontSize: 17 }}>({data.price})</Text></Text>
-                {data.veggie == true && data.vegan == false
+                <Text style={styles.title}>{postData.title} <Text style={{ fontFamily: "Poppins_300Light", fontSize: 17 }}>({postData.price})</Text></Text>
+                {postData.veggie == true && postData.vegan == false
                     ? <FontAwesomeIcon icon={faLeaf} style={{ color: 'green', left: 10 }} size={30} />
                     : <></>
                 }
-                {data.vegan == true
+                {postData.vegan == true
                     ? <FontAwesomeIcon icon={faSeedling} style={{ color: 'green', left: 10 }} size={30} />
                     : <></>
                 }
             </View>
 
-            <Text style={styles.description}>{data.description}</Text>
+            <Text style={styles.description}>{postData.description}</Text>
             <View style={styles.info}>
                 <View style={styles.infoList}>
-                    <Text style={styles.infoItem}>{moment((data.pickup).toDate()).format('DD/MM/YYYY' + ', ' + 'hh:mm')}</Text>
-                    <Text style={styles.infoItem}>{data.address}</Text>
-                    <Text style={styles.infoItem}>Type: {data.type}</Text>
-                    {/* {
-                        data.amount
-                            ? <Text style={styles.infoItem}>Nog af te halen: {data.amount}</Text>
-                            : null
-                    } */}
-                    {data.amount > 1
-                        ? <Text style={[styles.infoItem, { fontFamily: 'Poppins_300Light' }]}>Aantal: {data.amount}</Text>
+                    <Text style={styles.infoItem}>{moment((postData.pickup).toDate()).format('DD/MM/YYYY' + ', ' + 'hh:mm')}</Text>
+                    <Text style={styles.infoItem}>{postData.address}</Text>
+                    <Text style={styles.infoItem}>Type: {postData.type}</Text>
+                    {postData.amount > 1
+                        ? <Text style={[styles.infoItem, { fontFamily: 'Poppins_300Light' }]}>Aantal: {postData.amount}</Text>
                         : null
                     }
                     <View style={styles.infoItemCode}>
@@ -134,43 +137,16 @@ export function ProfileListItem({ postData, indexKey, type }) {
                             </View>
                         }
                     </View>
-                    {/* <View style={styles.infoItemCode}>
-                        {
-                            data.bought_at
-                                ? <Text style={styles.infoCode}>
-                                    {codeList == null ?
-                                        <ActivityIndicator size="small" color={theme.PRIMARY_COLOR} />
-                                        : codeList.map((item) => <Text> {item.pickup_code} </Text>)}
-                                </Text>
-                                :
-                                <View style={styles.validateContainer}>
-                                    <TextInput
-                                        style={styles.infoInput}
-                                        placeholder="CODE"
-                                        onChangeText={val => setCode(val)}
-                                    />
-                                    <TouchableOpacity style={styles.validateBtn} onPress={() => confirmPickup()}>
-                                        {checkingCode
-                                            ? <Text style={styles.validateBtnTxt}><ActivityIndicator size="small" color="white" /></Text>
-                                            : checkResult == null
-                                                ? <Text style={styles.validateBtnTxt}>Valideren</Text>
-                                                : checkResult.is_used == true
-                                                    ? <Text style={styles.validateBtnTxt}>Al gebruikt</Text>
-                                                    : checkResult == false
-                                                        ? <FontAwesomeIcon icon={faTimes} style={styles.checkIcon} />
-                                                        : <FontAwesomeIcon icon={faCheck} style={styles.checkIcon} />
-                                        }
-                                    </TouchableOpacity>
-                                </View>
-                        }
-                    </View> */}
                     {
-                        data.bought_at
+                        postData.bought_at
                             ? <Text style={[styles.infoItem, styles.regularFont]}>Toon deze code bij het afhalen van je aankoop</Text>
                             : <Text style={[styles.infoItem, styles.regularFont]}>Vraag de code aan de persoon die je aanbieding komt ophalen, vul deze code hier in</Text>
                     }
                 </View>
             </View>
+            </>
+            : <ActivityIndicator size="large" color={theme.PRIMARY_COLOR} />
+        }
         </View>
     );
 }
@@ -260,7 +236,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
     },
     validateBtn: {
-        backgroundColor: theme.PRIMARY_COLOR,
+        backgroundColor: theme.BUTTON_BACKGROUND,
         alignItems: 'center',
         padding: 5
     },

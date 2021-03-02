@@ -88,11 +88,11 @@ export function Map({ posts, selectedQuickFilter }) {
 
     // console.log("Index: " + index)
 
-    if (data[index].image != false) {
+    // if (data[index].image != false) {
       let id = data[index].id
       const response = await imageDownloadUrl(id)
       setImageUrl(response)
-    }
+    // }
 
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -125,16 +125,16 @@ export function Map({ posts, selectedQuickFilter }) {
         // Create a pickup code
         await createPickupCode(listingId)
         console.log("Created pickup code")
-        
+
         // Buy the item
         await buyItem(listingId)
         console.log("Bought item")
-        
+
         // console.log("Creating code and buying item")
         setModalVisible(!modalVisible)
       }
-      
-      
+
+
     } catch (e) {
       console.log(e.message)
       setModalVisible(!modalVisible)
@@ -161,24 +161,67 @@ export function Map({ posts, selectedQuickFilter }) {
         image: post.image
       };
 
+      // Filtering for veggie/vegan meals/food
+      // Veggie == vegan, vegan != veggie
+      if (quickFilter[0] == true && post.veggie == true) {
 
+        // meals
+        if (quickFilter[0] == true && post.veggie == true && quickFilter[2] == true && post.type == 'meal') {
+          coordinatesList.push(postObject)
+        }
+        // food
+        if (quickFilter[0] == true && post.veggie == true && quickFilter[3] == true && post.type == 'food') {
+          coordinatesList.push(postObject)
+        }
 
-      // Check if qfilter is veggie
-      if (quickFilter == 1 && post.veggie == true) {
-        coordinatesList.push(postObject)
-      } if (quickFilter == 2 && post.vegan == true) {
-        coordinatesList.push(postObject)
-      } if (quickFilter == 0) {
+        // All veggie/vegan
+        if (quickFilter[0] == true && quickFilter[2] == false && quickFilter[3] == false && post.veggie == true) {
+          coordinatesList.push(postObject)
+        }
+      }
+
+      // Filtering for vegan meals/food
+      if (quickFilter[1] == true && post.vegan == true) {
+
+        // meals
+        if (quickFilter[2] == true && post.type == 'meal') {
+          coordinatesList.push(postObject)
+        }
+        // food
+        if (quickFilter[3] == true && post.type == 'food') {
+          coordinatesList.push(postObject)
+        }
+
+        // All veggie/vegan
+        if (quickFilter[2] == false && quickFilter[3] == false) {
+          coordinatesList.push(postObject)
+        }
+      }
+
+      // only meals
+      if (quickFilter[0] == false && quickFilter[1] == false && quickFilter[2] == true && quickFilter[3] == false) {
+        if (post.type == 'meal') {
+          coordinatesList.push(postObject)
+        }
+      }
+
+      // only food
+      if (quickFilter[0] == false && quickFilter[1] == false && quickFilter[2] == false && quickFilter[3] == true) {
+        if (post.type == 'food') {
+          coordinatesList.push(postObject)
+        }
+      }
+
+      // No filters selected
+      if (quickFilter[0] == false && quickFilter[1] == false && quickFilter[2] == false && quickFilter[3] == false) {
         coordinatesList.push(postObject)
       }
     });
-
     setData(coordinatesList)
-
   }
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.container}>
       <MapView
         initialRegion={{
           latitude: 51.042479510131116,
@@ -277,17 +320,20 @@ export function Map({ posts, selectedQuickFilter }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.NEUTRAL_BACKGROUND,
-    alignItems: 'center',
-    justifyContent: 'center',
+    // backgroundColor: theme.NEUTRAL_BACKGROUND,
+    // alignItems: 'center',
+    // justifyContent: 'center',
   },
   map: {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
+    top: '-30%',
+    zIndex: 50,
   },
   overlayContainer: {
     flex: 1,
     bottom: 60,
+    zIndex: 51,
     position: 'absolute',
     width: '100%',
     alignItems: 'center'

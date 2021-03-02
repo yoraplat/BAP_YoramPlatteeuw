@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ActivityIndicator, View, Text, SafeAreaView, Dimensions, StatusBar, TouchableOpacity, ScrollView } from 'react-native';
+import { ActivityIndicator, View, Text, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
@@ -7,20 +7,18 @@ import styles from "./styles";
 import { TextInput } from 'react-native-gesture-handler';
 import Slider from '@react-native-community/slider';
 import { CheckBox } from 'react-native-elements';
-import { faCalendarAlt, faClock } from '@fortawesome/free-solid-svg-icons';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { useFirestore } from '../../Services/service.firestore';
-import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
-import Geocoder from 'react-native-geocoding';
+import { faCalendarAlt, faCamera, faClock } from '@fortawesome/free-solid-svg-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useFirestore } from '../../Services';
+import * as Location from 'expo-location';
 import theme from '../../Theme/theme.style';
 
-export function NewMealListing() {
+export function NewListing() {
 
     const [post, setPost] = useState({
         price: 0,
         image: false,
-        amount: 1,
         pickup: new Date(),
         title: null,
         address: null,
@@ -30,9 +28,11 @@ export function NewMealListing() {
         terms: false,
         bought_at: false,
         coordinates: false,
-        type: "meal"
+        type: 'food'
     });
 
+    const [selectedAmount, setSelectedAmount] = useState(1);
+    const [isMeal, setIsMeal] = useState(false);
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
 
@@ -40,14 +40,13 @@ export function NewMealListing() {
 
     const { createPost } = useFirestore();
 
-
     useEffect(() => {
         (async () => {
             if (Platform.OS !== 'web') {
                 let { mediaPermission } = await ImagePicker.requestMediaLibraryPermissionsAsync();
                 let { locationPermission } = await Location.requestPermissionsAsync();
                 if (mediaPermission || locationPermission !== 'granted') {
-                    //   alert('Om deze app te kunnen gebruiken ');
+                    //   alert('Om deze app te kunnen gebruiken hebben we toegang nodig tot je locatie en foto\'s');
                 }
             }
         })();
@@ -77,11 +76,10 @@ export function NewMealListing() {
     }
 
     const onChange = (event, selectedDate) => {
-        const currentDate = selectedDate || post.date;
+        const currentDate = selectedDate || post.pickup;
         setShow(Platform.OS === 'ios');
-        setPost({ ...post, date: currentDate })
+        setPost({ ...post, pickup: currentDate })
     };
-
     const showMode = (currentMode) => {
         setShow(true);
         setMode(currentMode);
@@ -95,6 +93,20 @@ export function NewMealListing() {
         showMode('time');
     };
 
+    const pickImage = async () => {
+        // let result = await ImagePicker.launchImageLibraryAsync({
+        let result = await ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.All,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.cancelled) {
+            setPost({ ...post, image: result.uri })
+        }
+    };
+
     let [fontsLoaded] = useFonts({
         Poppins_300Light,
         Poppins_400Regular,
@@ -105,66 +117,73 @@ export function NewMealListing() {
         return <SafeAreaView style={styles.container} ><AppLoading /></SafeAreaView>
     }
 
-    const makePost = async () => {
-        setInProgress(true);
-        try {
-            await Location.geocodeAsync(post.address).then((result) => {
-                // Quick fix for testing purposes, geocode doesn't always work on virtual device
-                const response = result
-                // const response = {
-                //     "accuracy": 0,
-                //     "altitude": 0,
-                //     "altitudeAccuracy": 0,
-                //     "heading": 0,
-                //     "latitude": 51.0323236,
-                //     "longitude": 3.7077646,
-                //     "speed": 0,
-                // }
-
-                if (Object.keys(response).length > 0) {
-
-                    // Validate all fields
-                    let validation = [];
-                    for (let key in post) {
-                        if (post[key] === null || post[key] === "") {
-                            validation.push(false)
-                        } else {
-                            validation.push(true)
-                        }
-                    }
-
-                    // When validated create the post
-                    const isValid = arr => arr.every(Boolean)
-                    if (isValid(validation)) {
-                        console.log("All fields are filled in, creating post")
-
-                        // updating object makes createPost very slow
-
-                        let data = post
-                        let dataToPost = { ...data, coordinates: response[0] }
-                        // console.log(dataToPost)
-
-                        // let dataToPost = post
-
-                        // Takes too long if coordinates are added
-                        // createPost(dataToPost).then(() => {
-                        //     setInProgress(false);
-                        // })
-                        createPost(dataToPost)
-                        setInProgress(false);
-                    }
-                    setInProgress(false);
-
-                } else {
-                    alert("Dit adres kon niet gevonden worden.")
-                    setInProgress(false);
-                }
-            })
-        } catch (e) {
-            console.log(e.message)
+    const setMeal = () => {
+        if (isMeal) {
+            setIsMeal(false)
+            setPost({ ...post, type: 'food' })
+        } else {
+            setIsMeal(true)
+            setPost({ ...post, type: 'meal' })
         }
     }
 
+    const makePost = async () => {
+        setInProgress(true);
+        await Location.geocodeAsync(post.address).then((result) => {
+            // Quick fix for testing purposes, geocode doesn't always work on virtual device
+            console.log(result)
+            const response = result
+
+            // const response = {
+            //     "accuracy": 0,
+            //     "altitude": 0,
+            //     "altitudeAccuracy": 0,
+            //     "heading": 0,
+            //     "latitude": 51.0547962,
+            //     "longitude": 3.7077666,
+            //     "speed": 0,
+            // }
+
+
+            if (Object.keys(response).length > 0) {
+                // Validate all fields
+                let validation = [];
+                for (let key in post) {
+                    if (post[key] === null || post[key] === "") {
+                        validation.push(false)
+                    } else {
+                        validation.push(true)
+                    }
+                }
+
+                // When validated create the post
+                const isValid = arr => arr.every(Boolean)
+                if (isValid(validation)) {
+                    console.log("All fields are filled in, creating post")
+
+                    let data = post
+                    let dataToPost;
+                    if (post.type == 'meal') {
+                        dataToPost = { ...data, coordinates: response[0], amount: selectedAmount }
+                    } else {
+                        dataToPost = { ...data, coordinates: response[0]}
+                    }
+
+                    // Takes too long if coordinates are added
+                    // console.log(dataToPost)
+                    createPost(dataToPost).then(() => {
+                        setInProgress(false);
+                    })
+                    // setInProgress(false);
+                }
+                setInProgress(false);
+
+            } else {
+                alert("Dit adres kon niet gevonden worden.")
+                setInProgress(false);
+            }
+        })
+    }
     return (
         <SafeAreaView style={styles.container} >
             <ScrollView contentContainerStyle={styles.list}>
@@ -175,13 +194,23 @@ export function NewMealListing() {
                             style={styles.txtInput}
                             placeholder="Titel"
                             placeholderTextColor={theme.TEXT_PLACEHOLDER}
+                            // onChangeText={val => setTitle(val)}
                             onChangeText={val => setPost({ ...post, title: val })}
                         />
+
                         <TextInput
                             style={styles.txtInput}
                             placeholder="Korte Beschrijving"
                             placeholderTextColor={theme.TEXT_PLACEHOLDER}
+                            // onChangeText={val => setDescription(val)}
                             onChangeText={val => setPost({ ...post, description: val })}
+                        />
+                    </View>
+                    <View style={styles.formItem}>
+                        <CheckBox
+                            title='Dit is een maaltijd'
+                            checked={isMeal}
+                            onPress={() => setMeal()}
                         />
                     </View>
                     <View style={styles.formItem}>
@@ -201,19 +230,34 @@ export function NewMealListing() {
                             maximumTrackTintColor={theme.TERTIARY_COLOR}
                         />
                     </View>
+                    {isMeal
+                        ?
+                        <View style={styles.formItem}>
+                            <Text style={styles.title}>Aantal Maaltijden</Text>
+                            <Text style={styles.subtitle}>{selectedAmount}x</Text>
+                            <Slider
+                                style={styles.slider}
+                                step={1}
+                                onValueChange={val => setSelectedAmount(val)}
+                                minimumValue={1}
+                                maximumValue={10}
+                                thumbTintColor={theme.PRIMARY_COLOR}
+                                minimumTrackTintColor={theme.PRIMARY_COLOR}
+                                maximumTrackTintColor={theme.TERTIARY_COLOR}
+                            />
+                        </View>
+                        :
+                        null
+                    }
                     <View style={styles.formItem}>
-                        <Text style={styles.title}>Aantal Maaltijden</Text>
-                        <Text style={styles.subtitle}>{post.amount}x</Text>
-                        <Slider
-                            style={styles.slider}
-                            step={1}
-                            onValueChange={val => setPost({ ...post, amount: val })}
-                            minimumValue={1}
-                            maximumValue={10}
-                            thumbTintColor={theme.PRIMARY_COLOR}
-                            minimumTrackTintColor={theme.PRIMARY_COLOR}
-                            maximumTrackTintColor={theme.TERTIARY_COLOR}
-                        />
+                        <Text style={styles.title}>Foto</Text>
+                        <TouchableOpacity style={styles.bigButton} onPress={pickImage}>
+                            {post.image != false
+                                ? <Text style={styles.bigButtonText}>Afbeelding Toegevoegd</Text>
+                                : <Text style={styles.bigButtonText}>Foto Toevoegen</Text>
+                            }
+                            <FontAwesomeIcon icon={faCamera} size={25} style={{ color: theme.TEXT_PLACEHOLDER }} />
+                        </TouchableOpacity>
                     </View>
                     <View style={styles.formItem}>
                         <Text style={styles.title}>Voedingswijze</Text>
@@ -228,6 +272,7 @@ export function NewMealListing() {
                             onPress={() => changeVegan()}
                         />
                     </View>
+
                     <View style={styles.formItem}>
                         <Text style={styles.title}>Afhaal moment</Text>
                         <TouchableOpacity style={styles.bigButton} onPress={showDatepicker}>
@@ -258,11 +303,10 @@ export function NewMealListing() {
                             style={styles.txtInput}
                             placeholder="Adres"
                             placeholderTextColor={theme.TEXT_PLACEHOLDER}
-                            // value='Muinkkaai 20, 9000 Gent'
+                            // onChangeText={val => setAddress(val)}
                             onChangeText={val => setPost({ ...post, address: val })}
                         />
                     </View>
-
                     <View style={styles.formItem}>
                         <CheckBox
                             title='De aangeboden voeding voldoet aan de voorwaarden'
@@ -274,9 +318,12 @@ export function NewMealListing() {
                     <TouchableOpacity disabled={inProgress ? true : false} style={styles.submitButton} onPress={() => makePost()}>
                         {inProgress
                             ? <ActivityIndicator size="large" color="white" />
-                            : <Text style={styles.submitButtonTxt}>Maaltijd Aanbieden</Text>
+                            : <Text style={styles.submitButtonTxt}>Voeding Aanbieden</Text>
                         }
                     </TouchableOpacity>
+
+
+
                 </View>
             </ScrollView>
         </SafeAreaView>

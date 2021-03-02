@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, SafeAreaView, StatusBar } from 'react-native';
+import { StyleSheet, SafeAreaView, StatusBar, Text } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faLeaf, faSeedling } from '@fortawesome/free-solid-svg-icons';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
@@ -17,6 +17,7 @@ export default function OfferedTab() {
         const fetchData = () => {
             fetchCreatedItems().then((response) => {
                 setCreatedItems(response);
+                console.log(response)
             })
         }
 
@@ -38,7 +39,7 @@ export default function OfferedTab() {
     }
 
     return (
-        <ProfileItemsList posts={createdItems} />
+        <ProfileItemsList posts={createdItems} type='offered' />
     );
 }
 

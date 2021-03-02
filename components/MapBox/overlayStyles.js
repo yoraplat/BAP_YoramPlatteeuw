@@ -3,7 +3,7 @@ import theme from '../../Theme/theme.style';
 
 const overlayStyles = StyleSheet.create({
   mapOverlay: {
-    backgroundColor: theme.NEUTRAL_BACKGROUND,
+    backgroundColor: theme.WHITE,
     // height: 150,
     borderRadius: 25,
     padding: 15,
@@ -74,7 +74,7 @@ const overlayStyles = StyleSheet.create({
     width: '30%'
   },
   basketBtn: {
-    backgroundColor: theme.PRIMARY_COLOR,
+    backgroundColor: theme.BUTTON_BACKGROUND,
     width: 50,
     height: 50,
     justifyContent: 'center',

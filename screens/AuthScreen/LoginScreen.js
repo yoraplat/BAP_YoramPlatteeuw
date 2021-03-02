@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { SafeAreaView, Text, StatusBar, Image, StyleSheet, View } from "react-native";
 import * as firebase from 'firebase';
-import logo from '../../assets/NoWaste_logo_big_logo_text.png';
+import logo from '../../assets/NoWasteV2_logo_big_logo_text.png';
 import { TextInput } from "react-native-gesture-handler";
 import { Button } from 'react-native-elements';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
@@ -67,7 +67,7 @@ export const LoginScreen = () => {
             value={email.email}
             onChangeText={email => setEmail({ email })}
             placeholder={'Email'}
-            placeholderTextColor={'white'}
+            placeholderTextColor={theme.TEXT_PLACEHOLDER}
           />
           <TextInput
             style={styles.input}
@@ -75,7 +75,7 @@ export const LoginScreen = () => {
             onChangeText={password => setPassword({ password })}
             placeholder={'Wachtwoord'}
             secureTextEntry={true}
-            placeholderTextColor={'white'}
+            placeholderTextColor={theme.TEXT_PLACEHOLDER}
           />
           <Button
             title={'Inloggen'}
@@ -145,8 +145,8 @@ const styles = StyleSheet.create({
     width: 300,
     padding: 10,
     borderWidth: 1,
-    backgroundColor: theme.TERTIARY_COLOR,
-    borderColor: theme.TERTIARY_COLOR,
+    backgroundColor: theme.NEUTRAL_BACKGROUND,
+    borderColor: theme.NEUTRAL_BACKGROUND,
     marginBottom: 15,
     fontFamily: 'Poppins_400Regular'
   },
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   optionTxt: {
     fontFamily: 'Poppins_400Regular',
     color: theme.PRIMARY_COLOR,
-    borderColor: theme.TERTIARY_COLOR,
+    // borderColor: theme.TERTIARY_COLOR,
     borderWidth: 0,
     fontSize: 15
   }

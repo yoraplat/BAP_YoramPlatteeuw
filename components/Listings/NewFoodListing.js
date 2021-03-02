@@ -121,10 +121,11 @@ export function NewFoodListing() {
 
     const makePost = async () => {
         setInProgress(true);
-        try {
             await Location.geocodeAsync(post.address).then((result) => {
                 // Quick fix for testing purposes, geocode doesn't always work on virtual device
+                console.log(result)
                 const response = result
+
                 // const response = {
                 //     "accuracy": 0,
                 //     "altitude": 0,
@@ -153,26 +154,24 @@ export function NewFoodListing() {
                     if (isValid(validation)) {
                         console.log("All fields are filled in, creating post")
 
-                        // let data = post
-                        // let dataToPost = { ...data, coordinates: response }
+                        let data = post
+                        let dataToPost = { ...data, coordinates: response[0] }
                         // console.log(dataToPost)
 
-                        let dataToPost = post
+                        // let dataToPost = post
 
                         // Takes too long if coordinates are added
                         createPost(dataToPost).then(() => {
                             setInProgress(false);
                         })
                     }
+                    setInProgress(false);
 
                 } else {
                     alert("Dit adres kon niet gevonden worden.")
                     setInProgress(false);
                 }
             })
-        } catch (e) {
-            console.log(e.message)
-        }
     }
     return (
         <SafeAreaView style={styles.container} >

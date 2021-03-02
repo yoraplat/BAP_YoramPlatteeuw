@@ -1,25 +1,31 @@
 export default {
     // PRIMARY COLORS
-    PRIMARY_COLOR: '#940203',
-    SECONDARY_COLOR: '#ACC8FF',
-    TERTIARY_COLOR: '#D94849',
+    PRIMARY_COLOR: "#52906E",
+    SECONDARY_COLOR: '#F8FDFF',
+    TERTIARY_COLOR: '#3c7556',
     // -----------------------------------
     // TEXT
-    BUTTON_TXT_COLOR: '#fff',
-    TXT_INPUT_BACKGROUND: '#EFF4FF',
-    TEXT_PLACEHOLDER: '#C48086',
+    TXT_INPUT_BACKGROUND: 'white',
+    TEXT_PLACEHOLDER: '#67BB8C',
     // -----------------------------------
     // BUTTONS
-    FOCUS: '#940203',
-    NO_FOCUS: '#D94849',
+    BUTTON_TXT_COLOR: '#fff',
+    BUTTON_BACKGROUND: '#005C9C',
+    // -----------------------------------
+    // BUTTONS
+    FOCUS: '#32906C',
+    NO_FOCUS: '#B8DDCD',
     // -----------------------------------
     // BASIC COLORS
     WHITE: '#fff',
     BLACK: '#000000',
     GREY: '#707070',
+    RED: '#f94848',
     // -----------------------------------
     // EXTRA'S
-    TRANSPARENT_POPUP: 'rgba(255,255,255,0.5)',
-    MAP_MARKER: '#6C0102',
-    NEUTRAL_BACKGROUND: '#ffffff',
+    // TRANSPARENT_POPUP: 'rgba(255,255,255,0.5)',
+    TRANSPARENT_POPUP: 'rgba(82, 144, 110, 0.3)',
+    MAP_MARKER: '#32906C',
+    NEUTRAL_BACKGROUND: '#e3f2e8',
+    TAB_BACKGROUND: '#DFF4EB',
   };

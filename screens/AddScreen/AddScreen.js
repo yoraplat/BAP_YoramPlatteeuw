@@ -5,21 +5,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 // import { useNavigation } from '@react-navigation/native';
 import { NewFoodListing } from '../../components/Listings/NewFoodListing';
 import { NewMealListing } from "../../components/Listings/NewMealListing";
+import { NewListing } from "../../components/Listings/NewListing";
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
 import theme from '../../Theme/theme.style';
 
 export const AddScreen = () => {
-
-  const [currentTab, setCurrentTab] = useState(1)
-
-  const selectTab = (id) => {
-    if (currentTab == 2) {
-      setCurrentTab(1)
-
-    }
-    setCurrentTab(id)
-  }
 
   let [fontsLoaded] = useFonts({
     Poppins_300Light,
@@ -31,62 +22,17 @@ export const AddScreen = () => {
     return <SafeAreaView style={styles.container} ><AppLoading /></SafeAreaView>
   }
 
-  const getStyle = function (id, buttonId) {
-    if (id == 1 && buttonId == 1) {
-      return {
-        backgroundColor: 'rgba(148, 2, 3, 1)',
-      }
-    } if (id == 1 && buttonId == 2) {
-      return {
-        backgroundColor: 'rgba(255, 255, 255, 1)',
-      }
-    } if (id == 2 && buttonId == 1) {
-      return {
-        backgroundColor: 'rgba(255, 255, 255, 1)',
-      }
-    } if (id == 2 && buttonId == 2) {
-      return {
-        backgroundColor: 'rgba(148, 2, 3, 1)',
-      }
-    }
-  }
-  const getStyleColor = function (id, buttonId) {
-    if (id == 1 && buttonId == 1) {
-      return {
-        color: 'rgba(255, 255, 255, 1)'
-      }
-    } if (id == 1 && buttonId == 2) {
-      return {
-        color: 'rgba(148, 2, 3, 1)',
-      }
-    } else {
-    } if (id == 2 && buttonId == 1) {
-      return {
-        color: 'rgba(148, 2, 3, 1)',
-      }
-    } if (id == 2 && buttonId == 2) {
-      return {
-        color: 'rgba(255, 255, 255, 1)',
-      }
-    }
-  }
-
   return (
     <SafeAreaView style={styles.container}>
-      {currentTab == 1
-        ? <NewFoodListing />
-        : <NewMealListing />
-      }
+      <NewListing/>
       <>
         <View style={styles.tabsContainer}>
-          <TouchableOpacity style={[styles.overlayTopMiddleLeft, getStyle(currentTab, 1)]} onPress={() => selectTab(1)}>
-            <Text style={[getStyleColor(currentTab, 1),styles.tabTxt]}>Voeding</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.overlayTopMiddleRight, getStyle(currentTab, 2)]} onPress={() => selectTab(2)}>
-            <Text style={[getStyleColor(currentTab, 2), styles.tabTxt]}>Maaltijd</Text>
+          <TouchableOpacity style={styles.title}>
+            <Text style={styles.tabTxt}>Nieuw item toevoegen</Text>
           </TouchableOpacity>
         </View>
       </>
+
     </SafeAreaView>
   );
 };
@@ -105,25 +51,26 @@ const styles = StyleSheet.create({
     width: '90%',
     justifyContent: "space-between"
   },
-  overlayTopMiddleRight: {
+  title: {
     marginTop: StatusBar.currentHeight,
     top: 25,
-    width: '48%',
+    width: '100%',
     padding: 15,
-    borderTopRightRadius: 15,
-    borderBottomRightRadius: 15,
+    borderRadius: 15,
+    backgroundColor: theme.PRIMARY_COLOR
     
   },
-  overlayTopMiddleLeft: {
-    marginTop: StatusBar.currentHeight,
-    top: 25,
-    width: '48%',
-    padding: 15,
-    borderTopLeftRadius: 15,
-    borderBottomLeftRadius: 15,
-  },
+  // overlayTopMiddleLeft: {
+  //   marginTop: StatusBar.currentHeight,
+  //   top: 25,
+  //   width: '48%',
+  //   padding: 15,
+  //   borderTopLeftRadius: 15,
+  //   borderBottomLeftRadius: 15,
+  // },
   tabTxt: {
     textAlign: 'center',
     fontFamily: "Poppins_700Bold",
+    color: theme.WHITE
   }
 });

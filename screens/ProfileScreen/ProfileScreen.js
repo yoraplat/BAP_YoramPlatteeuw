@@ -29,15 +29,15 @@ export const ProfileScreen = () => {
             }
         } if (id == 1 && buttonId == 2) {
             return {
-                backgroundColor: theme.WHITE,
+                backgroundColor: theme.TAB_BACKGROUND,
             }
         } if (id == 1 && buttonId == 3) {
             return {
-                backgroundColor: theme.WHITE,
+                backgroundColor: theme.TAB_BACKGROUND,
             }
         } if (id == 2 && buttonId == 1) {
             return {
-                backgroundColor: theme.WHITE,
+                backgroundColor: theme.TAB_BACKGROUND,
             }
         } if (id == 2 && buttonId == 2) {
             return {
@@ -45,15 +45,15 @@ export const ProfileScreen = () => {
             }
         } if (id == 2 && buttonId == 3) {
             return {
-                backgroundColor: theme.WHITE,
+                backgroundColor: theme.TAB_BACKGROUND,
             }
         } if (id == 3 && buttonId == 1) {
             return {
-                backgroundColor: theme.WHITE,
+                backgroundColor: theme.TAB_BACKGROUND,
             }
         } if (id == 3 && buttonId == 2) {
             return {
-                backgroundColor: theme.WHITE,
+                backgroundColor: theme.TAB_BACKGROUND,
             }
         } if (id == 3 && buttonId == 3) {
             return {
@@ -105,8 +105,7 @@ export const ProfileScreen = () => {
 
 
     const singOut = async () => {
-        // await logout();
-        // navigation.navigate('Login');
+        logout();
         alert("Logging out")
     }
     return (

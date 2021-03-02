@@ -146,12 +146,12 @@ export default function ProfileTab({ callLogoutFunction }) {
                         }
                         {/* <Text style={styles.submitButtonTxt}>Opslaan</Text> */}
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.submitButton}>
+                    <TouchableOpacity style={styles.submitButton} onPress={() => logout()}>
                         <Text style={styles.submitButtonTxt}>Uitloggen</Text>
                     </TouchableOpacity>
                 </View>
 
-                <View style={styles.form}>
+                {/* <View style={styles.form}>
                     <Text style={styles.title}>Gemiddelde feedback</Text>
                     <View style={styles.starList}>
                         <FontAwesomeIcon style={styles.starListItem} icon={faStar} color={theme.PRIMARY_COLOR} />
@@ -160,11 +160,7 @@ export default function ProfileTab({ callLogoutFunction }) {
                         <FontAwesomeIcon style={styles.starListItem} icon={faStar} color={theme.PRIMARY_COLOR} />
                         <FontAwesomeIcon style={styles.starListItem} icon={faStar} color={theme.PRIMARY_COLOR} />
                     </View>
-                </View>
-                <Button
-                    title="Logout"
-                    onPress={() => logout()}
-                />
+                </View> */}
             </ScrollView>
         </SafeAreaView>
     );

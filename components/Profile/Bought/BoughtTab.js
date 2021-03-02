@@ -14,6 +14,7 @@ export default function BoughtTab() {
         const fetchData = () => {
             fetchBoughtItems().then((response) => {
                 setBoughtItems(response)
+                console.log(response)
             })
         }
 

@@ -17,6 +17,8 @@ const FirestoreProvider = ({ children }) => {
   const [createdItemsId, setCreatedItemsId] = useState([]);
   const [createdItems, setCreatedItems] = useState([]);
 
+  const [messages, setMessages] = useState([]);
+
   const db = firebase.firestore();
 
   const createPost = async (data) => {
@@ -24,14 +26,14 @@ const FirestoreProvider = ({ children }) => {
     const uid = firebase.auth().currentUser.uid
 
     let postData = data;
-    postData = { ...postData, id: newId }
+    postData = { ...postData, id: newId, seller_id: uid }
 
     // Check if post has image
-    if (postData.image != false) {
-      const imageResponse = await fetch(postData.image)
-      const blob = await imageResponse.blob()
-      firebase.storage().ref().child("images/" + newId + ".jpg").put(blob)
-    }
+    // if (postData.image != false) {
+    const imageResponse = await fetch(postData.image)
+    const blob = await imageResponse.blob()
+    firebase.storage().ref().child("images/" + newId + ".jpg").put(blob)
+    // }
 
     // console.log("Creating post with id: " + newId)
     // Add post to users "created_listings"
@@ -40,6 +42,9 @@ const FirestoreProvider = ({ children }) => {
     })
 
     await db.collection('posts').doc(newId).set(postData)
+    // await db.collection('posts').doc(newId).update({
+    //   seller_id: uid
+    // })
   }
 
   const imageDownloadUrl = async (id) => {
@@ -118,8 +123,13 @@ const FirestoreProvider = ({ children }) => {
       created_at: new Date()
     }
 
+    let details
+
     await db.collection('/posts').doc(listingId).get().then(res => {
-      if (res.data().amount == true) {
+      let isTrue = "amount" in res.data()
+      if (isTrue) {
+        details = res.data()
+
         db.collection('/posts').doc(listingId).update({
           amount: firebase.firestore.FieldValue.increment(-1)
         })
@@ -128,6 +138,9 @@ const FirestoreProvider = ({ children }) => {
 
     await db.collection('/codes').doc(code).set(data).then(() => {
       console.log('Pickup code created: ' + code)
+      console.log('Creating chat with id: ' + code)
+      // Create a new chat for the bought item
+      createNewChat(code, details)
     })
   }
 
@@ -159,16 +172,16 @@ const FirestoreProvider = ({ children }) => {
         // Fetch all bought posts by id
         const boughtPosts = []
         const boughtPostsIds = []
-        
+
         boughtItemsId.forEach(id => {
-          
+
           // Prevent loading post multiple times if user has bought more than one item of a post
           if (!boughtPostsIds.includes(id)) {
             db.collection('/posts').doc(id).get()
-            .then(snapshot => {
-              const data = snapshot.data()
-              boughtPosts.push(data)
-            })
+              .then(snapshot => {
+                const data = snapshot.data()
+                boughtPosts.push(data)
+              })
           }
           boughtPostsIds.push(id)
           boughtItemsId.push(id)
@@ -201,6 +214,7 @@ const FirestoreProvider = ({ children }) => {
         setCreatedItems(createdItems)
       })
     if (createdItems) {
+      console.log(createdItems)
       return createdItems
     } else {
       return false
@@ -239,8 +253,109 @@ const FirestoreProvider = ({ children }) => {
     })
   }
 
+  // CHAT FUNCTIONS
+  const createNewChat = async (id, details) => {
+    let uid = uuid()
+    let user_id = firebase.auth().currentUser.uid;
+
+    // Set new message notifications
+    await db.collection('chats/' + id + '/messages').doc(uid).set({
+      message: 'Hier kan je terecht met je vragen',
+      sender_id: 'system',
+      created_at: new Date,
+    })
+
+    const image = await imageDownloadUrl(details.id)
+
+    // Create details doc
+    await db.collection('chats/').doc(id).set({
+      buyer_id: user_id,
+      seller_id: details.seller_id,
+      post_id: details.id,
+      title: details.title,
+      chat_id: id,
+      finished: false,
+      image_url: image
+    })
+  }
+
+  const fetchAllChats = async () => {
+    let uid = firebase.auth().currentUser.uid;
+    // Find all chats for bought & sold items which are currently awaiting pickup
+
+    // Find bought items
+    const snapshot = await db.collection('codes').where('user_id', '==', uid).where('is_used', '==', false).get()
+
+    // Find sold items
+    const snapshot2 = await db.collection('chats').where('seller_id', '==', uid).where('finished', '==', false).get()
+
+    let soldPosts = []
+    snapshot2.forEach(doc => {
+      soldPosts.push(doc.data())
+    })
+
+    let boughtPostCodes = []
+    snapshot.forEach(doc => {
+      boughtPostCodes.push(doc.data().pickup_code)
+    })
+
+    // create array of all user chats
+    let chatHeads = []
+
+    boughtPostCodes.forEach(async (code) => {
+      const boughtChat = await db.collection('chats/').doc(code).get()
+      chatHeads.push(boughtChat.data())
+    })
+
+    soldPosts.forEach((item) => {
+      chatHeads.push(item)
+    })
+
+    // Prevent errors if there are no results
+    if (chatHeads != null || chatHeads != undefined) {
+      return chatHeads
+    } else {
+      return false
+    }
+
+  }
+
+  const sendMessage = async (id, message) => {
+    let uid = firebase.auth().currentUser.uid
+    const newId = uuid();
+    await db.collection('chats/' + id + '/messages').doc(newId).set({
+      message: message,
+      created_at: new Date,
+      sender_id: uid
+    })
+  }
+
+  // const fetchChat = async (chat_id) => {
+  //   const messages = await db.collection('chats/' + chat_id + '/messages').get()
+  //   // console.log(messages)
+
+  //   let messageArray = []
+  //   messages.forEach(doc => {
+  //     messageArray.push(doc.data())
+  //   })
+  //   return messageArray
+  // }
+
+  const fetchChat = (chat_id) => {
+    const messageArray = [];
+    // Check for available posts
+    db.collection('chats/' + chat_id + '/messages').orderBy('created_at').onSnapshot((snapshot) => {
+      snapshot.forEach((doc) => {
+        // console.log(doc.data())
+        messageArray.push({ ...doc.data() })
+      })
+      
+    })
+    return messageArray
+  }
+
   return (
-    <FirestoreContext.Provider value={{ fetchCodes, imageDownloadUrl, createPost, fetchFood, fetchMeals, fetchAllPosts, buyItem, fetchBoughtItems, fetchCreatedItems, checkAvailable, createPickupCode, checkCode, updateCodeState }}>
+    <FirestoreContext.Provider value={{ sendMessage, fetchChat, fetchAllChats, fetchCodes, createNewChat, imageDownloadUrl, createPost, fetchFood, fetchMeals, fetchAllPosts, buyItem, fetchBoughtItems, fetchCreatedItems, checkAvailable, createPickupCode, checkCode, updateCodeState }}>
       {children}
     </FirestoreContext.Provider>
   );
