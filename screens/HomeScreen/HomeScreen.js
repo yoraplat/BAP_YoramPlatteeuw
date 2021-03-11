@@ -8,6 +8,10 @@ import ItemsList from "../../components/MapBox/ItemsList";
 import { useFirestore } from '../../Services';
 import theme from '../../Theme/theme.style';
 import { ScrollView } from "react-native-gesture-handler";
+// import { firebase } from "@react-native-firebase/functions";
+
+import * as firebase from 'firebase';
+import 'firebase/firestore';
 
 export const HomeScreen = () => {
 
@@ -21,11 +25,30 @@ export const HomeScreen = () => {
     "5": false,
   })
   const { fetchAllPosts } = useFirestore();
-  const [allPosts, setAllPosts] = useState();
+  const [allPosts, setAllPosts] = useState(null);
 
+  // useEffect(() => {
+  //   // setAllPosts(fetchAllPosts);
+  //   const fetchData = async () => {
+  //     await fetchAllPosts().then((response) => {
+  //       setAllPosts(response)
+  //     })
+  //   }
+
+  //   if (allPosts == null || allPosts.length < 1 || allPosts != undefined) {
+  //     fetchData();
+  //   }
+  // }, []);
   useEffect(() => {
-    setAllPosts(fetchAllPosts);
-  }, [fetchAllPosts]);
+
+    firebase.firestore().collection('/posts').where('bought_at', '==', false).onSnapshot((snapshot) => {
+      let food = []
+      snapshot.forEach((doc) => {
+        food.push({ ...doc.data() })
+      })
+      setAllPosts(food)
+    })
+  }, []);
 
   const selectTab = (id) => {
     if (currentTab == 2) {
@@ -126,28 +149,33 @@ export const HomeScreen = () => {
           <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(3)}>
             <Text style={[styles.filterItem, setBgColor(3)]}>Voeding</Text>
           </TouchableOpacity>
-          { currentTab == 1 ?
-        <>
-        <FontAwesomeIcon icon={faSort} style={styles.filterItemIcon} size={30} />
-          <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(4)}>
-            <Text style={[styles.filterItem, setBgColor(4)]}>Prijs</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(5)}>
-            <Text style={[styles.filterItem, setBgColor(5)]}>Afstand</Text>
-          </TouchableOpacity>
-        </>
-          : null
-        }
+          {currentTab == 1 ?
+            <>
+              <FontAwesomeIcon icon={faSort} style={styles.filterItemIcon} size={30} />
+              <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(4)}>
+                <Text style={[styles.filterItem, setBgColor(4)]}>Prijs</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(5)}>
+                <Text style={[styles.filterItem, setBgColor(5)]}>Afstand</Text>
+              </TouchableOpacity>
+            </>
+            : null
+          }
         </ScrollView>
       </View>
 
+      {/* <Text>{JSON.stringify(allPosts)}</Text> */}
       <View style={styles.listContainer}>
-        {currentTab == 1
-          ?
-          <ItemsList posts={allPosts} selectedQuickFilter={selectedFilters} />
-          : <>
-            <Map posts={allPosts} selectedQuickFilter={selectedFilters} />
-          </>
+        {allPosts == undefined
+          ? <Text style={styles.warningTxt}>Er zijn momenteel geen aanbiedingen, kom later eens terug</Text>
+          :
+          currentTab == 1
+            ?
+            <ItemsList posts={allPosts} selectedQuickFilter={selectedFilters} />
+            : <>
+              <Map posts={allPosts} selectedQuickFilter={selectedFilters} />
+            </>
+
         }
       </View>
     </SafeAreaView>
@@ -231,5 +259,14 @@ const styles = StyleSheet.create({
   },
   icon: {
     alignSelf: "center"
+  },
+  warningTxt: {
+    textAlign: "center",
+    fontSize: 15,
+    // fontFamily: 'Poppins_500Medium',
+    backgroundColor: theme.SECONDARY_COLOR,
+    padding: 10,
+    color: theme.PRIMARY_COLOR,
+    top: 20
   }
 });

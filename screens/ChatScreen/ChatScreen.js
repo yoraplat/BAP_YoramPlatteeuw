@@ -12,7 +12,7 @@ import { useFirestore } from '../../Services';
 export const ChatScreen = () => {
 
   const { fetchAllChats, fetchChat, sendMessage } = useFirestore()
-  
+
   const [availableChats, setAvailableChats] = useState(null)
   const [chatMessages, setChatMessages] = useState(null)
   const [headerLoading, setHeaderLoading] = useState(true)
@@ -21,18 +21,21 @@ export const ChatScreen = () => {
   const [newMessage, setNewMessage] = useState('')
 
 
+  const fetch = async () => {
+    await fetchAllChats().then((data) => {
+      setAvailableChats(data)
+      setHeaderLoading(false)
+
+      selectChat(0, data[0].chat_id)
+    })
+  }
   useEffect(() => {
-    const fetch = async () => {
-      await fetchAllChats().then((data) => {
-        setAvailableChats(data)
-        setHeaderLoading(false)
-      })
-    }
 
     if (availableChats == null || availableChats.length < 1) {
       fetch()
     }
-  }, [])
+  }, [fetchAllChats, fetchChat])
+
 
   let [fontsLoaded] = useFonts({
     Poppins_300Light,
@@ -48,10 +51,11 @@ export const ChatScreen = () => {
     setSelectedChat(index)
     loadMessages(id)
   }
-  
+
   const loadMessages = async (id) => {
     const messages = await fetchChat(id)
     setChatMessages(messages)
+    console.log('fetching chat: ' + JSON.stringify(chatMessages))
   }
 
   const createMessage = () => {
@@ -72,6 +76,7 @@ export const ChatScreen = () => {
     setNewMessage('')
   }
 
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.chatContainer}>
@@ -84,16 +89,18 @@ export const ChatScreen = () => {
                   <View style={styles.headerBadge}>
                     <Text style={styles.badgeTxt}>2</Text>
                   </View>
-                  <Text style={styles.text}>{chat.title}</Text>
+                  <Text style={selectedChat == index ? styles.bigText : styles.text}>{chat.title.length >= 8 ? chat.title.substring(0, 8) + '...' : chat.title}</Text>
                   <Image source={{ uri: chat.image_url }} style={selectedChat == index ? styles.imageActive : styles.image} />
                 </TouchableOpacity>
               )
-            })}
+            })
+          }
         </View>
       </ScrollView>
       <View style={styles.contentContainer}>
         <View style={styles.contentTitle}>
-          <Text style={styles.chatTitle}>{ availableChats == null || availableChats.length < 1 ? 'Gesprek laden...' : availableChats[selectedChat].title }</Text>
+          {/* <Text style={styles.chatTitle}>{availableChats[selectedChat].title}</Text> */}
+          <Text style={styles.chatTitle}>Title</Text>
         </View>
         <ScrollView horizontal={false} showsVerticalScrollIndicator={false} style={styles.contentChat}>
           {headerLoading
@@ -244,5 +251,18 @@ const styles = StyleSheet.create({
     top: 2,
     textAlign: 'center',
     color: theme.WHITE
+  },
+  text: {
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 13,
+  },
+  bigText: {
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 18,
+  },
+  noMessage: {
+    fontFamily: 'Poppins_500Medium',
+    fontSize: 15,
+    color: theme.PRIMARY_COLOR
   }
 });

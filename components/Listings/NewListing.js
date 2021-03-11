@@ -196,6 +196,7 @@ export function NewListing() {
                             placeholderTextColor={theme.TEXT_PLACEHOLDER}
                             // onChangeText={val => setTitle(val)}
                             onChangeText={val => setPost({ ...post, title: val })}
+                            maxLength={35}
                         />
 
                         <TextInput
@@ -204,6 +205,7 @@ export function NewListing() {
                             placeholderTextColor={theme.TEXT_PLACEHOLDER}
                             // onChangeText={val => setDescription(val)}
                             onChangeText={val => setPost({ ...post, description: val })}
+                            maxLength={90}
                         />
                     </View>
                     <View style={styles.formItem}>

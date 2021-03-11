@@ -26,33 +26,23 @@ export function ListItem({ messages }) {
 
     return (
         <>
-        {/* use chatItemUser for messages from user */}
+            {/* use chatItemUser for messages from user */}
             {messages && messages.map((message, index) => {
                 return (
-                    message.sender_id != 'system' 
-                    ?
-                <View style={message.sender_id == user_id ? styles.chatItemUser : styles.chatItem} key={index}>
-                    <Text style={styles.text}>{message.message}</Text>
-                    <Text style={styles.details}>{moment((message.created_at).toDate()).format('DD/MM/YYYY' + ', ' + 'hh:mm')}</Text>
-                </View>
-                :
-                <View style={styles.chatItemSystem} key={index}>
-                    <Text style={styles.text}>{message.message}</Text>
-                </View>
+                    message.sender_id != 'system'
+                        ?
+                        <View style={message.sender_id == user_id ? styles.chatItemUser : styles.chatItem} key={index}>
+                            <Text style={styles.text}>{message.message}</Text>
+                            <Text style={styles.details}>{moment((message.created_at).toDate()).format('DD/MM/YYYY' + ', ' + 'hh:mm')}</Text>
+                        </View>
+                        :
+                        <View style={styles.chatItemSystem} key={index}>
+                            <Text style={styles.text}>{message.message}</Text>
+                        </View>
 
                 )
             })}
         </>
-        // <>
-        //     <View style={styles.chatItem}>
-        //         <Text style={styles.text}>beste, zefz ezterz zef re zefzef yhrt</Text>
-        //         <Text style={styles.details}>12 februari, 12:42</Text>
-        //     </View>
-        //     <View style={styles.chatItemUser}>
-        //         <Text style={styles.text}>beste, zefz ezterz zef re zefzef yhrt</Text>
-        //         <Text style={styles.details}>12 februari, 12:42</Text>
-        //     </View>
-        // </>
     );
 }
 

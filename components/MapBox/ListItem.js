@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, SafeAreaView, ImageBackground, Modal, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faCheck, faChevronCircleRight, faExpand, faShoppingBag, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faChevronCircleRight, faExpand, faShoppingBag, faShoppingBasket, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
 import { useFirestore } from '../../Services';
+import { useAuth } from '../../Services';
 import theme from '../../Theme/theme.style';
 import Slider from 'react-native-slide-to-unlock';
+import * as WebBrowser from 'expo-web-browser';
+import { ActivityIndicator } from 'react-native';
+import * as firebase from 'firebase';
+import 'firebase/firestore';
 
 export function ListItem({ postData, count }) {
 
@@ -14,7 +19,12 @@ export function ListItem({ postData, count }) {
     const [imageVisible, setImageVisible] = useState(false)
     const [confirmVisible, setConfirmVisible] = useState(false)
     const [infoState, setInfoState] = useState(false)
-    const { buyItem, checkAvailable, createPickupCode, imageDownloadUrl } = useFirestore();
+    const { buyItem, checkAvailable, createPickupCode, imageDownloadUrl, createPayment } = useFirestore();
+    const { user_id } = useAuth();
+    // Payment
+    const [awaitingPayment, setAwaitingPayment] = useState(false)
+    const [paymentStatus, setPaymentStatus] = useState()
+    const [paymentId, setPaymentId] = useState(null)
 
     useEffect(() => {
         (async () => {
@@ -23,8 +33,17 @@ export function ListItem({ postData, count }) {
                 setImageUrl(response)
             }
         })()
-        console.log('loaded list item ' + count)
-    }, [])
+
+        if (paymentId) {
+            firebase.firestore().collection('payments').doc(paymentId).onSnapshot((doc) => {
+                const data = doc.data().status
+                setPaymentStatus(data)
+                if (data == 'paid') {
+                    finishPayment()
+                }
+            })
+        }
+    }, [paymentId])
 
     const convertDate = (date) => {
         const months = {
@@ -46,7 +65,7 @@ export function ListItem({ postData, count }) {
         const month = months[d.getMonth()];
         const hour = d.getHours();
         const minutes = d.getMinutes();
-        return `${hour}:${minutes}u (${day} ${month})`
+        return `${day} ${month} om ${hour}:${minutes}u`
     }
 
 
@@ -61,7 +80,8 @@ export function ListItem({ postData, count }) {
         vegan: postData.vegan,
         price: postData.price > 0 ? "€" + postData.price : "Gratis",
         hasImage: postData.image ? true : false,
-        // image: imageUrl
+        seller_id: postData.seller_id,
+        // seller: user_id(),
     }
 
     let [fontsLoaded] = useFonts({
@@ -83,31 +103,48 @@ export function ListItem({ postData, count }) {
         }
     }
 
-    const confirmPurchase = async (listingId) => {
+
+    const confirmPurchase = async (listingId, type) => {
+
         try {
+
             // Check if still available
-            console.log("Checking if available")
             const available = await checkAvailable(listingId)
 
             if (available != false) {
-                // Create a pickup code
-                await createPickupCode(listingId)
-                console.log("Created pickup code")
+                // If transaction needed create payment and redirect user to payment url
+                if (type == 'paid') {
+                    setAwaitingPayment(true)
+                    setPaymentStatus('open')
+                    createPayment(data).then((res) => {
+                        console.log('status after creating payment: ' + res)
+                        setPaymentId(res)
+                    })
+                } else {
+                    // Create a pickup code
+                    // Add payment id to code doc
+                    await createPickupCode(listingId)
+                    console.log("Created pickup code")
 
-                // Buy the item
-                await buyItem(listingId)
-                console.log("Bought item")
+                    // Buy the item
+                    await buyItem(listingId)
+                    console.log("Bought item")
 
-                // console.log("Creating code and buying item")
-                setConfirmVisible(false)
+                    setConfirmVisible(false)
+
+                }
             }
-
-
         } catch (e) {
             console.log(e.message)
             setConfirmVisible(false)
-            // alert("Item is niet meer beschikbaar.")
+            setAwaitingPayment(false)
+            alert("Item is niet meer beschikbaar.")
         }
+    }
+
+    const finishPayment = async () => {
+        await createPickupCode(data.id)
+        await buyItem(data.id)
     }
 
     const showImage = async () => {
@@ -117,7 +154,7 @@ export function ListItem({ postData, count }) {
             if (data.hasImage != false) {
                 const response = await imageDownloadUrl(data.id)
                 setImageUrl(response)
-              }
+            }
             setImageVisible(true)
         }
     }
@@ -127,33 +164,22 @@ export function ListItem({ postData, count }) {
             <View style={styles.content}>
                 {/* {data.hasImage
                     ? */}
-                    <View style={styles.header}>
-                        <ImageBackground source={{ uri: imageUrl }} style={styles.backgroundImage}>
-                            <View style={styles.overlay}>
-                                <Text style={styles.title}>{data.title}</Text>
-                                <Text style={styles.description}>{data.description}</Text>
-                                <Text style={styles.description}>{data.amount} beschikbaar</Text>
+                <View style={styles.header}>
+                    <ImageBackground source={{ uri: imageUrl }} style={styles.backgroundImage}>
+                        <View style={styles.overlay}>
+                            <Text style={styles.title}>{data.title}</Text>
+                            <Text style={styles.description}>{data.description}</Text>
+                            <Text style={styles.description}>{data.amount} beschikbaar</Text>
 
-                                <TouchableOpacity style={styles.imageSizeBtn} onPress={() => showImage()}>
-                                    <FontAwesomeIcon icon={faExpand} style={{ color: theme.WHITE }} size={25} />
-                                </TouchableOpacity>
-                            </View>
-                        </ImageBackground>
-                    </View>
-                   {/* :
-
-                    <View style={styles.emptyHeader}>
-                        <View style={styles.emptyBackground}>
-                            <View style={styles.overlay}>
-                                <Text style={styles.title}>{data.title}</Text>
-                                <Text style={styles.description}>{data.description}</Text>
-                            </View>
+                            <TouchableOpacity style={styles.imageSizeBtn} onPress={() => showImage()}>
+                                <FontAwesomeIcon icon={faExpand} style={{ color: theme.WHITE }} size={25} />
+                            </TouchableOpacity>
                         </View>
-                    </View>
-                } */}
+                    </ImageBackground>
+                </View>
                 <TouchableOpacity style={styles.info} onPress={() => buy()}>
                     <View style={styles.infoItem}>
-                        <Text style={styles.infoTxt}>Ophalen om {data.pickup}</Text>
+                        <Text style={styles.infoTxt}>Ophalen op {data.pickup}</Text>
                         <Text style={styles.infoTxt}>{data.address}</Text>
                     </View>
                     <View style={styles.infoItem}>
@@ -163,29 +189,31 @@ export function ListItem({ postData, count }) {
                         </View>
                     </View>
                 </TouchableOpacity>
-                {infoState
-                    ? <View style={styles.buyInfo}>
-                        <Slider
-                            onEndReached={() => {
-                                setConfirmVisible(true)
-                            }}
-                            containerStyle={{
-                                margin: 5,
-                                backgroundColor: 'white',
-                                borderRadius: 25,
-                                padding: 5,
-                                overflow: 'hidden',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                width: '100%'
-                            }}
-                            sliderElement={
-                                <FontAwesomeIcon icon={faChevronCircleRight} style={{ color: theme.PRIMARY_COLOR, backgroundColor: theme.WHITE }} size={30} />
-                            }
-                        >
-                            <Text style={{ fontSize: 15 }}>Reserveren</Text>
-                        </Slider>
-                    </View>
+                {infoState ?
+                    data.seller_id != user_id()
+                        ? <View style={styles.buyInfo}>
+                            <Slider
+                                onEndReached={() => {
+                                    setConfirmVisible(true)
+                                }}
+                                containerStyle={{
+                                    margin: 5,
+                                    backgroundColor: 'white',
+                                    borderRadius: 25,
+                                    padding: 5,
+                                    overflow: 'hidden',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    width: '100%'
+                                }}
+                                sliderElement={
+                                    <FontAwesomeIcon icon={faChevronCircleRight} style={{ color: theme.PRIMARY_COLOR, backgroundColor: theme.WHITE }} size={30} />
+                                }
+                            >
+                                <Text style={{ fontSize: 15 }}>Reserveren</Text>
+                            </Slider>
+                        </View>
+                        : <Text style={styles.warningTxt}>Je kan je eigen aanbiedingen niet kopen. Bedankt voor je bijdrage aan een betere wereld!</Text>
                     : null
                 }
             </View>
@@ -223,7 +251,7 @@ export function ListItem({ postData, count }) {
                             <View style={styles.freeItem}>
                                 <Text style={styles.freeItemTxt}>Ben je zeker dat je deze aanbieding wil reserveren?</Text>
                                 <View style={styles.itemBtnList}>
-                                    <TouchableOpacity style={styles.itemBtnPositive} onPress={() => confirmPurchase(data.id)}>
+                                    <TouchableOpacity style={styles.itemBtnPositive} onPress={() => confirmPurchase(data.id, 'free')}>
                                         <FontAwesomeIcon icon={faCheck} style={{ color: theme.WHITE }} size={30} />
                                     </TouchableOpacity>
                                     <TouchableOpacity style={styles.itemBtnNegative} onPress={() => setConfirmVisible(false)}>
@@ -235,11 +263,31 @@ export function ListItem({ postData, count }) {
                             // Modal for paid items 
                             :
                             <View style={styles.freeItem}>
-                                <Text style={styles.freeItemTxt}>TODO: pay for the offer</Text>
+                                <Text style={styles.freeItemTxt}>Bevestig je aankoop</Text>
+                                <View style={styles.itemConfirmDetails}>
+                                    <Text style={styles.confirmDetailsBig}>{data.title}</Text>
+                                    <Text style={styles.confirmDetails}>Prijs: {data.price}</Text>
+                                    <Text style={styles.confirmDetails}>Adres: {data.address}</Text>
+                                    <Text style={styles.confirmDetails}>Op te halen op {data.pickup}</Text>
+                                </View>
+                                {paymentStatus != 'paid' && paymentStatus != null
+                                    ? <Text style={styles.freeItemTxt}>Wachten op betaling <ActivityIndicator size="large" color={theme.PRIMARY_COLOR} /></Text>
+                                    : paymentStatus == 'paid'
+                                        ? <Text style={styles.freeItemTxt}>Item is betaald</Text>
+                                        : null
+                                }
                                 <View style={styles.itemBtnList}>
-                                    <TouchableOpacity style={styles.itemBtnPositive} onPress={() => confirmPurchase(data.id)}>
-                                        <FontAwesomeIcon icon={faCheck} style={{ color: theme.WHITE }} size={30} />
-                                    </TouchableOpacity>
+                                    {
+                                        paymentStatus != 'paid'
+                                            ? <TouchableOpacity style={styles.itemBtnPositive} onPress={() => confirmPurchase(data.id, 'paid')}>
+                                                <FontAwesomeIcon icon={faCheck} style={{ color: theme.WHITE }} size={30} />
+                                            </TouchableOpacity>
+                                            : paymentStatus == 'open' ?
+                                                <TouchableOpacity style={styles.itemBtnPositive}>
+                                                    <FontAwesomeIcon style={{ color: theme.WHITE }} icon={faShoppingBasket} size={30} />
+                                                </TouchableOpacity>
+                                                : null
+                                    }
                                     <TouchableOpacity style={styles.itemBtnNegative} onPress={() => setConfirmVisible(false)}>
                                         <FontAwesomeIcon icon={faTimes} style={{ color: theme.WHITE }} size={30} />
                                     </TouchableOpacity>
@@ -365,7 +413,8 @@ const styles = StyleSheet.create({
         fontFamily: "Poppins_400Regular",
         color: theme.PRIMARY_COLOR,
         fontSize: 18,
-        padding: 20
+        padding: 10,
+        textAlign: 'center',
     },
     itemBtnList: {
         flexDirection: 'row',
@@ -403,5 +452,25 @@ const styles = StyleSheet.create({
         zIndex: 999,
         position: 'absolute',
         padding: 5
-    }
+    },
+    warningTxt: {
+        backgroundColor: theme.PRIMARY_COLOR,
+        color: theme.SECONDARY_COLOR,
+        marginTop: 2,
+        padding: 10,
+        textAlign: 'center'
+    },
+
+    // Modal details
+    itemConfirmDetails: {
+        padding: 15
+    },
+    confirmDetails: {
+        fontFamily: "Poppins_400Regular",
+        paddingBottom: 5,
+    },
+    confirmDetailsBig: {
+        fontFamily: "Poppins_500Medium",
+        paddingBottom: 5,
+    },
 });

@@ -112,13 +112,13 @@ export default function ProfileTab({ callLogoutFunction }) {
                             placeholderTextColor={theme.TXT_PLACEHOLDER}
                             onChangeText={val => setUsername(val)}
                         />
-                        <TextInput
+                        {/* <TextInput
                             style={styles.txtInput}
                             placeholder="Rekeningnummer"
                             value={accountNumber}
                             placeholderTextColor={theme.TXT_PLACEHOLDER}
                             onChangeText={val => setAccountNumber(val)}
-                        />
+                        /> */}
                         <TouchableOpacity style={styles.submitButton}>
                             <Text style={styles.submitButtonTxt}>Wachtwoord veranderen</Text>
                         </TouchableOpacity>

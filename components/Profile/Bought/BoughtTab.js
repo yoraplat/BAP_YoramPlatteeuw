@@ -14,15 +14,18 @@ export default function BoughtTab() {
         const fetchData = () => {
             fetchBoughtItems().then((response) => {
                 setBoughtItems(response)
-                console.log(response)
             })
         }
 
         if (boughtItems == null || boughtItems.length < 1) {
-            fetchData();
+            if (typeof boughtItems != undefined ) {
+                fetchData()
+            } else {
+                console.log('No records found')
+            }
         }
 
-    }, [boughtItems]);
+    }, [boughtItems, fetchBoughtItems]);
 
     let [fontsLoaded] = useFonts({
         Poppins_300Light,

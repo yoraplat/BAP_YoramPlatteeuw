@@ -1,8 +1,10 @@
-import { default as React, useContext, useState, createContext } from 'react';
+import { default as React, useContext, useState, createContext, useEffect } from 'react';
 import * as firebase from 'firebase';
 import 'firebase/firestore';
 import 'firebase/storage';
+import 'firebase/functions';
 import uuid from 'uuid-random';
+import * as WebBrowser from 'expo-web-browser';
 
 const FirestoreContext = createContext();
 const useFirestore = () => useContext(FirestoreContext);
@@ -16,10 +18,13 @@ const FirestoreProvider = ({ children }) => {
   const [boughtItems, setBoughtItems] = useState([]);
   const [createdItemsId, setCreatedItemsId] = useState([]);
   const [createdItems, setCreatedItems] = useState([]);
+  const [chatItems, setChatItems] = useState([]);
 
-  const [messages, setMessages] = useState([]);
+  // Payments
+  const [status, setStatus] = useState(null);
 
   const db = firebase.firestore();
+  const fn = firebase.functions();
 
   const createPost = async (data) => {
     const newId = uuid();
@@ -53,16 +58,30 @@ const FirestoreProvider = ({ children }) => {
   }
 
 
-  const fetchAllPosts = () => {
-    const food = [];
+  const fetchAllPosts = async () => {
     // Check for available posts
+    // let food = []
     db.collection('/posts').where('bought_at', '==', false).onSnapshot((snapshot) => {
+      let food = []
       snapshot.forEach((doc) => {
         food.push({ ...doc.data() })
       })
-      setAllPosts(food)
+      return food
     })
-    return allPosts
+
+    // await db.collection('/posts').where('bought_at', '==', false).get().then((snapshot) => {
+    //   food = []
+    //   snapshot.forEach((doc) => {
+    //     food.push({ ...doc.data() })
+    //   })
+    // })
+
+    // Prevent endless fetching for non existing data
+    // if (!food.length) {
+    //   return undefined
+    // } else {
+    //   return food
+    // }
   }
 
   const fetchMeals = () => {
@@ -83,8 +102,40 @@ const FirestoreProvider = ({ children }) => {
     return allFood
   }
 
-  const buyItem = async (listingId) => {
+  const createPayment = async (data) => {
+    let parsedPrice = parseFloat(data.price.replace('€', '')).toFixed(2)
 
+    // Used to create a callback id, the payment can be found in the db with the same doc id 
+    let payment_uid = uuid();
+
+    try {
+      // payment info
+      // Price should be in xx.xx format
+      const paymentObject = {
+        "item_id": data.id,
+        "description": "aankoop NoWaste item met payment uid: " + payment_uid,
+        "payment_uid": payment_uid,
+        "price": parsedPrice,
+        "redirectUrl": 'https://us-central1-nowaste-58a45.cloudfunctions.net/mollieRedirect',
+        "webhookUrl": 'https://us-central1-nowaste-58a45.cloudfunctions.net/mollieCallback?id=' + payment_uid,
+        "buyer_id": firebase.auth().currentUser.uid
+      }
+
+      // This function returns a mollie payment url
+      const makePayment = firebase.functions().httpsCallable('mollieCheckout')
+
+      await makePayment(paymentObject).then(result => {
+        payment_uid = result.data.payment_uid
+        WebBrowser.openBrowserAsync(result.data.uri)
+      })
+      return payment_uid
+
+    } catch (e) {
+      console.log(e.message)
+    }
+  }
+
+  const buyItem = async (listingId) => {
     const uid = firebase.auth().currentUser.uid
 
     const current_bought = await db.collection('/users').doc(uid).get()
@@ -99,11 +150,19 @@ const FirestoreProvider = ({ children }) => {
       // Only set bought_at when all meals have been bought
       // bought_at determines if post is still available or not
       const checkAmount = await db.collection('/posts').doc(listingId).get()
-      if (checkAmount.data().amount <= 0) {
+      if (checkAmount.data().amount <= 0 || !checkAmount.data().amount) {
         db.collection('/posts').doc(listingId).update({
           bought_at: new Date,
         })
       }
+    })
+  }
+
+  const listenForPaymentUpdate = (id) => {
+    // Listen for status updates
+    db.collection('payments').doc(id).onSnapshot((doc) => {
+      const data = doc.data().status
+      return data
     })
   }
 
@@ -127,9 +186,8 @@ const FirestoreProvider = ({ children }) => {
 
     await db.collection('/posts').doc(listingId).get().then(res => {
       let isTrue = "amount" in res.data()
+      details = res.data()
       if (isTrue) {
-        details = res.data()
-
         db.collection('/posts').doc(listingId).update({
           amount: firebase.firestore.FieldValue.increment(-1)
         })
@@ -185,13 +243,15 @@ const FirestoreProvider = ({ children }) => {
           }
           boughtPostsIds.push(id)
           boughtItemsId.push(id)
-        });
+
+        })
+
         setBoughtItems(boughtPosts)
       })
-    if (boughtItems) {
-      return boughtItems
+    if (!boughtItems.length) {
+      return undefined
     } else {
-      return false
+      return boughtItems
     }
   }
 
@@ -203,21 +263,20 @@ const FirestoreProvider = ({ children }) => {
         setCreatedItemsId(data["created_listings"])
 
         // Fetch all created posts by id
-        const createdItems = [];
+        const created = [];
         createdItemsId.forEach(id => {
           db.collection('/posts').doc(id).get()
             .then(snapshot => {
               const data = snapshot.data()
-              createdItems.push(data)
+              created.push(data)
             })
-        });
-        setCreatedItems(createdItems)
+        })
+        setCreatedItems(created)
       })
-    if (createdItems) {
-      console.log(createdItems)
-      return createdItems
+    if (!createdItems.length) {
+      return undefined
     } else {
-      return false
+      return createdItems
     }
   }
 
@@ -289,18 +348,18 @@ const FirestoreProvider = ({ children }) => {
     // Find sold items
     const snapshot2 = await db.collection('chats').where('seller_id', '==', uid).where('finished', '==', false).get()
 
-    let soldPosts = []
+    const soldPosts = []
     snapshot2.forEach(doc => {
       soldPosts.push(doc.data())
     })
 
-    let boughtPostCodes = []
+    const boughtPostCodes = []
     snapshot.forEach(doc => {
       boughtPostCodes.push(doc.data().pickup_code)
     })
 
     // create array of all user chats
-    let chatHeads = []
+    const chatHeads = []
 
     boughtPostCodes.forEach(async (code) => {
       const boughtChat = await db.collection('chats/').doc(code).get()
@@ -312,11 +371,22 @@ const FirestoreProvider = ({ children }) => {
     })
 
     // Prevent errors if there are no results
-    if (chatHeads != null || chatHeads != undefined) {
-      return chatHeads
-    } else {
-      return false
-    }
+    // if (chatHeads != null || chatHeads != undefined) {
+    //   console.log(chatHeads)
+    //   return chatHeads
+    // } else {
+    //   console.log('false')
+    //   return false
+    // }
+    setChatItems(chatHeads)
+    return chatItems
+
+    // console.log('Service: ' + JSON.stringify(chatItems))
+    // if (chatItems.length) {
+    //   return chatItems
+    // } else {
+    //   return undefined
+    // }
 
   }
 
@@ -330,17 +400,6 @@ const FirestoreProvider = ({ children }) => {
     })
   }
 
-  // const fetchChat = async (chat_id) => {
-  //   const messages = await db.collection('chats/' + chat_id + '/messages').get()
-  //   // console.log(messages)
-
-  //   let messageArray = []
-  //   messages.forEach(doc => {
-  //     messageArray.push(doc.data())
-  //   })
-  //   return messageArray
-  // }
-
   const fetchChat = (chat_id) => {
     const messageArray = [];
     // Check for available posts
@@ -349,13 +408,13 @@ const FirestoreProvider = ({ children }) => {
         // console.log(doc.data())
         messageArray.push({ ...doc.data() })
       })
-      
+
     })
     return messageArray
   }
 
   return (
-    <FirestoreContext.Provider value={{ sendMessage, fetchChat, fetchAllChats, fetchCodes, createNewChat, imageDownloadUrl, createPost, fetchFood, fetchMeals, fetchAllPosts, buyItem, fetchBoughtItems, fetchCreatedItems, checkAvailable, createPickupCode, checkCode, updateCodeState }}>
+    <FirestoreContext.Provider value={{ listenForPaymentUpdate, createPayment, sendMessage, fetchChat, fetchAllChats, fetchCodes, createNewChat, imageDownloadUrl, createPost, fetchFood, fetchMeals, fetchAllPosts, buyItem, fetchBoughtItems, fetchCreatedItems, checkAvailable, createPickupCode, checkCode, updateCodeState }}>
       {children}
     </FirestoreContext.Provider>
   );

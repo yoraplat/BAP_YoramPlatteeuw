@@ -16,16 +16,18 @@ export default function OfferedTab() {
     useEffect(() => {
         const fetchData = () => {
             fetchCreatedItems().then((response) => {
-                setCreatedItems(response);
-                console.log(response)
+                setCreatedItems(response)
             })
         }
 
         if (createdItems == null || createdItems.length < 1) {
-            fetchData();
+            if (typeof createdItems != undefined ) {
+                fetchData()
+            } else {
+                console.log('No records found')
+            }
         }
-
-    }, [createdItems]);
+    }, [createdItems, fetchCreatedItems])
 
     let [fontsLoaded] = useFonts({
         Poppins_300Light,

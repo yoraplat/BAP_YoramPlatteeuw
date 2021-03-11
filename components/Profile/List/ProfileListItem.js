@@ -113,7 +113,7 @@ export function ProfileListItem({ postData, indexKey, type }) {
                             ? <Text style={styles.infoCode}>
                                 {codeList == null ?
                                     <ActivityIndicator size="small" color={theme.PRIMARY_COLOR} />
-                                    : codeList.map((item) => <Text> {item.pickup_code} </Text>)}
+                                    : codeList.map((item, index) => <Text key={index}> {item.pickup_code} </Text>)}
                             </Text>
 
                             : <View style={styles.validateContainer}>

@@ -7,6 +7,7 @@ import overlayStyles from './overlayStyles'
 import { MapItemOverlay } from './MapItemOverlay';
 import moment from 'moment';
 import { useFirestore } from '../../Services';
+import { useAuth } from '../../Services';
 import theme from '../../Theme/theme.style';
 
 export function Map({ posts, selectedQuickFilter }) {
@@ -73,7 +74,8 @@ export function Map({ posts, selectedQuickFilter }) {
   const [selectedPost, setSelectedPost] = useState(null);
   const [quickFilter, setQuickFilter] = useState(selectedQuickFilter);
 
-  const { buyItem, checkAvailable, createPickupCode, imageDownloadUrl } = useFirestore();
+  const { buyItem, checkAvailable, createPickupCode, imageDownloadUrl } = useFirestore()
+  const { user_id } = useAuth()
 
   const fadeAnim = useRef(new Animated.Value(0.01)).current;
 
@@ -86,13 +88,9 @@ export function Map({ posts, selectedQuickFilter }) {
   const getDetails = async (index) => {
     setSelectedPost(index + 1)
 
-    // console.log("Index: " + index)
-
-    // if (data[index].image != false) {
-      let id = data[index].id
-      const response = await imageDownloadUrl(id)
-      setImageUrl(response)
-    // }
+    let id = data[index].id
+    const response = await imageDownloadUrl(id)
+    setImageUrl(response)
 
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -158,7 +156,8 @@ export function Map({ posts, selectedQuickFilter }) {
         longitude: parseFloat(post.coordinates.longitude),
         address: post.address,
         id: post.id,
-        image: post.image
+        image: post.image,
+        seller_id: post.seller_id
       };
 
       // Filtering for veggie/vegan meals/food
@@ -300,13 +299,16 @@ export function Map({ posts, selectedQuickFilter }) {
                     }
                   </View>
                 </View>
-                <TouchableHighlight
-                  style={overlayStyles.submitButton}
-                  onPress={() => {
-                    confirmPurchase(modalData.id);
-                  }}>
-                  <Text style={overlayStyles.submitButtonTxt}>Voeding Redden</Text>
-                </TouchableHighlight>
+                {modalData.seller_id != user_id()
+                  ? <TouchableHighlight
+                    style={overlayStyles.submitButton}
+                    onPress={() => {
+                      confirmPurchase(modalData.id);
+                    }}>
+                    <Text style={overlayStyles.submitButtonTxt}>Voeding Redden</Text>
+                  </TouchableHighlight>
+                  : <Text>Je kan je eigen aanbiedingen niet kopen. Bedankt voor je bijdrage aan een betere wereld!</Text>
+              }
               </View>
             </View>
           </Modal>

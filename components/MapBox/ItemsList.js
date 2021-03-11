@@ -18,11 +18,11 @@ export default function ItemsList({ posts, selectedQuickFilter }) {
         setQuickFilter(selectedQuickFilter);
         posts != undefined ? loadList() : '';
     }, [posts]);
-    
+
     const loadList = () => {
         const postList = [];
         posts.forEach((post) => {
-            
+
             const postObject = {
                 title: post.title,
                 description: post.description,
@@ -36,7 +36,8 @@ export default function ItemsList({ posts, selectedQuickFilter }) {
                 longitude: parseFloat(post.coordinates.longitude),
                 address: post.address,
                 id: post.id,
-                image: post.image
+                image: post.image,
+                seller_id: post.seller_id
             };
 
             // Filtering for veggie/vegan meals/food
@@ -113,13 +114,17 @@ export default function ItemsList({ posts, selectedQuickFilter }) {
     return (
         <SafeAreaView style={styles.container} >
             <ScrollView style={styles.list}>
-                {data && data.map((post, index) => (
-                    <ListItem
-                        postData={post}
-                        key={index}
-                        count={index}
-                    />
-                ))}
+                {posts != undefined
+                    ?
+                    data && data.map((post, index) => (
+                        <ListItem
+                            postData={post}
+                            key={index}
+                            count={index}
+                        />
+                    ))
+                    : <Text style={styles.warningTxt}>Er zijn momenteel geen aanbiedingen beschikbaar, kom later eens terug.</Text>
+                }
             </ScrollView>
         </SafeAreaView>
     );
@@ -137,4 +142,12 @@ const styles = StyleSheet.create({
         width: "100%",
         flex: 1,
     },
+    warningTxt: {
+        textAlign: "center",
+        fontSize: 15,
+        fontFamily: 'Poppins_500Medium',
+        backgroundColor: theme.SECONDARY_COLOR,
+        padding: 10,
+        color: theme.PRIMARY_COLOR
+    }
 });
