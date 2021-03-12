@@ -27,9 +27,9 @@ export const AddScreen = () => {
       <NewListing/>
       <>
         <View style={styles.tabsContainer}>
-          <TouchableOpacity style={styles.title}>
-            <Text style={styles.tabTxt}>Nieuw item toevoegen</Text>
-          </TouchableOpacity>
+          {/* <TouchableOpacity style={styles.title}> */}
+            <Text style={styles.title}>Nieuw item toevoegen</Text>
+          {/* </TouchableOpacity> */}
         </View>
       </>
 
@@ -40,7 +40,7 @@ export const AddScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.SECONDARY_COLOR,
+    backgroundColor: theme.PRIMARY_COLOR,
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
@@ -53,11 +53,13 @@ const styles = StyleSheet.create({
   },
   title: {
     marginTop: StatusBar.currentHeight,
-    top: 25,
+    top: 15,
     width: '100%',
-    padding: 15,
-    borderRadius: 15,
-    backgroundColor: theme.PRIMARY_COLOR
+    padding: 0,
+    textAlign: 'center',
+    fontFamily: "Poppins_700Bold",
+    color: theme.WHITE,
+    fontSize: 20
     
   },
   // overlayTopMiddleLeft: {
@@ -69,8 +71,6 @@ const styles = StyleSheet.create({
   //   borderBottomLeftRadius: 15,
   // },
   tabTxt: {
-    textAlign: 'center',
-    fontFamily: "Poppins_700Bold",
-    color: theme.WHITE
+    
   }
 });

@@ -4,6 +4,7 @@
     "slug": "NoWasteV2",
     "version": "1.0.0",
     "orientation": "portrait",
+    "scheme": "nowaste",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/logoV2.1.png",

@@ -9,8 +9,11 @@ import { useAuth } from '../../Services';
 
 
 export function ListItem({ messages }) {
+    const [currentMessages, setCurrentMessages] = useState(messages)
 
-
+    useEffect(() => {
+        setCurrentMessages(messages)
+    },[messages])
     const { user_id } = useAuth()
 
     let [fontsLoaded] = useFonts({
@@ -27,7 +30,7 @@ export function ListItem({ messages }) {
     return (
         <>
             {/* use chatItemUser for messages from user */}
-            {messages && messages.map((message, index) => {
+            {currentMessages && currentMessages.map((message, index) => {
                 return (
                     message.sender_id != 'system'
                         ?
@@ -48,8 +51,8 @@ export function ListItem({ messages }) {
 
 const styles = StyleSheet.create({
     chatItem: {
-        // backgroundColor: theme.SECONDARY_COLOR,
-        backgroundColor: "#e5e5e5",
+        backgroundColor: theme.SECONDARY_COLOR,
+        // backgroundColor: "#e5e5e5",
         padding: 15,
         borderRadius: 15,
         marginBottom: 15,
@@ -63,7 +66,7 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     chatItemSystem: {
-        backgroundColor: theme.TXT_INPUT_BACKGROUND,
+        // backgroundColor: theme.TXT_INPUT_BACKGROUND,
         // padding: 15,
         // borderRadius: 15,
         alignItems: "center",

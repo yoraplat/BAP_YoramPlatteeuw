@@ -16,7 +16,7 @@ exports.mollieCallback = functions.https.onRequest((request, response) => {
             await admin.firestore().collection('payments').doc(request.query.id).update({
                 status: res.status
             })
-    
+
             response.send({
                 "message": "Payment " + res.id + " updated with status: " + res.status,
             })
@@ -26,9 +26,9 @@ exports.mollieCallback = functions.https.onRequest((request, response) => {
 })
 
 exports.mollieRedirect = functions.https.onRequest((request, response) => {
-    // Redirect to the app
     // Update this url when the app becomes a standalone app
     response.redirect('exp://192.168.1.56:19000')
+    // response.redirect('nowaste://')
 })
 
 
@@ -60,4 +60,18 @@ exports.mollieCheckout = functions.https.onCall((data, context) => {
         .catch(error => {
             return error
         });
+})
+
+
+// Chat Backend
+exports.newChatMessage = functions.firestore.document('chats/{chatId}/messages/{newMessageId}').onWrite((change, context) => {
+    // Listen for new chat messages
+    console.log("A new message has been added to chat " + context.params.chatId + ' with the message id: ' + context.params.newMessageId)
+    // If a new message has been added, send a notification to the receiving user and add a notification to the corresponding chat
+    admin.firestore().collection('chats/').doc(context.params.chatId).update({
+        last_message: {
+            sender_id: change.after.data().sender_id,
+            message_id: context.params.newMessageId
+        }
+    })
 })

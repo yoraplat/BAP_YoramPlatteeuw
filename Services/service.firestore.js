@@ -338,56 +338,76 @@ const FirestoreProvider = ({ children }) => {
     })
   }
 
-  const fetchAllChats = async () => {
-    let uid = firebase.auth().currentUser.uid;
-    // Find all chats for bought & sold items which are currently awaiting pickup
+  // const fetchAllChats = async () => {
+  //   let uid = firebase.auth().currentUser.uid;
+  //   // Find all chats for bought & sold items which are currently awaiting pickup
 
-    // Find bought items
-    const snapshot = await db.collection('codes').where('user_id', '==', uid).where('is_used', '==', false).get()
+  //   // Find bought items
+  //   const snapshot = await db.collection('codes').where('user_id', '==', uid).where('is_used', '==', false).get()
 
-    // Find sold items
-    const snapshot2 = await db.collection('chats').where('seller_id', '==', uid).where('finished', '==', false).get()
+  //   // Find sold items
+  //   const snapshot2 = await db.collection('chats').where('seller_id', '==', uid).where('finished', '==', false).get()
 
-    const soldPosts = []
-    snapshot2.forEach(doc => {
-      soldPosts.push(doc.data())
+  //   const soldPosts = []
+  //   snapshot2.forEach(doc => {
+  //     soldPosts.push(doc.data())
+  //   })
+
+  //   const boughtPostCodes = []
+  //   snapshot.forEach(doc => {
+  //     boughtPostCodes.push(doc.data().pickup_code)
+  //   })
+
+  //   // create array of all user chats
+  //   const chatHeads = []
+
+  //   boughtPostCodes.forEach(async (code) => {
+  //     const boughtChat = await db.collection('chats/').doc(code).get()
+  //     chatHeads.push(boughtChat.data())
+  //   })
+
+  //   soldPosts.forEach((item) => {
+  //     chatHeads.push(item)
+  //   })
+
+  //   // Prevent errors if there are no results
+  //   // if (chatHeads != null || chatHeads != undefined) {
+  //   //   console.log(chatHeads)
+  //   //   return chatHeads
+  //   // } else {
+  //   //   console.log('false')
+  //   //   return false
+  //   // }
+  //   setChatItems(chatHeads)
+  //   return chatItems
+
+  //   // console.log('Service: ' + JSON.stringify(chatItems))
+  //   // if (chatItems.length) {
+  //   //   return chatItems
+  //   // } else {
+  //   //   return undefined
+  //   // }
+
+  // }
+
+  const fetchAllChats = () => {
+    let uid = firebase.auth().currentUser.uid
+
+    // Chats from bought items have same name (id) as the equivalent chat id 
+    let bought
+    db.collection('codes').where('user_id', '==', uid).where('is_used', '==', false).onSnapshot((res) => {
+      let chats = []
+      res.forEach(async (code) => {
+        await db.collection('chats').doc(code.data().pickup_code).get().then((res) => {
+          console.log('result: ' + res.data())
+          chats.push(res.data())
+
+        })
+        bought = chats
+      })
     })
-
-    const boughtPostCodes = []
-    snapshot.forEach(doc => {
-      boughtPostCodes.push(doc.data().pickup_code)
-    })
-
-    // create array of all user chats
-    const chatHeads = []
-
-    boughtPostCodes.forEach(async (code) => {
-      const boughtChat = await db.collection('chats/').doc(code).get()
-      chatHeads.push(boughtChat.data())
-    })
-
-    soldPosts.forEach((item) => {
-      chatHeads.push(item)
-    })
-
-    // Prevent errors if there are no results
-    // if (chatHeads != null || chatHeads != undefined) {
-    //   console.log(chatHeads)
-    //   return chatHeads
-    // } else {
-    //   console.log('false')
-    //   return false
-    // }
-    setChatItems(chatHeads)
-    return chatItems
-
-    // console.log('Service: ' + JSON.stringify(chatItems))
-    // if (chatItems.length) {
-    //   return chatItems
-    // } else {
-    //   return undefined
-    // }
-
+    console.log(bought)
+    // return bought
   }
 
   const sendMessage = async (id, message) => {
@@ -413,8 +433,22 @@ const FirestoreProvider = ({ children }) => {
     return messageArray
   }
 
+  const checkUnread = async (id) => {
+    await db.collection('chats').doc(id).get().then((res) => {
+      const data = res.data()
+      if (data.last_message.sender_id != firebase.auth().currentUser.uid) {
+        db.collection('chats').doc(id).update({
+          last_message: {
+            message_id: null,
+            sender_id: null,
+          }
+        })
+      }
+    })
+  }
+
   return (
-    <FirestoreContext.Provider value={{ listenForPaymentUpdate, createPayment, sendMessage, fetchChat, fetchAllChats, fetchCodes, createNewChat, imageDownloadUrl, createPost, fetchFood, fetchMeals, fetchAllPosts, buyItem, fetchBoughtItems, fetchCreatedItems, checkAvailable, createPickupCode, checkCode, updateCodeState }}>
+    <FirestoreContext.Provider value={{ checkUnread, listenForPaymentUpdate, createPayment, sendMessage, fetchChat, fetchAllChats, fetchCodes, createNewChat, imageDownloadUrl, createPost, fetchFood, fetchMeals, fetchAllPosts, buyItem, fetchBoughtItems, fetchCreatedItems, checkAvailable, createPickupCode, checkCode, updateCodeState }}>
       {children}
     </FirestoreContext.Provider>
   );

@@ -27,18 +27,6 @@ export const HomeScreen = () => {
   const { fetchAllPosts } = useFirestore();
   const [allPosts, setAllPosts] = useState(null);
 
-  // useEffect(() => {
-  //   // setAllPosts(fetchAllPosts);
-  //   const fetchData = async () => {
-  //     await fetchAllPosts().then((response) => {
-  //       setAllPosts(response)
-  //     })
-  //   }
-
-  //   if (allPosts == null || allPosts.length < 1 || allPosts != undefined) {
-  //     fetchData();
-  //   }
-  // }, []);
   useEffect(() => {
 
     firebase.firestore().collection('/posts').where('bought_at', '==', false).onSnapshot((snapshot) => {
@@ -111,12 +99,17 @@ export const HomeScreen = () => {
   const setBgColor = (id) => {
     if (selectedFilters[id] == false || selectedFilters[id] == undefined) {
       return {
-        backgroundColor: theme.NEUTRAL_BACKGROUND,
+        // backgroundColor: theme.NEUTRAL_BACKGROUND,
+        borderColor: theme.PRIMARY_COLOR,
+        borderWidth: 2,
         color: theme.PRIMARY_COLOR
       }
     } else {
       return {
-        backgroundColor: theme.PRIMARY_COLOR,
+        // backgroundColor: theme.PRIMARY_COLOR,
+        borderColor: theme.BUTTON_BACKGROUND,
+        backgroundColor: theme.BUTTON_BACKGROUND,
+        borderWidth: 2,
         color: theme.WHITE
       }
     }
@@ -227,8 +220,8 @@ const styles = StyleSheet.create({
   },
   filterItem: {
     padding: 7,
-    borderColor: theme.PRIMARY_COLOR,
-    borderWidth: 2,
+    // borderColor: theme.PRIMARY_COLOR,
+    // borderWidth: 2,
     borderRadius: 5,
     fontSize: 15,
     textAlign: "center",

@@ -9,15 +9,14 @@ import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { ListItem } from "../../components/Chat/ListItem";
 import { useFirestore } from '../../Services';
 
-export const ChatScreen = () => {
+export const backup = () => {
 
   const { fetchAllChats, fetchChat, sendMessage, checkUnread } = useFirestore()
-  const [chats, setChats] = useState(null)
-
-  useEffect(() => {
-    // Fetch all chat objects
-    // Depending on selected chat load chat messages
-  },[])
+  const [availableChats, setAvailableChats] = useState(null)
+  const [chatMessages, setChatMessages] = useState(null)
+  const [headerLoading, setHeaderLoading] = useState(true)
+  const [selectedChat, setSelectedChat] = useState(0)
+  const [newMessage, setNewMessage] = useState('')
 
   let [fontsLoaded] = useFonts({
     Poppins_300Light,
@@ -29,49 +28,95 @@ export const ChatScreen = () => {
     return <SafeAreaView style={styles.container} ><AppLoading /></SafeAreaView>
   }
 
-  return (
-    <View style={{ top: 25 }}>
-      <Text>{JSON.stringify(chats)}</Text>
-    </View>
-    // <SafeAreaView style={styles.container}>
-    //   <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.chatContainer}>
-    //     <View style={styles.headerContainer}>
-    //       {headerLoading
-    //         ? <ActivityIndicator size="large" color={theme.PRIMARY_COLOR} />
-    //         : availableChats && availableChats.map((chat, index) => {
-    //           return (
-    //             <TouchableOpacity key={index} style={styles.headerItem} onPress={() => selectChat(index, chat.chat_id)}>
-    //               <View style={styles.headerBadge}>
-    //                 <Text style={styles.badgeTxt}>1</Text>
-    //               </View>
-    //               <Text style={selectedChat == index ? styles.bigText : styles.text}>{chat.title.length >= 8 ? chat.title.substring(0, 8) + '...' : chat.title}</Text>
-    //               <Image source={{ uri: chat.image_url }} style={selectedChat == index ? styles.imageActive : styles.image} />
-    //             </TouchableOpacity>
-    //           )
-    //         })
-    //       }
-    //     </View>
-    //   </ScrollView>
-    //   <View style={styles.contentContainer}>
-    //     <View style={styles.contentTitle}>
-    //       {/* <Text style={styles.chatTitle}>{availableChats[selectedChat].title}</Text> */}
-    //       <Text style={styles.chatTitle}>Title</Text>
-    //     </View>
-    //     <ScrollView horizontal={false} showsVerticalScrollIndicator={false} style={styles.contentChat}>
-    //       {headerLoading
-    //         ? <ActivityIndicator size="large" color={theme.PRIMARY_COLOR} />
-    //         : <ListItem messages={chatMessages} />
-    //         // : <Text>{JSON.stringify(chatMessages)}</Text>
-    //       }
-    //     </ScrollView>
-    //     <View style={styles.submit}>
-    //       <TextInput style={styles.chatInput} placeholderTextColor={theme.WHITE} placeholder={'Type je bericht hier'} value={newMessage} onChangeText={(val) => setNewMessage(val)} />
-    //       <TouchableOpacity onPress={() => createMessage()}>
-    //         <FontAwesomeIcon icon={faPaperPlane} size={20} style={{ color: theme.WHITE }} />
-    //       </TouchableOpacity>
-    //     </View>
-    //   </View>
-    // </SafeAreaView>
+  const fetch = async () => {
+    await fetchAllChats().then((data) => {
+      setAvailableChats(data)
+      setHeaderLoading(false)
+      selectChat(0, data[0].chat_id)
+      console.log('data ' + JSON.stringify(data))
+    })
+  }
+  useEffect(() => {
+
+    if (availableChats == null || availableChats.length < 1) {
+      fetch()
+    }
+  }, [fetchAllChats, fetchChat, chatMessages])
+
+
+
+  const selectChat = (index, id) => {
+    console.log("selected chat: " + id)
+    loadMessages(id)
+    setSelectedChat(index)
+    checkUnread(id)
+  }
+
+  const loadMessages = async (id) => {
+    // Clear unread message if last sender_id != currentUser
+    const messages = await fetchChat(id)
+    setChatMessages(messages)
+  }
+
+  const createMessage = () => {
+    // Empty messages array
+    setChatMessages(null)
+
+    // Get id of current chat
+    let id = availableChats[selectedChat].chat_id
+
+    // Create data object with created_at, message, sender_id
+    let message = newMessage
+    sendMessage(id, message)
+
+    // Reload messages, otherwise the messages array becomes a copy + a new message
+    loadMessages(id)
+
+    // Reset input field
+    setNewMessage('')
+  }
+
+
+  return (    
+    <SafeAreaView style={styles.container}>
+      <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.chatContainer}>
+        <View style={styles.headerContainer}>
+          {headerLoading
+            ? <ActivityIndicator size="large" color={theme.PRIMARY_COLOR} />
+            : availableChats && availableChats.map((chat, index) => {
+              return (
+                <TouchableOpacity key={index} style={styles.headerItem} onPress={() => selectChat(index, chat.chat_id)}>
+                  <View style={styles.headerBadge}>
+                    <Text style={styles.badgeTxt}>1</Text>
+                  </View>
+                  <Text style={selectedChat == index ? styles.bigText : styles.text}>{chat.title.length >= 8 ? chat.title.substring(0, 8) + '...' : chat.title}</Text>
+                  <Image source={{ uri: chat.image_url }} style={selectedChat == index ? styles.imageActive : styles.image} />
+                </TouchableOpacity>
+              )
+            })
+          }
+        </View>
+      </ScrollView>
+      <View style={styles.contentContainer}>
+        <View style={styles.contentTitle}>
+          {/* <Text style={styles.chatTitle}>{availableChats[selectedChat].title}</Text> */}
+          <Text style={styles.chatTitle}>Title</Text>
+        </View>
+        <ScrollView horizontal={false} showsVerticalScrollIndicator={false} style={styles.contentChat}>
+          {headerLoading
+            ? <ActivityIndicator size="large" color={theme.PRIMARY_COLOR} />
+            : <ListItem messages={chatMessages} />
+            // : <Text>{JSON.stringify(chatMessages)}</Text>
+          }
+        </ScrollView>
+        <View style={styles.submit}>
+          <TextInput style={styles.chatInput} placeholderTextColor={theme.WHITE} placeholder={'Type je bericht hier'} value={newMessage} onChangeText={(val) => setNewMessage(val)} />
+          <TouchableOpacity onPress={() => createMessage()}>
+            <FontAwesomeIcon icon={faPaperPlane} size={20} style={{ color: theme.WHITE }} />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, View, Text, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
+import { ActivityIndicator, View, Text, SafeAreaView, TouchableOpacity, ScrollView, Switch } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
@@ -166,7 +166,7 @@ export function NewListing() {
                     if (post.type == 'meal') {
                         dataToPost = { ...data, coordinates: response[0], amount: selectedAmount }
                     } else {
-                        dataToPost = { ...data, coordinates: response[0]}
+                        dataToPost = { ...data, coordinates: response[0] }
                     }
 
                     // Takes too long if coordinates are added
@@ -209,11 +209,15 @@ export function NewListing() {
                         />
                     </View>
                     <View style={styles.formItem}>
-                        <CheckBox
-                            title='Dit is een maaltijd'
-                            checked={isMeal}
-                            onPress={() => setMeal()}
-                        />
+                        <View style={{ flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center'}}>
+                            <Switch
+                                trackColor={{ false: theme.NO_FOCUS, true: theme.FOCUS }}
+                                thumbColor={"#f4f3f4"}
+                                onValueChange={() => setMeal()}
+                                value={isMeal}
+                            />
+                            <Text style={styles.text}>Dit is een maaltijd</Text>
+                        </View>
                     </View>
                     <View style={styles.formItem}>
                         <Text style={styles.title}>Prijs</Text>
@@ -235,7 +239,7 @@ export function NewListing() {
                     {isMeal
                         ?
                         <View style={styles.formItem}>
-                            <Text style={styles.title}>Aantal Maaltijden</Text>
+                            <Text style={styles.title}>Aantal Porties</Text>
                             <Text style={styles.subtitle}>{selectedAmount}x</Text>
                             <Slider
                                 style={styles.slider}
@@ -263,16 +267,24 @@ export function NewListing() {
                     </View>
                     <View style={styles.formItem}>
                         <Text style={styles.title}>Voedingswijze</Text>
+                        <View style={{ }}>
                         <CheckBox
                             title='Vegetarisch'
                             checked={post.veggie}
                             onPress={() => changeVeggie()}
-                        />
+                            containerStyle={{ backgroundColor: theme.NEUTRAL_BACKGROUND, width: '100%', padding: 0}}
+                            textStyle={{ color: theme.PRIMARY_COLOR}}
+                            checkedColor={theme.PRIMARY_COLOR}
+                            />
                         <CheckBox
                             title='Veganistisch'
                             checked={post.vegan}
                             onPress={() => changeVegan()}
+                            containerStyle={{ backgroundColor: theme.NEUTRAL_BACKGROUND, width: '100%', padding: 0}}
+                            textStyle={{ color: theme.PRIMARY_COLOR}}                            
+                            checkedColor={theme.PRIMARY_COLOR}
                         />
+                        </View>
                     </View>
 
                     <View style={styles.formItem}>
@@ -314,12 +326,15 @@ export function NewListing() {
                             title='De aangeboden voeding voldoet aan de voorwaarden'
                             checked={post.terms}
                             onPress={() => changeTerms()}
+                            containerStyle={{ backgroundColor: 'transparent' }}
+                            textStyle={{ color: theme.PRIMARY_COLOR}}
+                            checkedColor={theme.PRIMARY_COLOR}
                         />
                     </View>
 
                     <TouchableOpacity disabled={inProgress ? true : false} style={styles.submitButton} onPress={() => makePost()}>
                         {inProgress
-                            ? <ActivityIndicator size="large" color="white" />
+                            ? <ActivityIndicator size="large" color={theme.PRIMARY_COLOR} />
                             : <Text style={styles.submitButtonTxt}>Voeding Aanbieden</Text>
                         }
                     </TouchableOpacity>

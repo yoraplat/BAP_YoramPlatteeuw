@@ -1,37 +1,33 @@
 New post:   Check if address has specified a city
-            set max character for title and description [DONE]
-
-HomeScreen: Fix space between tabselectors [DONE]
-            itemsList: calculate distance to post address [MAYBE]
+            
+HomeScreen: itemsList: calculate distance to post address [MAYBE]
             Images not loading when filtered, or have wrong index <----------
             add ordering <----------
-            Prevent users to buy their own listings [DONE]
             Filter according to user preferences <----------
-
-            Items do not dissapear when sold <---------- use onSnapshot
+            load items within region
 
 ChatScreen: Chat messages don't load without selecting a Chat
             Delete chat when item is picked up <----------
 
 Logout button:  After logout redirect to login page
 
-
-load items within region
-
 validate all forms input
 
 Add payment method [DONE]
   Debug with different payment statuses (only continue buying process when status is 'paid')
   check if user has an payment object for selected listing
-Users need to have an account number in order to post payed items
-
-Prevent all data fetches to return invalid data when there are no results [DONE]
+  allow user to get his money B!Tch
 
 Use onSnapshot to update data lists <--------------
-  Homepage, new posts do not appear without refreshing [DONE]
-When item created, create page does not reset
+  When item created, create page does not reset
+
+Remake chat screen
+  - All chats and corresponding messages chould be loaded into 1 state
+
+QR code 
 
 BEFORE DEPLOYING THE APP:
 
 Cloud Functions:
   update mollieRedirect to link to the standalone app url (currently linking to expo url)
+  chat notifications

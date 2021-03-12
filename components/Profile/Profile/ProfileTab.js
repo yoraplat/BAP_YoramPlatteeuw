@@ -112,13 +112,13 @@ export default function ProfileTab({ callLogoutFunction }) {
                             placeholderTextColor={theme.TXT_PLACEHOLDER}
                             onChangeText={val => setUsername(val)}
                         />
-                        {/* <TextInput
+                        <TextInput
                             style={styles.txtInput}
-                            placeholder="Rekeningnummer"
+                            placeholder="IBAN nummer om betalingen te ontvangen"
                             value={accountNumber}
                             placeholderTextColor={theme.TXT_PLACEHOLDER}
                             onChangeText={val => setAccountNumber(val)}
-                        /> */}
+                        />
                         <TouchableOpacity style={styles.submitButton}>
                             <Text style={styles.submitButtonTxt}>Wachtwoord veranderen</Text>
                         </TouchableOpacity>
@@ -130,11 +130,17 @@ export default function ProfileTab({ callLogoutFunction }) {
                             title='Enkel veggie & vegan aanbiedingen tonen'
                             checked={onlyVeggie}
                             onPress={() => changeVeggie()}
+                            containerStyle={{ backgroundColor: theme.NEUTRAL_BACKGROUND, width: '100%', padding: 0}}
+                            textStyle={{ color: theme.PRIMARY_COLOR}}                            
+                            checkedColor={theme.PRIMARY_COLOR}
                         />
                         <CheckBox
                             title='Enkel vegan aanbiedingen tonen'
                             checked={onlyVegan}
                             onPress={() => changeVegan()}
+                            containerStyle={{ backgroundColor: theme.NEUTRAL_BACKGROUND, width: '100%', padding: 0}}
+                            textStyle={{ color: theme.PRIMARY_COLOR}}                            
+                            checkedColor={theme.PRIMARY_COLOR}
                         />
                     </View>
 
@@ -150,17 +156,6 @@ export default function ProfileTab({ callLogoutFunction }) {
                         <Text style={styles.submitButtonTxt}>Uitloggen</Text>
                     </TouchableOpacity>
                 </View>
-
-                {/* <View style={styles.form}>
-                    <Text style={styles.title}>Gemiddelde feedback</Text>
-                    <View style={styles.starList}>
-                        <FontAwesomeIcon style={styles.starListItem} icon={faStar} color={theme.PRIMARY_COLOR} />
-                        <FontAwesomeIcon style={styles.starListItem} icon={faStar} color={theme.PRIMARY_COLOR} />
-                        <FontAwesomeIcon style={styles.starListItem} icon={faStar} color={theme.PRIMARY_COLOR} />
-                        <FontAwesomeIcon style={styles.starListItem} icon={faStar} color={theme.PRIMARY_COLOR} />
-                        <FontAwesomeIcon style={styles.starListItem} icon={faStar} color={theme.PRIMARY_COLOR} />
-                    </View>
-                </View> */}
             </ScrollView>
         </SafeAreaView>
     );

@@ -165,7 +165,7 @@ export function ListItem({ postData, count }) {
                 {/* {data.hasImage
                     ? */}
                 <View style={styles.header}>
-                    <ImageBackground source={{ uri: imageUrl }} style={styles.backgroundImage}>
+                    <ImageBackground source={{ uri: imageUrl }} style={styles.backgroundImage} imageStyle={{borderTopLeftRadius: 15, borderTopRightRadius: 15}}>
                         <View style={styles.overlay}>
                             <Text style={styles.title}>{data.title}</Text>
                             <Text style={styles.description}>{data.description}</Text>
@@ -306,12 +306,13 @@ export function ListItem({ postData, count }) {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: theme.NEUTRAL_BACKGROUND,
-        marginBottom: 20
+        marginBottom: 20,
     },
     backgroundImage: {
         flex: 1,
         resizeMode: "cover",
         justifyContent: "center",
+        borderRadius: 15,
     },
     emptyBackground: {
         flex: 1,
@@ -320,7 +321,7 @@ const styles = StyleSheet.create({
         height: 100
     },
     header: {
-        height: 170
+        height: 170,
     },
     overlay: {
         backgroundColor: theme.TRANSPARENT_POPUP,
@@ -328,7 +329,9 @@ const styles = StyleSheet.create({
         padding: 10,
         flex: 1,
         flexDirection: 'column',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
     },
     title: {
         fontFamily: "Poppins_700Bold",
