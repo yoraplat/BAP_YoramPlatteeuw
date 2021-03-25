@@ -72,7 +72,8 @@ export function Map({ posts, selectedQuickFilter }) {
   const [data, setData] = useState(null);
   const [modalData, setModalData] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
-  const [quickFilter, setQuickFilter] = useState(selectedQuickFilter);
+  // const [quickFilter, setQuickFilter] = useState(selectedQuickFilter);
+  const quickFilter = selectedQuickFilter
 
   const { buyItem, checkAvailable, createPickupCode, imageDownloadUrl } = useFirestore()
   const { user_id } = useAuth()
@@ -80,9 +81,10 @@ export function Map({ posts, selectedQuickFilter }) {
   const fadeAnim = useRef(new Animated.Value(0.01)).current;
 
   useEffect(() => {
-    setQuickFilter(selectedQuickFilter);
+    // setQuickFilter(selectedQuickFilter);
     posts != undefined ? loadCoordinates() : '';
-  }, [posts]);
+    console
+  }, [posts, quickFilter]);
 
 
   const getDetails = async (index) => {

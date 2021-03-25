@@ -9,11 +9,21 @@ import ProfileTab from '../../components/Profile/Profile/ProfileTab'
 import { useFirestore } from '../../Services';
 import theme from '../../Theme/theme.style';
 
-export const ProfileScreen = () => {
+export const ProfileScreen = ({ route }) => {
 
-    const { logout } = useAuth();
     const navigation = useNavigation();
+    const { logout } = useAuth();
     const [currentTab, setCurrentTab] = useState(1)
+    
+    useEffect(() => {
+        // If user is redirected by a notification, check the route param to redirect to the correct subtab
+        if (route.params && route.params.type == 'offered') {
+            setCurrentTab(2)
+        }
+        if (route.params && route.params.type == 'bought') {
+            setCurrentTab(1)
+        }
+    }, [route])
 
     const selectTab = (id) => {
         if (currentTab == 3) {
@@ -105,17 +115,16 @@ export const ProfileScreen = () => {
 
 
     const singOut = async () => {
-        logout();
-        alert("Logging out")
+        logout()
     }
     return (
         <SafeAreaView style={styles.container}>
             {currentTab == 1
-                ? <BoughtTab/>
+                ? <BoughtTab />
                 : null
             }
             {currentTab == 2
-                ? <OfferedTab/>
+                ? <OfferedTab />
                 : null
             }
             {currentTab == 3

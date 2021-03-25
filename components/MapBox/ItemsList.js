@@ -1,28 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, Text, SafeAreaView, Dimensions, StatusBar, TouchableOpacity, ScrollView } from 'react-native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faShoppingBasket } from '@fortawesome/free-solid-svg-icons';
-import { faImage } from '@fortawesome/free-regular-svg-icons';
+import { StyleSheet, View, Text, SafeAreaView, StatusBar, ScrollView } from 'react-native';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
 import { ListItem } from './ListItem';
 import theme from '../../Theme/theme.style';
 
 export default function ItemsList({ posts, selectedQuickFilter }) {
-
-    const [quickFilter, setQuickFilter] = useState(selectedQuickFilter);
     const [data, setData] = useState(null);
-
+    const quickFilter = selectedQuickFilter
 
     useEffect(() => {
-        setQuickFilter(selectedQuickFilter);
-        posts != undefined ? loadList() : '';
-    }, [posts]);
+        posts != undefined ? loadList() : ''
+    }, [posts, selectedQuickFilter]);
 
     const loadList = () => {
         const postList = [];
+        // Create a post object from each array item
         posts.forEach((post) => {
-
             const postObject = {
                 title: post.title,
                 description: post.description,
@@ -96,7 +90,25 @@ export default function ItemsList({ posts, selectedQuickFilter }) {
                 postList.push(postObject)
             }
 
+
         });
+
+        // Ordering
+        // Price
+        if (quickFilter[4] == true) {
+            function orderByPrice(a, b) {
+                return (a.price != "Gratis" ? a.price : 0) - (b.price != "Gratis" ? b.price : 0)
+            }
+            postList.sort(orderByPrice);
+        }
+        // Price
+        if (quickFilter[5] == true) {
+            function orderByDate(a, b) {
+                return a.pickup - b.pickup
+            }
+            postList.sort(orderByDate);
+        }
+
         setData(postList)
     }
 
@@ -114,7 +126,7 @@ export default function ItemsList({ posts, selectedQuickFilter }) {
     return (
         <SafeAreaView style={styles.container} >
             <ScrollView style={styles.list}>
-                {posts != undefined
+                {posts != undefined && posts.length != 0
                     ?
                     data && data.map((post, index) => (
                         <ListItem

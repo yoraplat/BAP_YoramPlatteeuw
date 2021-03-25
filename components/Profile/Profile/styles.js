@@ -68,6 +68,19 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 15,
   },
+  passwordButton: {
+    backgroundColor: theme.PRIMARY_COLOR,
+    borderRadius: 15,
+    padding: 10,
+    marginBottom: 15,
+    top: 10,
+  },
+  deleteButton: {
+    backgroundColor: theme.RED,
+    borderRadius: 15,
+    padding: 10,
+    marginBottom: 15,
+  },
   submitButtonTxt: {
     color: theme.BUTTON_TXT_COLOR,
     textAlign: 'center',
@@ -81,6 +94,15 @@ const styles = StyleSheet.create({
   starListItem: {
     fontSize: 100
   },
+  text: {
+    color: theme.PRIMARY_COLOR,
+  },  
+  ahsLogo: {
+    resizeMode: 'contain',
+    maxWidth: '100%',
+    height: 250,
+    alignSelf: 'center'
+  }
 });
 
 export default styles

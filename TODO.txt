@@ -1,33 +1,17 @@
-New post:   Check if address has specified a city
-            
 HomeScreen: itemsList: calculate distance to post address [MAYBE]
-            Images not loading when filtered, or have wrong index <----------
-            add ordering <----------
-            Filter according to user preferences <----------
-            load items within region
-
-ChatScreen: Chat messages don't load without selecting a Chat
-            Delete chat when item is picked up <----------
-
-Logout button:  After logout redirect to login page
-
-validate all forms input
+  fix map item overlay layout
+  add more sorting options
 
 Add payment method [DONE]
   Debug with different payment statuses (only continue buying process when status is 'paid')
   check if user has an payment object for selected listing
-  allow user to get his money B!Tch
 
-Use onSnapshot to update data lists <--------------
-  When item created, create page does not reset
-
-Remake chat screen
-  - All chats and corresponding messages chould be loaded into 1 state
-
-QR code 
+Voorwaarden when creating a post
+fix loading "aangeboden" when item created
 
 BEFORE DEPLOYING THE APP:
+  change logos and icons in app.json
 
-Cloud Functions:
-  update mollieRedirect to link to the standalone app url (currently linking to expo url)
-  chat notifications
+  Cloud Functions:
+    update mollieRedirect to link to the standalone app url (currently linking to expo url)
+  

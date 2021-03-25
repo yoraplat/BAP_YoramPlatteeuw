@@ -1,20 +1,33 @@
-import React, { useState, useEffect } from "react";
-import { SafeAreaView, Text, View, StatusBar, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { SafeAreaView, Text, View, StatusBar, StyleSheet, TouchableOpacity, Dimensions, Button } from "react-native";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faLeaf, faMap, faSlidersH, faStream, faFilter, faSeedling, faSort, faExchangeAlt, faArrowUp } from '@fortawesome/free-solid-svg-icons'
+import { useNavigation } from '@react-navigation/native';
 // Components
 import { Map } from "../../components/MapBox/Map";
 import ItemsList from "../../components/MapBox/ItemsList";
 import { useFirestore } from '../../Services';
+import { useAuth } from '../../Services';
 import theme from '../../Theme/theme.style';
 import { ScrollView } from "react-native-gesture-handler";
-// import { firebase } from "@react-native-firebase/functions";
-
 import * as firebase from 'firebase';
 import 'firebase/firestore';
+import { useScrollToTop } from '@react-navigation/native';
+
+// Notifications
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 export const HomeScreen = () => {
-
+  const navigation = useNavigation();
   const [currentTab, setCurrentTab] = useState(1)
   const [selectedFilters, setSelectedFilters] = useState({
     "0": false,
@@ -24,25 +37,79 @@ export const HomeScreen = () => {
     "4": false,
     "5": false,
   })
-  const { fetchAllPosts } = useFirestore();
+  const { user_id } = useAuth();
   const [allPosts, setAllPosts] = useState(null);
+
+  const scrollToStart = useRef()
+  // useScrollToTop(scrollToStart)
+
+  // Notifications
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
+  // ---------------
 
   useEffect(() => {
 
-    firebase.firestore().collection('/posts').where('bought_at', '==', false).onSnapshot((snapshot) => {
+    // Get user preferences
+    (async () => {
+      const uid = await firebase.auth().currentUser.uid
+      firebase.firestore().collection('/users').doc(uid).onSnapshot((res) => {
+        if (res.data().settings.only_vegan == true) {
+          setSelectedFilters({ ...selectedFilters, [1]: true })
+        } else if (res.data().settings.only_veggie == true) {
+          setSelectedFilters({ ...selectedFilters, [0]: true })
+        }
+      })
+    })()
+    
+
+    const current_date = new Date
+    firebase.firestore().collection('/posts').where('bought_at', '==', false).orderBy('pickup', 'asc').onSnapshot((snapshot) => {
       let food = []
       snapshot.forEach((doc) => {
-        food.push({ ...doc.data() })
+        if (doc.data().pickup.toDate() > current_date) {
+          food.push({ ...doc.data() })
+        }
       })
       setAllPosts(food)
     })
-  }, []);
+
+    // Notifications
+    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      setNotification(notification);
+      // When app is active notifications will be catched here
+    })
+    // Interaction with a notification
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      // console.log(response)
+      // When notification is clicked, interaction happens here. Also catches notification when app is inactive
+      // Redirect user to the right screen
+      navigation.navigate(response.notification.request.content.data.screen, {
+        type: response.notification.request.content.data.type,
+        id: response.notification.request.content.data.item_id
+      })
+    })
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    }
+  }, [])
+
 
   const selectTab = (id) => {
     if (currentTab == 2) {
       setCurrentTab(1)
     }
     setCurrentTab(id)
+    scrollToStart.current?.scrollTo({
+      y: -1,
+      animated: true
+    })
   }
 
   const getStyle = function (id, buttonId) {
@@ -115,6 +182,38 @@ export const HomeScreen = () => {
     }
   }
 
+  async function registerForPushNotificationsAsync() {
+    let token;
+    if (Constants.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!');
+        return;
+      }
+      token = (await Notifications.getExpoPushTokenAsync()).data;
+      // Add token to user data
+      firebase.firestore().collection('users').doc(user_id()).set(
+        { pushtoken: token },
+        { merge: true }
+      )
+    }
+
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+
+    return token;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -128,7 +227,7 @@ export const HomeScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.filterContainer}>
-        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.filterList}>
+        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} ref={scrollToStart} style={styles.filterList}>
           <FontAwesomeIcon icon={faFilter} style={styles.filterItemIcon} size={30} />
           <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(0)}>
             <Text style={[styles.filterItem, setBgColor(0)]}>Veggie</Text>
@@ -149,7 +248,7 @@ export const HomeScreen = () => {
                 <Text style={[styles.filterItem, setBgColor(4)]}>Prijs</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(5)}>
-                <Text style={[styles.filterItem, setBgColor(5)]}>Afstand</Text>
+                <Text style={[styles.filterItem, setBgColor(5)]}>Ophalen op</Text>
               </TouchableOpacity>
             </>
             : null
@@ -225,7 +324,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     fontSize: 15,
     textAlign: "center",
-    // backgroundColor: theme.NEUTRAL_BACKGROUND,
+    backgroundColor: theme.TXT_INPUT_BACKGROUND,
     marginRight: 8,
   },
 

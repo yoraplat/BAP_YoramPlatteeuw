@@ -13,24 +13,30 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useFirestore } from '../../Services';
 import * as Location from 'expo-location';
 import theme from '../../Theme/theme.style';
+import { useNavigation } from '@react-navigation/native';
 
 export function NewListing() {
 
+    // Current date + 2 days
+    const current_date = new Date()
+    current_date.setDate(current_date.getDate() + 2)
+
     const [post, setPost] = useState({
         price: 0,
-        image: false,
-        pickup: new Date(),
+        image: null,
+        pickup: current_date,
         title: null,
         address: null,
         description: null,
         veggie: false,
         vegan: false,
-        terms: false,
+        terms: null,
         bought_at: false,
         coordinates: false,
         type: 'food'
     });
 
+    const navigation = useNavigation();
     const [selectedAmount, setSelectedAmount] = useState(1);
     const [isMeal, setIsMeal] = useState(false);
     const [mode, setMode] = useState('date');
@@ -53,10 +59,10 @@ export function NewListing() {
     }, []);
 
     const changeTerms = () => {
-        if (post.terms == false) {
+        if (post.terms == null) {
             setPost({ ...post, terms: true })
         } else {
-            setPost({ ...post, terms: false })
+            setPost({ ...post, terms: null })
         }
     }
     const changeVeggie = () => {
@@ -128,39 +134,25 @@ export function NewListing() {
     }
 
     const makePost = async () => {
-        setInProgress(true);
-        await Location.geocodeAsync(post.address).then((result) => {
-            // Quick fix for testing purposes, geocode doesn't always work on virtual device
-            console.log(result)
-            const response = result
+        setInProgress(true)
+        // Validate all inputs before continuing
+        const validation = []
+        Object.values(post).map((value, index) => {
+            if (value !== null) {
+                validation.push('valid')
+            } else {
+                validation.push('invalid')
+            }
+        })
 
-            // const response = {
-            //     "accuracy": 0,
-            //     "altitude": 0,
-            //     "altitudeAccuracy": 0,
-            //     "heading": 0,
-            //     "latitude": 51.0547962,
-            //     "longitude": 3.7077666,
-            //     "speed": 0,
-            // }
+        const isValid = arr => arr == 'valid' || arr === false
+        // Continue if validation is successful
+        if (validation.every(isValid)) {
+            // Fetch address geo data
+            await Location.geocodeAsync(post.address).then((result) => {
+                const response = result
 
-
-            if (Object.keys(response).length > 0) {
-                // Validate all fields
-                let validation = [];
-                for (let key in post) {
-                    if (post[key] === null || post[key] === "") {
-                        validation.push(false)
-                    } else {
-                        validation.push(true)
-                    }
-                }
-
-                // When validated create the post
-                const isValid = arr => arr.every(Boolean)
-                if (isValid(validation)) {
-                    console.log("All fields are filled in, creating post")
-
+                if (Object.keys(response).length > 0) {
                     let data = post
                     let dataToPost;
                     if (post.type == 'meal') {
@@ -169,20 +161,42 @@ export function NewListing() {
                         dataToPost = { ...data, coordinates: response[0] }
                     }
 
-                    // Takes too long if coordinates are added
-                    // console.log(dataToPost)
                     createPost(dataToPost).then(() => {
                         setInProgress(false);
                     })
-                    // setInProgress(false);
-                }
-                setInProgress(false);
+                    setInProgress(false);
 
-            } else {
-                alert("Dit adres kon niet gevonden worden.")
-                setInProgress(false);
-            }
-        })
+                    // Clear all inputs
+                    setPost({
+                        price: 0,
+                        image: null,
+                        pickup: new Date(),
+                        title: null,
+                        address: null,
+                        description: null,
+                        veggie: false,
+                        vegan: false,
+                        terms: null,
+                        bought_at: false,
+                        coordinates: false,
+                        type: 'food'
+                    })
+
+                    // Navigate profile screen
+                    // Pass parameter to got to the offerd tab
+                    navigation.navigate('Profile', {
+                        type: 'offered'
+                    })
+                } else {
+                    alert("Dit adres kon niet gevonden worden.")
+                    setInProgress(false);
+                }
+            })
+        }
+        else {
+            alert("Gelieve alle velden correct in te vullen")
+            setInProgress(false)
+        }
     }
     return (
         <SafeAreaView style={styles.container} >
@@ -195,21 +209,23 @@ export function NewListing() {
                             placeholder="Titel"
                             placeholderTextColor={theme.TEXT_PLACEHOLDER}
                             // onChangeText={val => setTitle(val)}
-                            onChangeText={val => setPost({ ...post, title: val })}
+                            value={post.title}
+                            onChangeText={val => setPost({ ...post, title: val.trim() == '' ? null : val })}
                             maxLength={35}
                         />
 
                         <TextInput
                             style={styles.txtInput}
                             placeholder="Korte Beschrijving"
+                            value={post.description}
                             placeholderTextColor={theme.TEXT_PLACEHOLDER}
                             // onChangeText={val => setDescription(val)}
-                            onChangeText={val => setPost({ ...post, description: val })}
+                            onChangeText={val => setPost({ ...post, description: val.trim() == '' ? null : val })}
                             maxLength={90}
                         />
                     </View>
                     <View style={styles.formItem}>
-                        <View style={{ flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center'}}>
+                        <View style={{ flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center' }}>
                             <Switch
                                 trackColor={{ false: theme.NO_FOCUS, true: theme.FOCUS }}
                                 thumbColor={"#f4f3f4"}
@@ -258,7 +274,7 @@ export function NewListing() {
                     <View style={styles.formItem}>
                         <Text style={styles.title}>Foto</Text>
                         <TouchableOpacity style={styles.bigButton} onPress={pickImage}>
-                            {post.image != false
+                            {post.image != null
                                 ? <Text style={styles.bigButtonText}>Afbeelding Toegevoegd</Text>
                                 : <Text style={styles.bigButtonText}>Foto Toevoegen</Text>
                             }
@@ -267,23 +283,23 @@ export function NewListing() {
                     </View>
                     <View style={styles.formItem}>
                         <Text style={styles.title}>Voedingswijze</Text>
-                        <View style={{ }}>
-                        <CheckBox
-                            title='Vegetarisch'
-                            checked={post.veggie}
-                            onPress={() => changeVeggie()}
-                            containerStyle={{ backgroundColor: theme.NEUTRAL_BACKGROUND, width: '100%', padding: 0}}
-                            textStyle={{ color: theme.PRIMARY_COLOR}}
-                            checkedColor={theme.PRIMARY_COLOR}
+                        <View style={{}}>
+                            <CheckBox
+                                title='Vegetarisch'
+                                checked={post.veggie}
+                                onPress={() => changeVeggie()}
+                                containerStyle={{ backgroundColor: theme.NEUTRAL_BACKGROUND, width: '100%', padding: 0 }}
+                                textStyle={{ color: theme.PRIMARY_COLOR }}
+                                checkedColor={theme.PRIMARY_COLOR}
                             />
-                        <CheckBox
-                            title='Veganistisch'
-                            checked={post.vegan}
-                            onPress={() => changeVegan()}
-                            containerStyle={{ backgroundColor: theme.NEUTRAL_BACKGROUND, width: '100%', padding: 0}}
-                            textStyle={{ color: theme.PRIMARY_COLOR}}                            
-                            checkedColor={theme.PRIMARY_COLOR}
-                        />
+                            <CheckBox
+                                title='Veganistisch'
+                                checked={post.vegan}
+                                onPress={() => changeVegan()}
+                                containerStyle={{ backgroundColor: theme.NEUTRAL_BACKGROUND, width: '100%', padding: 0 }}
+                                textStyle={{ color: theme.PRIMARY_COLOR }}
+                                checkedColor={theme.PRIMARY_COLOR}
+                            />
                         </View>
                     </View>
 
@@ -318,7 +334,8 @@ export function NewListing() {
                             placeholder="Adres"
                             placeholderTextColor={theme.TEXT_PLACEHOLDER}
                             // onChangeText={val => setAddress(val)}
-                            onChangeText={val => setPost({ ...post, address: val })}
+                            value={post.address}
+                            onChangeText={val => setPost({ ...post, address: val.trim() == '' ? null : val })}
                         />
                     </View>
                     <View style={styles.formItem}>
@@ -327,7 +344,7 @@ export function NewListing() {
                             checked={post.terms}
                             onPress={() => changeTerms()}
                             containerStyle={{ backgroundColor: 'transparent' }}
-                            textStyle={{ color: theme.PRIMARY_COLOR}}
+                            textStyle={{ color: theme.PRIMARY_COLOR }}
                             checkedColor={theme.PRIMARY_COLOR}
                         />
                     </View>
@@ -338,9 +355,6 @@ export function NewListing() {
                             : <Text style={styles.submitButtonTxt}>Voeding Aanbieden</Text>
                         }
                     </TouchableOpacity>
-
-
-
                 </View>
             </ScrollView>
         </SafeAreaView>

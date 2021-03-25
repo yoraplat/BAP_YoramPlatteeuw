@@ -6,6 +6,9 @@
     "orientation": "portrait",
     "scheme": "nowaste",
     "icon": "./assets/icon.png",
+    "notification": {
+      "icon": "./assets/icon.png"
+    },
     "splash": {
       "image": "./assets/logoV2.1.png",
       "resizeMode": "contain",

@@ -18,7 +18,9 @@ const FirestoreProvider = ({ children }) => {
   const [boughtItems, setBoughtItems] = useState([]);
   const [createdItemsId, setCreatedItemsId] = useState([]);
   const [createdItems, setCreatedItems] = useState([]);
-  const [chatItems, setChatItems] = useState([]);
+  // Chat
+  const [boughtChats, setBoughtChats] = useState([]);
+  const [offeredChats, setOfferedChats] = useState([]);
 
   // Payments
   const [status, setStatus] = useState(null);
@@ -138,13 +140,13 @@ const FirestoreProvider = ({ children }) => {
   const buyItem = async (listingId) => {
     const uid = firebase.auth().currentUser.uid
 
-    const current_bought = await db.collection('/users').doc(uid).get()
-    const current_items = current_bought.data().bought_listings
-    let bought_array = current_items
-    bought_array.push(listingId)
+    // const current_bought = await db.collection('/users').doc(uid).get()
+    // const current_items = current_bought.data().bought_listings
+    // let bought_array = current_items
+    // bought_array.push(listingId)
 
     await db.collection('/users').doc(firebase.auth().currentUser.uid).update(
-      { bought_listings: bought_array }
+      { bought_listings: firebase.firestore.FieldValue.arrayUnion(listingId) }
     ).then(async () => {
 
       // Only set bought_at when all meals have been bought
@@ -310,6 +312,9 @@ const FirestoreProvider = ({ children }) => {
     await db.collection('codes').doc(code).update({
       is_used: state,
     })
+    await db.collection('chats').doc(code).update({
+      finished: true,
+    })
   }
 
   // CHAT FUNCTIONS
@@ -336,6 +341,11 @@ const FirestoreProvider = ({ children }) => {
       finished: false,
       image_url: image
     })
+
+    // Update USER data with id added to chats
+    await db.collection('users').doc(user_id).update({ chats: firebase.firestore.FieldValue.arrayUnion(id) })
+    // Update SELLER data with id added to chats
+    await db.collection('users').doc(details.seller_id).update({ chats: firebase.firestore.FieldValue.arrayUnion(id) })
   }
 
   // const fetchAllChats = async () => {
@@ -393,26 +403,23 @@ const FirestoreProvider = ({ children }) => {
   const fetchAllChats = () => {
     let uid = firebase.auth().currentUser.uid
 
-    // Chats from bought items have same name (id) as the equivalent chat id 
-    let bought
-    db.collection('codes').where('user_id', '==', uid).where('is_used', '==', false).onSnapshot((res) => {
-      let chats = []
-      res.forEach(async (code) => {
-        await db.collection('chats').doc(code.data().pickup_code).get().then((res) => {
-          console.log('result: ' + res.data())
-          chats.push(res.data())
-
+    // Listen for updates in users chats array
+    db.collection('users').doc(uid).onSnapshot((res) => {
+      const userChats = []
+      const chats = res.data().chats
+      chats.forEach(async (chat) => {
+        await db.collection('chats').doc(chat).get().then((res) => {
+          userChats.push(res.data())
         })
-        bought = chats
       })
+      console.log(userChats)
+      return userChats
     })
-    console.log(bought)
-    // return bought
   }
 
   const sendMessage = async (id, message) => {
     let uid = firebase.auth().currentUser.uid
-    const newId = uuid();
+    const newId = uuid()
     await db.collection('chats/' + id + '/messages').doc(newId).set({
       message: message,
       created_at: new Date,
@@ -447,8 +454,48 @@ const FirestoreProvider = ({ children }) => {
     })
   }
 
+  const checkPickup = async (post_id) => {
+    let response = null
+    await firebase.firestore().collection('codes').where('listing_id', '==', post_id).get().then((res) => {
+      // console.log(res.data().length)
+      let used_codes = []
+      let total_codes = []
+
+      res.forEach(code => {
+        total_codes.push(code.data().pickup_code)
+      })
+
+      res.forEach(code => {
+        if (code.data().is_used == true) {
+          used_codes.push(code.data().pickup_code)
+        }
+      })
+
+      if (used_codes.length == total_codes.length) {
+        response = true
+      } else {
+        response = false
+      }
+
+    })
+    return response
+  }
+
+  const resetPassword = async (email) => {
+    try {
+      const mailObject = {
+        "email": email,
+      }
+
+      const sendMail = firebase.functions().httpsCallable('passwordReset')
+      await sendMail(mailObject)
+    } catch (e) {
+      console.log(e.message)
+    }
+  }
+
   return (
-    <FirestoreContext.Provider value={{ checkUnread, listenForPaymentUpdate, createPayment, sendMessage, fetchChat, fetchAllChats, fetchCodes, createNewChat, imageDownloadUrl, createPost, fetchFood, fetchMeals, fetchAllPosts, buyItem, fetchBoughtItems, fetchCreatedItems, checkAvailable, createPickupCode, checkCode, updateCodeState }}>
+    <FirestoreContext.Provider value={{ resetPassword, checkPickup, checkUnread, listenForPaymentUpdate, createPayment, sendMessage, fetchChat, fetchAllChats, fetchCodes, createNewChat, imageDownloadUrl, createPost, fetchFood, fetchMeals, fetchAllPosts, buyItem, fetchBoughtItems, fetchCreatedItems, checkAvailable, createPickupCode, checkCode, updateCodeState }}>
       {children}
     </FirestoreContext.Provider>
   );

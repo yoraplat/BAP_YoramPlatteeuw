@@ -12,8 +12,12 @@ import * as WebBrowser from 'expo-web-browser';
 import { ActivityIndicator } from 'react-native';
 import * as firebase from 'firebase';
 import 'firebase/firestore';
+import moment from 'moment';
+import 'moment/locale/nl-be';
+
 
 export function ListItem({ postData, count }) {
+    moment.locale('nl');
 
     const [imageUrl, setImageUrl] = useState(null)
     const [imageVisible, setImageVisible] = useState(false)
@@ -43,37 +47,13 @@ export function ListItem({ postData, count }) {
                 }
             })
         }
-    }, [paymentId])
-
-    const convertDate = (date) => {
-        const months = {
-            0: 'januari',
-            1: 'februari',
-            2: 'maart',
-            3: 'april',
-            4: 'mei',
-            5: 'juni',
-            6: 'juli',
-            7: 'augustus',
-            8: 'september',
-            9: 'oktober',
-            10: 'november',
-            11: 'december'
-        }
-        const d = new Date(date * 1000);
-        const day = d.getDay();
-        const month = months[d.getMonth()];
-        const hour = d.getHours();
-        const minutes = d.getMinutes();
-        return `${day} ${month} om ${hour}:${minutes}u`
-    }
-
+    }, [paymentId, postData])
 
     const data = {
         title: postData.title,
         id: postData.id,
         description: postData.description,
-        pickup: convertDate(postData.pickup.seconds),
+        pickup: postData.pickup,
         address: postData.address,
         amount: !postData.amount ? 1 : postData.amount,
         veggie: postData.veggie,
@@ -179,7 +159,8 @@ export function ListItem({ postData, count }) {
                 </View>
                 <TouchableOpacity style={styles.info} onPress={() => buy()}>
                     <View style={styles.infoItem}>
-                        <Text style={styles.infoTxt}>Ophalen op {data.pickup}</Text>
+                        {/* <Text style={styles.infoTxt}>Ophalen op {moment((postData.pickup).toDate()).format('DD/MM/YYYY' + ', ' + 'hh:mm')}</Text> */}
+                        <Text style={styles.infoTxt}>Ophalen op {moment((data.pickup).toDate()).format('D MMMM [om] HH:mm[u]')}</Text>
                         <Text style={styles.infoTxt}>{data.address}</Text>
                     </View>
                     <View style={styles.infoItem}>
@@ -268,12 +249,12 @@ export function ListItem({ postData, count }) {
                                     <Text style={styles.confirmDetailsBig}>{data.title}</Text>
                                     <Text style={styles.confirmDetails}>Prijs: {data.price}</Text>
                                     <Text style={styles.confirmDetails}>Adres: {data.address}</Text>
-                                    <Text style={styles.confirmDetails}>Op te halen op {data.pickup}</Text>
+                                    <Text style={styles.confirmDetails}>Op te halen op {moment((data.pickup).toDate()).format('D MMMM [om] HH:mm[u]')}</Text>
                                 </View>
                                 {paymentStatus != 'paid' && paymentStatus != null
-                                    ? <Text style={styles.freeItemTxt}>Wachten op betaling <ActivityIndicator size="large" color={theme.PRIMARY_COLOR} /></Text>
+                                    ? <Text style={styles.statusTxt}>Wachten op betaling <ActivityIndicator size="small" color={theme.PRIMARY_COLOR} /></Text>
                                     : paymentStatus == 'paid'
-                                        ? <Text style={styles.freeItemTxt}>Item is betaald</Text>
+                                        ? <Text style={styles.statusTxt}>Item is betaald</Text>
                                         : null
                                 }
                                 <View style={styles.itemBtnList}>
@@ -406,19 +387,28 @@ const styles = StyleSheet.create({
     },
 
     modalViewConfirm: {
-        backgroundColor: theme.NEUTRAL_BACKGROUND,
+        // backgroundColor: theme.NEUTRAL_BACKGROUND,
+        backgroundColor: theme.TXT_INPUT_BACKGROUND,
     },
     freeItem: {
         // height: 300,
         width: 300,
     },
     freeItemTxt: {
-        fontFamily: "Poppins_400Regular",
+        fontFamily: "Poppins_500Medium",
         color: theme.PRIMARY_COLOR,
-        fontSize: 18,
+        fontSize: 20,
         padding: 10,
         textAlign: 'center',
     },
+    statusTxt: {
+        fontFamily: "Poppins_400Regular",
+        color: theme.PRIMARY_COLOR,
+        fontSize: 15,
+        padding: 10,
+        textAlign: 'center',
+    },
+
     itemBtnList: {
         flexDirection: 'row',
         justifyContent: 'center',
@@ -439,17 +429,6 @@ const styles = StyleSheet.create({
         backgroundColor: theme.RED,
 
     },
-
-    // modalView: {
-    // shadowColor: '#000',
-    // shadowOffset: {
-    //     width: 0,
-    //     height: 2,
-    // },
-    // shadowOpacity: 0.25,
-    // shadowRadius: 3.84,
-    // elevation: 5,
-    // },
     closeBtn: {
         alignSelf: 'flex-end',
         zIndex: 999,
@@ -474,6 +453,7 @@ const styles = StyleSheet.create({
     },
     confirmDetailsBig: {
         fontFamily: "Poppins_500Medium",
+        fontSize: 15,
         paddingBottom: 5,
     },
 });

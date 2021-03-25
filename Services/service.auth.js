@@ -28,7 +28,7 @@ const AuthProvider = ({ children }) => {
 
   const updateUser = async (data) => {
     const uid = firebase.auth().currentUser.uid
-    const user = await firebase.firestore().collection('/users').doc(uid).update({
+    await firebase.firestore().collection('/users').doc(uid).update({
       account_number: data.account_number,
       email: data.email,
       username: data.username,
@@ -49,8 +49,20 @@ const AuthProvider = ({ children }) => {
     firebase.auth().signOut();
   }
 
+  const userPreferences = async () => {
+    const uid = firebase.auth().currentUser.uid
+    await firebase.firestore().collection('/users').doc(uid).get().then((res) => {
+      return res.data().settings
+    })
+  }
+
+  const deleteUserData = () => {
+    const uid = firebase.auth().currentUser.uid
+    firebase.firestore().collection('users').doc(uid).delete()
+  }
+
   return (
-    <AuthContext.Provider value={{ user_id, currentUser, logout, fetchUser, updateUser }}>
+    <AuthContext.Provider value={{ deleteUserData, userPreferences, user_id, currentUser, logout, fetchUser, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

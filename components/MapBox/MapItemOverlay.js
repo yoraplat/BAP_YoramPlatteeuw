@@ -50,7 +50,7 @@ export function MapItemOverlay({ post, closeOverlayFunction, openModalFunction }
 
             <View style={overlayStyles.info}>
                 <View style={overlayStyles.infoList}>
-                    <Text style={overlayStyles.infoItem}>{moment((post.pickup).toDate()).format('DD/MM/YYYY' + ', ' + 'hh:mm')}</Text>
+                    <Text style={overlayStyles.infoItem}>{moment((post.pickup).toDate()).format('DD/MM/YYYY' + ', ' + 'HH:mm[u]')}</Text>
                     <Text style={[overlayStyles.infoItem, overlayStyles.small]}>1,3 km</Text>
                     <Text style={overlayStyles.infoItem}>{post.address}</Text>
                     <Text style={[overlayStyles.infoItemImage, overlayStyles.right, { fontFamily: 'Poppins_300Light' }]}>{post.amount} beschikbaar</Text>

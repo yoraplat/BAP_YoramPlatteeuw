@@ -8,15 +8,17 @@ import moment from 'moment';
 import { TextInput } from 'react-native-gesture-handler';
 import { useFirestore } from '../../../Services';
 import theme from '../../../Theme/theme.style';
+import { firebase } from '@react-native-firebase/functions';
 
 export function ProfileListItem({ postData, indexKey, type }) {
 
-    const { checkCode, updateCodeState, fetchCodes } = useFirestore();
+    const { checkCode, updateCodeState, fetchCodes, checkPickup } = useFirestore();
 
     const [code, setCode] = useState(null)
     const [codeList, setCodeList] = useState(null)
     const [checkingCode, setCheckingCode] = useState(false)
     const [checkResult, setCheckResult] = useState(null)
+    const [status, setStatus] = useState(null)
 
     useEffect(() => {
 
@@ -32,22 +34,6 @@ export function ProfileListItem({ postData, indexKey, type }) {
             }
         }
     }, [codeList]);
-
-
-    // const data = {
-    //     title: postData.title,
-    //     description: postData.description,
-    //     pickup: postData.pickup,
-    //     bought_at: postData.bought_at,
-    //     address: postData.address,
-    //     amount: postData.amount,
-    //     veggie: postData.veggie,
-    //     vegan: postData.vegan,
-    //     price: postData.price > 0 ? "€" + postData.price : "Gratis",
-    //     hasImage: postData.image ? true : false,
-    //     id: postData.id,
-    //     type: postData.type == "food" ? "Voeding" : "Maaltijd"
-    // }
 
     const confirmPickup = async () => {
         try {
@@ -81,73 +67,134 @@ export function ProfileListItem({ postData, indexKey, type }) {
     }
 
 
+    const check_status = async () => {
+        let item_status
+        // Check if pickup date had passed and skip checking pickup codes
+        let date = postData.pickup.toDate()
+        let current_date = new Date
+        // Check if pickup date has past
+        if (date < current_date) {
+            item_status = true
+        }
+        // Check if post has been bought
+        if (postData.bought_at != false) {
+            // Check if all pickup codes for certain post are used
+            const status_response = await checkPickup(postData.id)
+            item_status = status_response
+        }
+        return item_status
+    }
+
+    if (postData) {
+        const fetch = async () => {
+            const res = await check_status()
+            setStatus(res)
+        }
+        fetch()
+    }
 
     return (
-        <View style={styles.listItem}>
-            { postData != null ?
-            <>
-            <View style={styles.topLine}>
-                <Text style={styles.title}>{postData.title} <Text style={{ fontFamily: "Poppins_300Light", fontSize: 17 }}>({postData.price})</Text></Text>
-                {postData.veggie == true && postData.vegan == false
-                    ? <FontAwesomeIcon icon={faLeaf} style={{ color: 'green', left: 10 }} size={30} />
-                    : <></>
-                }
-                {postData.vegan == true
-                    ? <FontAwesomeIcon icon={faSeedling} style={{ color: 'green', left: 10 }} size={30} />
-                    : <></>
-                }
-            </View>
-
-            <Text style={styles.description}>{postData.description}</Text>
-            <View style={styles.info}>
-                <View style={styles.infoList}>
-                    <Text style={styles.infoItem}>{moment((postData.pickup).toDate()).format('DD/MM/YYYY' + ', ' + 'hh:mm')}</Text>
-                    <Text style={styles.infoItem}>{postData.address}</Text>
-                    <Text style={styles.infoItem}>Type: {postData.type}</Text>
-                    {postData.amount > 1
-                        ? <Text style={[styles.infoItem, { fontFamily: 'Poppins_300Light' }]}>Aantal: {postData.amount}</Text>
-                        : null
-                    }
-                    <View style={styles.infoItemCode}>
-                        {type == 'bought'
-                            ? <Text style={styles.infoCode}>
-                                {codeList == null ?
-                                    <ActivityIndicator size="small" color={theme.PRIMARY_COLOR} />
-                                    : codeList.map((item, index) => <Text key={index}> {item.pickup_code} </Text>)}
-                            </Text>
-
-                            : <View style={styles.validateContainer}>
-                                <TextInput
-                                    style={styles.infoInput}
-                                    placeholder="CODE"
-                                    onChangeText={val => setCode(val)}
-                                />
-                                <TouchableOpacity style={styles.validateBtn} onPress={() => confirmPickup()}>
-                                    {checkingCode
-                                        ? <Text style={styles.validateBtnTxt}><ActivityIndicator size="small" color="white" /></Text>
-                                        : checkResult == null
-                                            ? <Text style={styles.validateBtnTxt}>Valideren</Text>
-                                            : checkResult.is_used == true
-                                                ? <Text style={styles.validateBtnTxt}>Al gebruikt</Text>
-                                                : checkResult == false
-                                                    ? <FontAwesomeIcon icon={faTimes} style={styles.checkIcon} />
-                                                    : <FontAwesomeIcon icon={faCheck} style={styles.checkIcon} />
-                                    }
-                                </TouchableOpacity>
+        <>
+            { status == null || status == false
+                ? <View style={styles.listItem}>
+                    {postData != null ?
+                        <>
+                            <View style={styles.topLine}>
+                                <Text style={styles.title}>{postData.title} <Text style={{ fontFamily: "Poppins_300Light", fontSize: 17 }}>(€{postData.price})</Text></Text>
+                                {postData.veggie == true && postData.vegan == false
+                                    ? <FontAwesomeIcon icon={faLeaf} style={{ color: 'green', left: 10 }} size={30} />
+                                    : <></>
+                                }
+                                {postData.vegan == true
+                                    ? <FontAwesomeIcon icon={faSeedling} style={{ color: 'green', left: 10 }} size={30} />
+                                    : <></>
+                                }
                             </View>
-                        }
-                    </View>
-                    {
-                        postData.bought_at
-                            ? <Text style={[styles.infoItem, styles.regularFont]}>Toon deze code bij het afhalen van je aankoop</Text>
-                            : <Text style={[styles.infoItem, styles.regularFont]}>Vraag de code aan de persoon die je aanbieding komt ophalen, vul deze code hier in</Text>
+
+                            <Text style={styles.description}>{postData.description}</Text>
+                            <View style={styles.info}>
+                                <View style={styles.infoList}>
+                                    <Text style={styles.infoItem}>{moment((postData.pickup).toDate()).format('DD/MM/YYYY' + ', ' + 'HH:mm[u]')}</Text>
+                                    <Text style={styles.infoItem}>{postData.address}</Text>
+                                    <Text style={styles.infoItem}>Type: {postData.type}</Text>
+                                    {postData.amount > 1
+                                        ? <Text style={[styles.infoItem, { fontFamily: 'Poppins_300Light' }]}>Aantal: {postData.amount}</Text>
+                                        : null
+                                    }
+                                    <View style={styles.infoItemCode}>
+                                        {type == 'bought'
+                                            ? <Text style={styles.infoCode}>
+                                                {codeList == null ?
+                                                    <ActivityIndicator size="small" color={theme.PRIMARY_COLOR} />
+                                                    : codeList.map((item, index) => <Text key={index}> {item.pickup_code} </Text>)}
+                                            </Text>
+
+                                            : <View style={styles.validateContainer}>
+                                                <TextInput
+                                                    style={styles.infoInput}
+                                                    placeholder="CODE"
+                                                    onChangeText={val => setCode(val)}
+                                                />
+                                                <TouchableOpacity style={styles.validateBtn} onPress={() => confirmPickup()}>
+                                                    {checkingCode
+                                                        ? <Text style={styles.validateBtnTxt}><ActivityIndicator size="small" color="white" /></Text>
+                                                        : checkResult == null
+                                                            ? <Text style={styles.validateBtnTxt}>Valideren</Text>
+                                                            : checkResult.is_used == true
+                                                                ? <Text style={styles.validateBtnTxt}>Al gebruikt</Text>
+                                                                : checkResult == false
+                                                                    ? <FontAwesomeIcon icon={faTimes} style={styles.checkIcon} />
+                                                                    : <FontAwesomeIcon icon={faCheck} style={styles.checkIcon} />
+                                                    }
+                                                </TouchableOpacity>
+                                            </View>
+                                        }
+                                    </View>
+                                    {
+                                        postData.bought_at
+                                            ? <Text style={[styles.infoItem, styles.regularFont]}>Toon deze code bij het afhalen van je aankoop</Text>
+                                            : <Text style={[styles.infoItem, styles.regularFont]}>Vraag de code aan de persoon die je aanbieding komt ophalen, vul deze code hier in</Text>
+                                    }
+                                </View>
+                            </View>
+                        </>
+                        : <ActivityIndicator size="large" color={theme.PRIMARY_COLOR} />
                     }
                 </View>
-            </View>
-            </>
-            : <ActivityIndicator size="large" color={theme.PRIMARY_COLOR} />
-        }
-        </View>
+                : <View style={styles.listItem}>
+                    {postData != null
+                        ?
+                        <>
+                            <View style={styles.topLine}>
+                                <Text style={styles.title}>{postData.title} <Text style={{ fontFamily: "Poppins_300Light", fontSize: 17 }}>(€{postData.price})</Text></Text>
+                                {postData.veggie == true && postData.vegan == false
+                                    ? <FontAwesomeIcon icon={faLeaf} style={{ color: 'green', left: 10 }} size={30} />
+                                    : <></>
+                                }
+                                {postData.vegan == true
+                                    ? <FontAwesomeIcon icon={faSeedling} style={{ color: 'green', left: 10 }} size={30} />
+                                    : <></>
+                                }
+                            </View>
+
+                            <Text style={styles.description}>{postData.description}</Text>
+                            <View style={styles.info}>
+                                <View style={styles.infoList}>
+                                    <Text style={styles.infoItem}>{moment((postData.pickup).toDate()).format('DD/MM/YYYY' + ', ' + 'hh:mm')}</Text>
+                                    <Text style={styles.infoItem}>{postData.address}</Text>
+
+                                    <Text style={[styles.infoItem, styles.regularFont]}>Dit item is niet meer beschikbaar</Text>
+
+                                </View>
+                            </View>
+                            <View style={styles.disabledOverlay}>
+                            </View>
+                        </>
+                        : <ActivityIndicator size="large" color={theme.PRIMARY_COLOR} />
+                    }
+                </View>
+            }
+        </>
     );
 }
 
@@ -156,7 +203,16 @@ const styles = StyleSheet.create({
         backgroundColor: theme.NEUTRAL_BACKGROUND,
         padding: 20,
         borderRadius: 15,
-        marginBottom: 20
+        marginBottom: 20,
+    },
+    disabledOverlay: {
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: 'rgba(0,0,0,0.2)',
+        borderRadius: 15
     },
     title: {
         fontFamily: "Poppins_700Bold",

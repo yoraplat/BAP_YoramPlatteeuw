@@ -11,8 +11,8 @@ import theme from '../../../Theme/theme.style';
 export default function OfferedTab() {
 
     const [createdItems, setCreatedItems] = useState(null)
+    const { fetchCreatedItems } = useFirestore()
 
-    const { fetchCreatedItems } = useFirestore();
     useEffect(() => {
         const fetchData = () => {
             fetchCreatedItems().then((response) => {
@@ -27,7 +27,7 @@ export default function OfferedTab() {
                 console.log('No records found')
             }
         }
-    }, [createdItems, fetchCreatedItems])
+    }, [fetchCreatedItems])
 
     let [fontsLoaded] = useFonts({
         Poppins_300Light,
