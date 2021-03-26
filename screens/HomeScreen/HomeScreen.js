@@ -1,18 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
-import { SafeAreaView, Text, View, StatusBar, StyleSheet, TouchableOpacity, Dimensions, Button } from "react-native";
+import { SafeAreaView, Text, View, StatusBar, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faLeaf, faMap, faSlidersH, faStream, faFilter, faSeedling, faSort, faExchangeAlt, faArrowUp } from '@fortawesome/free-solid-svg-icons'
+import { faMap, faStream, faFilter, faSort } from '@fortawesome/free-solid-svg-icons'
 import { useNavigation } from '@react-navigation/native';
 // Components
 import { Map } from "../../components/MapBox/Map";
 import ItemsList from "../../components/MapBox/ItemsList";
-import { useFirestore } from '../../Services';
 import { useAuth } from '../../Services';
 import theme from '../../Theme/theme.style';
 import { ScrollView } from "react-native-gesture-handler";
 import * as firebase from 'firebase';
 import 'firebase/firestore';
-import { useScrollToTop } from '@react-navigation/native';
 
 // Notifications
 import * as Notifications from 'expo-notifications';
@@ -50,11 +48,17 @@ export const HomeScreen = () => {
   const responseListener = useRef();
   // ---------------
 
+  async function getUid() {
+    return firebase.auth().currentUser.uid
+  }
+
   useEffect(() => {
 
     // Get user preferences
-    (async () => {
-      const uid = await firebase.auth().currentUser.uid
+    // (async () => {
+    //   const uid = firebase.auth().currentUser.uid
+    getUid().then(uid => {
+      console.log('uid: ' + uid)
       firebase.firestore().collection('/users').doc(uid).onSnapshot((res) => {
         if (res.data().settings.only_vegan == true) {
           setSelectedFilters({ ...selectedFilters, [1]: true })
@@ -62,11 +66,11 @@ export const HomeScreen = () => {
           setSelectedFilters({ ...selectedFilters, [0]: true })
         }
       })
-    })()
-    
+    }) 
+    // })()
 
     const current_date = new Date
-    firebase.firestore().collection('/posts').where('bought_at', '==', false).orderBy('pickup', 'asc').onSnapshot((snapshot) => {
+    firebase.firestore().collection('/posts').where('bought_at', '==', false).onSnapshot((snapshot) => {
       let food = []
       snapshot.forEach((doc) => {
         if (doc.data().pickup.toDate() > current_date) {

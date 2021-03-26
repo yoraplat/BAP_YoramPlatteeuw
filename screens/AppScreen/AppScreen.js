@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { View, Text, ActivityIndicator } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
@@ -24,17 +25,12 @@ export default function AppScreen() {
 
   const { currentUser, logout } = useAuth();
 
-  const [user, setUser] = useState(currentUser());
+  const [user, setUser] = useState(undefined);
 
-  // useEffect(() => {
-  //   (async function getUser() {
-  //     setUser(await currentUser());
-  //   })()
-  // }, [currentUser]);
-
+  // Wait for user to load before returning any screen
   useEffect(() => {
-    firebase.auth().onAuthStateChanged((user) => {
-      setUser(user)
+    firebase.auth().onAuthStateChanged((res) => {
+      setUser(res)
     })
   }, [])
 
@@ -84,9 +80,15 @@ export default function AppScreen() {
   return (
     <>
       {
-        user
-          ? <TabNav />
-          : <StackNav />
+        user === undefined
+          ?
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <ActivityIndicator size="large" color={theme.PRIMARY_COLOR} />
+            <Text style={{ top: 10, color: theme.PRIMARY_COLOR }}>Laden</Text>
+          </View>
+          : user
+            ? <TabNav />
+            : <StackNav />
       }
     </>
   );

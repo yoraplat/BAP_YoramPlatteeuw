@@ -313,8 +313,8 @@ export function NewListing() {
                             <Text style={styles.bigButtonText}>{post.pickup.getHours() + ':' + post.pickup.getMinutes()}</Text>
                             <FontAwesomeIcon icon={faClock} size={25} style={{ color: theme.TEXT_PLACEHOLDER }} />
                         </TouchableOpacity>
-                        <View>
-                            {show && (
+                        {show && (
+                            <View>
                                 <DateTimePicker
                                     testID="dateTimePicker"
                                     value={post.pickup}
@@ -322,9 +322,10 @@ export function NewListing() {
                                     is24Hour={true}
                                     display="default"
                                     onChange={onChange}
+                                    style={{ width: '100%' }}
                                 />
-                            )}
-                        </View>
+                            </View>
+                        )}
                     </View>
 
                     <View style={styles.formItem}>

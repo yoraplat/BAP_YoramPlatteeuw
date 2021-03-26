@@ -12,12 +12,15 @@ import * as WebBrowser from 'expo-web-browser';
 import { ActivityIndicator } from 'react-native';
 import * as firebase from 'firebase';
 import 'firebase/firestore';
-import moment from 'moment';
-import 'moment/locale/nl-be';
+import moment from 'moment/min/moment-with-locales'
+// import moment from 'moment';
+// import 'moment/locale/nl-be';
+// import 'moment/min/locales';
+// import 'moment/min/moment-with-locales';
 
 
 export function ListItem({ postData, count }) {
-    moment.locale('nl');
+    moment.locale('nl-be');
 
     const [imageUrl, setImageUrl] = useState(null)
     const [imageVisible, setImageVisible] = useState(false)

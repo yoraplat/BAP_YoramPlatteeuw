@@ -1,20 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { SafeAreaView, Text, StatusBar, Image, StyleSheet, View } from "react-native";
 import * as firebase from 'firebase';
-import logo from '../../assets/NoWasteV2_logo_big_logo_text.png';
+import logo from '../../assets/inscreen_logo.png';
 import { TextInput } from "react-native-gesture-handler";
 import { Button } from 'react-native-elements';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useAuth } from '../../Services';
-import { RegisterScreen } from './RegisterScreen';
-import AppScreen from "../AppScreen/AppScreen";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import theme from '../../Theme/theme.style';
 
 export const LoginScreen = ({ navigation }) => {
-  const { currentUser } = useAuth();
   const Stack = createStackNavigator();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -128,12 +125,11 @@ const styles = StyleSheet.create({
   logoContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    top: '20%'
+    top: '20%',
   },
   logo: {
     width: 300,
     height: 300,
-
   },
   text: {
     marginTop: 100

@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, Text, StatusBar, Image, StyleSheet, View } from "react-native";
-import * as firebase from 'firebase';
-import logo from '../../assets/NoWasteV2_logo_big_logo_text.png';
+import { SafeAreaView, Text, StyleSheet, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { Button } from 'react-native-elements';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
 import { useAuth, useFirestore } from '../../Services';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import theme from '../../Theme/theme.style';
 
 export const ResetScreen = ({ navigation }) => {

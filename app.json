@@ -2,7 +2,7 @@
   "expo": {
     "name": "NoWasteV2",
     "slug": "NoWasteV2",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "scheme": "nowaste",
     "icon": "./assets/icon.png",
@@ -10,9 +10,9 @@
       "icon": "./assets/icon.png"
     },
     "splash": {
-      "image": "./assets/logoV2.1.png",
+      "image": "./assets/logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#D2E8D9"
+      "backgroundColor": "#fff9ed"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -26,12 +26,12 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#D2E8D9"
+        "backgroundColor": "#fff9ed"
       },
       "package": "com.yoraplat.NoWasteV2"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icon.png"
     }
   }
 }

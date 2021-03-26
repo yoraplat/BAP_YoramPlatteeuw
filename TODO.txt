@@ -1,17 +1,19 @@
 HomeScreen: itemsList: calculate distance to post address [MAYBE]
-  fix map item overlay layout
-  add more sorting options
+  fix map item overlay layout <----
 
-Add payment method [DONE]
-  Debug with different payment statuses (only continue buying process when status is 'paid')
-  check if user has an payment object for selected listing
+Debug with different payment statuses (only continue buying process when status is 'paid') [OK]
+check if user has an payment object for selected listing? [OK]
 
-Voorwaarden when creating a post
-fix loading "aangeboden" when item created
+Fix momentjs locale on production <----
+
+fix loading "aangeboden" when item created <----
 
 BEFORE DEPLOYING THE APP:
-  change logos and icons in app.json
+  fix auth logo background <----
 
   Cloud Functions:
-    update mollieRedirect to link to the standalone app url (currently linking to expo url)
+    update mollieRedirect to link to the standalone app url (currently linking to expo url) <----
   
+
+Check deployed app:
+  HomeScreen "onSnapshot returns undefined"

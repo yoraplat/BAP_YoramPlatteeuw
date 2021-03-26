@@ -103,8 +103,9 @@ export default function ItemsList({ posts, selectedQuickFilter }) {
         }
         // Price
         if (quickFilter[5] == true) {
+            console.log('sorting')
             function orderByDate(a, b) {
-                return a.pickup - b.pickup
+                return a.pickup.toMillis() - b.pickup.toMillis() 
             }
             postList.sort(orderByDate);
         }

@@ -1,10 +1,6 @@
 import React, { useState } from "react";
-import { SafeAreaView, Text, StatusBar, View, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
-import * as firebase from 'firebase';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { SafeAreaView, Text, StatusBar, View, StyleSheet } from "react-native";
 // import { useNavigation } from '@react-navigation/native';
-import { NewFoodListing } from '../../components/Listings/NewFoodListing';
-import { NewMealListing } from "../../components/Listings/NewMealListing";
 import { NewListing } from "../../components/Listings/NewListing";
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
@@ -24,12 +20,10 @@ export const AddScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <NewListing/>
+      <NewListing />
       <>
         <View style={styles.tabsContainer}>
-          {/* <TouchableOpacity style={styles.title}> */}
-            <Text style={styles.title}>Nieuw item toevoegen</Text>
-          {/* </TouchableOpacity> */}
+          <Text style={styles.title}>Nieuw item toevoegen</Text>
         </View>
       </>
 
@@ -60,7 +54,7 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_700Bold",
     color: theme.WHITE,
     fontSize: 20
-    
+
   },
   // overlayTopMiddleLeft: {
   //   marginTop: StatusBar.currentHeight,
@@ -71,6 +65,6 @@ const styles = StyleSheet.create({
   //   borderBottomLeftRadius: 15,
   // },
   tabTxt: {
-    
+
   }
 });
