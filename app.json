@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "NoWasteV2",
-    "slug": "NoWasteV2",
+    "name": "NoWaste",
+    "slug": "NoWaste",
     "version": "1.1.0",
     "orientation": "portrait",
     "scheme": "nowaste",
@@ -28,10 +28,27 @@
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#fff9ed"
       },
-      "package": "com.yoraplat.NoWasteV2"
+      "package": "com.yoraplat.NoWasteV2",
+      "config" : {
+        "googleMaps": {
+          "apiKey": "AIzaSyBt9AIE3Epq1sgwvg0cWTTj1uSYIxvhiZE"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/icon.png"
+    },
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "school-sg",
+            "project": "nowaste",
+            "authToken": "1f3d544b45a44cf1b8d037a4027dcfb90e189909445547e6a5f1dd6c4566615a"
+          }
+        }
+      ]
     }
   }
 }

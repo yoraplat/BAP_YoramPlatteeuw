@@ -41,8 +41,8 @@ exports.mollieCallback = functions.https.onRequest((request, response) => {
 
 exports.mollieRedirect = functions.https.onRequest((request, response) => {
     // Update this url when the app becomes a standalone app
-    response.redirect('exp://192.168.1.56:19000')
-    // response.redirect('nowaste://')
+    // response.redirect('exp://192.168.1.56:19000')
+    response.redirect('nowaste://')
 })
 
 
