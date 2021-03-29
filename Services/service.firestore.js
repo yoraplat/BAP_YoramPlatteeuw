@@ -220,91 +220,6 @@ const FirestoreProvider = ({ children }) => {
     }
   }
 
-  // const fetchBoughtItems = async () => {
-  //   const uid = firebase.auth().currentUser.uid
-
-  //   // Get id's of bought items
-  //   await db.collection('/users').doc(uid).get()
-  //     .then(snapshot => {
-  //       const data = snapshot.data()
-  //       setBoughtItemsId(data["bought_listings"])
-
-  //       // Fetch all bought posts by id
-  //       const boughtPosts = []
-  //       const boughtPostsIds = []
-
-  //       boughtItemsId.forEach(id => {
-
-  //         // Prevent loading post multiple times if user has bought more than one item of a post
-  //         if (!boughtPostsIds.includes(id)) {
-  //           db.collection('/posts').doc(id).get()
-  //             .then(snapshot => {
-  //               const data = snapshot.data()
-  //               boughtPosts.push(data)
-  //             })
-  //         }
-  //         boughtPostsIds.push(id)
-  //         boughtItemsId.push(id)
-
-  //       })
-
-  //       setBoughtItems(boughtPosts)
-  //     })
-  //   if (!boughtItems.length) {
-  //     return undefined
-  //   } else {
-  //     return boughtItems
-  //   }
-  // }
-
-  const fetchBoughtItems = async () => {
-    let data
-    const posts = []
-    const uid = firebase.auth().currentUser.uid
-
-    // Get all bought items id from user profile
-    await firebase.firestore().collection('users').doc(uid).get().then(async res => {
-      // data == list of post id's
-      data = res.data().bought_listings
-
-      // push all posts to posts array
-      for (let i = 0; i < data.length; i++) {
-        await firebase.firestore().collection('posts').doc(data[i]).get().then(res => {
-          posts.push(res.data())
-        })
-        i++
-      }
-    })
-
-    // Return array of all bought posts
-    return posts
-  }
-
-  const fetchCreatedItems = async () => {
-    const uid = firebase.auth().currentUser.uid
-    await db.collection('/users').doc(uid).get()
-      .then(snapshot => {
-        const data = snapshot.data()
-        setCreatedItemsId(data["created_listings"])
-
-        // Fetch all created posts by id
-        const created = [];
-        createdItemsId.forEach(id => {
-          db.collection('/posts').doc(id).get()
-            .then(snapshot => {
-              const data = snapshot.data()
-              created.push(data)
-            })
-        })
-        setCreatedItems(created)
-      })
-    if (!createdItems.length) {
-      return undefined
-    } else {
-      return createdItems
-    }
-  }
-
   const checkCode = async (code) => {
     const checkResponse = await db.collection('codes').doc(code).get()
     const data = checkResponse.data()
@@ -518,7 +433,7 @@ const FirestoreProvider = ({ children }) => {
   }
 
   return (
-    <FirestoreContext.Provider value={{ resetPassword, checkPickup, checkUnread, listenForPaymentUpdate, createPayment, sendMessage, fetchChat, fetchAllChats, fetchCodes, createNewChat, imageDownloadUrl, createPost, fetchFood, fetchMeals, fetchAllPosts, buyItem, fetchBoughtItems, fetchCreatedItems, checkAvailable, createPickupCode, checkCode, updateCodeState }}>
+    <FirestoreContext.Provider value={{ resetPassword, checkPickup, checkUnread, listenForPaymentUpdate, createPayment, sendMessage, fetchChat, fetchAllChats, fetchCodes, createNewChat, imageDownloadUrl, createPost, fetchFood, fetchMeals, fetchAllPosts, buyItem, checkAvailable, createPickupCode, checkCode, updateCodeState }}>
       {children}
     </FirestoreContext.Provider>
   );

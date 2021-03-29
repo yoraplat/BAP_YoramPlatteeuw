@@ -184,9 +184,10 @@ export function NewListing() {
 
                     // Navigate profile screen
                     // Pass parameter to got to the offerd tab
-                    navigation.navigate('Profile', {
-                        type: 'offered'
-                    })
+                    // navigation.navigate('Profile', {
+                    //     type: 'offered'
+                    // })
+                    // BUG data in profile screen is being added to the existing data without updating the items list
                 } else {
                     alert("Dit adres kon niet gevonden worden.")
                     setInProgress(false);

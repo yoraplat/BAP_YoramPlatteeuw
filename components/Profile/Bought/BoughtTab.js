@@ -3,40 +3,30 @@ import { StyleSheet, View, Text, SafeAreaView, StatusBar, TouchableOpacity, Scro
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
 import ProfileItemsList from '../List/ProfileItemsList'
-import { useFirestore } from '../../../Services';
 import theme from '../../../Theme/theme.style';
+import * as firebase from 'firebase';
 
 export default function BoughtTab() {
-    const [boughtItems, setBoughtItems] = useState(null)
-
     const [data, setData] = useState(null)
 
-    const { fetchBoughtItems } = useFirestore();
-    // useEffect(() => {
-    // const fetchData = () => {
-    //     fetchBoughtItems().then((response) => {
-    //         setBoughtItems(response)
-    //     })
-    // }
-
-    // if (boughtItems == null || boughtItems.length < 1) {
-    //     if (typeof boughtItems != undefined ) {
-    //         fetchData()
-    //     } else {
-    //         console.log('No records found')
-    //     }
-    // }
-    // }, [boughtItems, fetchBoughtItems]);
-
-    const fetch = async () => {
-        setData(await fetchBoughtItems())
-    }
-
     useEffect(() => {
-        fetch()
-        console.log('Fetching bought')
+            let data
+            const posts = []
+            const uid = firebase.auth().currentUser.uid
+            // Get all created items id from user profile
+            // Use onSnapshot to listen for updates
+            firebase.firestore().collection('users').doc(uid).onSnapshot(async res => {
+                // data == list of post id's
+                data = res.data().bought_listings
+                // push all posts to posts array
+                for (let i = 0; i < data.length; i++) {
+                    await firebase.firestore().collection('posts').doc(data[i]).get().then(res => {
+                        posts.push(res.data())
+                    })
+                }
+                setData(posts)
+            })
     }, []);
-
 
     let [fontsLoaded] = useFonts({
         Poppins_300Light,

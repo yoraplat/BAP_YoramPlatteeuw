@@ -22,23 +22,43 @@ export const ChatScreen = () => {
   const [newMessage, setNewMessage] = useState(null)
   const [uid, setUid] = useState(null)
 
+  // useEffect(() => {
+  //   // Load all chats belonging to the user
+  //   const uid = firebase.auth().currentUser.uid
+  //   setUid(uid)
+  //   firebase.firestore().collection('users').doc(uid).onSnapshot(async (res) => {
+  //     const userChats = []
+  //     for (const chat of res.data().chats) {
+  //       await firebase.firestore().collection('chats').doc(chat).get().then((res) => {
+  //         if (res.data().finished != true) {
+  //           userChats.push(res.data())
+  //         }
+  //       })
+  //     }
+  //     setChats(userChats)
+  //     setLoadingChats(false)
+  //   })
+  // }, [])
+
   useEffect(() => {
-    // Load all chats belonging to the user
+    let data
+    const userChats = []
     const uid = firebase.auth().currentUser.uid
-    setUid(uid)
-    firebase.firestore().collection('users').doc(uid).onSnapshot(async (res) => {
-      const userChats = []
-      for (const chat of res.data().chats) {
-        await firebase.firestore().collection('chats').doc(chat).get().then((res) => {
-          if (res.data().finished != true) {
-            userChats.push(res.data())
+    firebase.firestore().collection('users').doc(uid).onSnapshot(async res => {
+        data = res.data().chats
+        if (data != null) {
+          for (let i = 0; i < data.length; i++) {
+              await firebase.firestore().collection('chats').doc(data[i]).get().then(res => {
+                if (res.data().finished != true) {
+                  userChats.push(res.data())
+                }  
+              })
           }
-        })
-      }
-      setChats(userChats)
-      setLoadingChats(false)
+        }
+        setChats(userChats)
+        setLoadingChats(false)
     })
-  }, [])
+}, []);
 
   let [fontsLoaded] = useFonts({
     Poppins_300Light,
