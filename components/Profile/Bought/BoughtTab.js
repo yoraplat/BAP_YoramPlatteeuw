@@ -9,37 +9,47 @@ import theme from '../../../Theme/theme.style';
 export default function BoughtTab() {
     const [boughtItems, setBoughtItems] = useState(null)
 
+    const [data, setData] = useState(null)
+
     const { fetchBoughtItems } = useFirestore();
+    // useEffect(() => {
+    // const fetchData = () => {
+    //     fetchBoughtItems().then((response) => {
+    //         setBoughtItems(response)
+    //     })
+    // }
+
+    // if (boughtItems == null || boughtItems.length < 1) {
+    //     if (typeof boughtItems != undefined ) {
+    //         fetchData()
+    //     } else {
+    //         console.log('No records found')
+    //     }
+    // }
+    // }, [boughtItems, fetchBoughtItems]);
+
+    const fetch = async () => {
+        setData(await fetchBoughtItems())
+    }
+
     useEffect(() => {
-        const fetchData = () => {
-            fetchBoughtItems().then((response) => {
-                setBoughtItems(response)
-            })
-        }
+        fetch()
+        console.log('Fetching bought')
+    }, []);
 
-        if (boughtItems == null || boughtItems.length < 1) {
-            if (typeof boughtItems != undefined ) {
-                fetchData()
-            } else {
-                console.log('No records found')
-            }
-        }
-
-    }, [boughtItems, fetchBoughtItems]);
 
     let [fontsLoaded] = useFonts({
         Poppins_300Light,
         Poppins_400Regular,
         Poppins_500Medium,
         Poppins_700Bold,
-    });
-
+    })
     if (!fontsLoaded) {
         return <SafeAreaView style={styles.container} ><AppLoading /></SafeAreaView>
     }
 
     return (
-        <ProfileItemsList posts={boughtItems} type="bought" />
+        <ProfileItemsList posts={data} type="bought" />
     );
 }
 

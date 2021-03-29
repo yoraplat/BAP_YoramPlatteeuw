@@ -14,20 +14,23 @@ export default function OfferedTab() {
     const { fetchCreatedItems } = useFirestore()
 
     useEffect(() => {
-        const fetchData = () => {
-            fetchCreatedItems().then((response) => {
-                setCreatedItems(response)
-            })
-        }
+        // const fetchData = () => {
+        //     fetchCreatedItems().then((response) => {
+        //         setCreatedItems(response)
+        //     })
+        // }
 
-        if (createdItems == null || createdItems.length < 1) {
-            if (typeof createdItems != undefined ) {
-                fetchData()
-            } else {
-                console.log('No records found')
-            }
-        }
-    }, [fetchCreatedItems])
+        // if (createdItems == null || createdItems.length < 1) {
+        //     if (typeof createdItems != undefined ) {
+        //         fetchData()
+        //     } else {
+        //         console.log('No records found')
+        //     }
+        // }
+
+        console.log('fetching offered')
+    // }, [fetchCreatedItems])
+    }, [])
 
     let [fontsLoaded] = useFonts({
         Poppins_300Light,
@@ -41,7 +44,10 @@ export default function OfferedTab() {
     }
 
     return (
-        <ProfileItemsList posts={createdItems} type='offered' />
+        <>
+        <Text>Test</Text>
+        </>
+        // <ProfileItemsList posts={createdItems} type='offered' />
     );
 }
 
