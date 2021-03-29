@@ -3,8 +3,4 @@ HomeScreen: fix map item overlay layout and buy screen <----
 
 Chatscreen: update to remove notification when new message is read <----
 Fix momentjs locale on production <----
-Bought items screen does not update when new item is created <----
-mollieCallback deeplinking not working <---
-
-Cloud Functions:
-  update mollieRedirect to link to the standalone app url (currently linking to expo url) [DEPENDS ON BUILD]
+deeplink first try crashes app in standalone app <----
