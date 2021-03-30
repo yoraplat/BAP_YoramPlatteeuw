@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
     },
     freeItem: {
         // height: 300,
-        width: 300,
+        width: 320,
     },
     freeItemTxt: {
         fontFamily: "Poppins_500Medium",
@@ -403,6 +403,8 @@ const styles = StyleSheet.create({
         fontSize: 20,
         padding: 10,
         textAlign: 'center',
+        marginTop: 15,
+        marginBottom: 15,
     },
     statusTxt: {
         fontFamily: "Poppins_400Regular",

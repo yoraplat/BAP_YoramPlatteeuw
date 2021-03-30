@@ -14,6 +14,8 @@ import { useFirestore } from '../../Services';
 import * as Location from 'expo-location';
 import theme from '../../Theme/theme.style';
 import { useNavigation } from '@react-navigation/native';
+import moment from 'moment/min/moment-with-locales';
+import * as firebase from 'firebase';
 
 export function NewListing() {
 
@@ -307,11 +309,11 @@ export function NewListing() {
                     <View style={styles.formItem}>
                         <Text style={styles.title}>Afhaal moment</Text>
                         <TouchableOpacity style={styles.bigButton} onPress={showDatepicker}>
-                            <Text style={styles.bigButtonText}>{post.pickup.getDate() + '/' + post.pickup.getMonth() + '/' + post.pickup.getFullYear()}</Text>
+                            <Text style={styles.bigButtonText}>{moment(post.pickup).format('DD/MM/YYYY')}</Text>
                             <FontAwesomeIcon icon={faCalendarAlt} size={25} style={{ color: theme.TEXT_PLACEHOLDER }} />
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.bigButton} onPress={showTimepicker}>
-                            <Text style={styles.bigButtonText}>{post.pickup.getHours() + ':' + post.pickup.getMinutes()}</Text>
+                            <Text style={styles.bigButtonText}>{moment(post.pickup).format('HH:mm')}</Text>
                             <FontAwesomeIcon icon={faClock} size={25} style={{ color: theme.TEXT_PLACEHOLDER }} />
                         </TouchableOpacity>
                         {show && (

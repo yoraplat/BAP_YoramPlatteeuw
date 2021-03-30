@@ -17,9 +17,10 @@ import * as WebBrowser from 'expo-web-browser';
 // import uuid from 'uuid-random';
 
 export const RegisterScreen = () => {
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
-  const [username, setUsername] = useState();
+  const [email, setEmail] = useState(null);
+  const [password, setPassword] = useState(null);
+  const [passwordCheck, setPasswordCheck] = useState(null);
+  const [username, setUsername] = useState(null);
   const [policy, setPolicy] = useState(false);
   const [policyUrl, setPolicyUrl] = useState('https://www.privacypolicies.com/live/6d016f17-5829-4f11-9257-819d98bebe0d');
 
@@ -34,26 +35,31 @@ export const RegisterScreen = () => {
 
   const RegisterUser = () => {
     try {
-      if (policy) {
-        firebase.auth()
-          .createUserWithEmailAndPassword(email.email, password.password)
-          .then((user) => {
-            firebase.firestore().collection('users').doc(user.user.uid).set({
-              username: username.username,
-              email: email.email,
-              account_number: null,
-              created_listings: null,
-              bought_listings: null,
-              settings: {
-                only_veggie: false,
-                only_vegan: false,
-              }
+      // Check if passwords match
+      if (passwordCheck.passwordCheck != null && password.password != null && passwordCheck.passwordCheck == password.password) {
+        if (policy) {
+          firebase.auth()
+            .createUserWithEmailAndPassword(email.email, password.password)
+            .then((user) => {
+              firebase.firestore().collection('users').doc(user.user.uid).set({
+                username: username.username,
+                email: email.email,
+                account_number: null,
+                created_listings: null,
+                bought_listings: null,
+                settings: {
+                  only_veggie: false,
+                  only_vegan: false,
+                }
+              })
+              navigation.navigate('Login')
             })
-            navigation.navigate('Login')
-          })
-          .catch(error => alert(error))
+            .catch(error => alert(error))
+        } else {
+          alert('Gelieve de voorwaarden te accepteren')
+        }
       } else {
-        alert('Gelieve de voorwaarden te accepteren')
+        alert('Ingevulde wachtwoorden komen niet overeen')
       }
     } catch (e) {
       console.log(e.message)
@@ -81,23 +87,27 @@ export const RegisterScreen = () => {
       <View style={styles.formContainer}>
         <TextInput
           style={styles.input}
-          // value={userData.email}
           onChangeText={email => setEmail({ email })}
           placeholder={'Email'}
           placeholderTextColor={theme.TEXT_PLACEHOLDER}
         />
         <TextInput
           style={styles.input}
-          // value={userData.name}
           onChangeText={username => setUsername({ username })}
           placeholder={'Naam'}
           placeholderTextColor={theme.TEXT_PLACEHOLDER}
         />
         <TextInput
           style={styles.input}
-          // value={userData.password}
           onChangeText={password => setPassword({ password })}
           placeholder={'Wachtwoord'}
+          secureTextEntry={true}
+          placeholderTextColor={theme.TEXT_PLACEHOLDER}
+        />
+        <TextInput
+          style={styles.input}
+          onChangeText={passwordCheck => setPasswordCheck({ passwordCheck })}
+          placeholder={'Wachtwoord Herhalen'}
           secureTextEntry={true}
           placeholderTextColor={theme.TEXT_PLACEHOLDER}
         />
@@ -139,7 +149,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.SECONDARY_COLOR,
     alignItems: 'center',
-    marginTop: -35
+    marginTop: -70
   },
   logoContainer: {
     flexDirection: 'row',

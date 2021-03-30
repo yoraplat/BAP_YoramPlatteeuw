@@ -1,4 +1,6 @@
-HomeScreen: itemsList: calculate distance to post address [MAYBE]
+HomeScreen:
+    Set map to user's current region and show nearest posts first (filter by distance)
+     
 HomeScreen: fix map item overlay layout and buy screen <----
 
 Chatscreen: update to remove notification when new message is read <----

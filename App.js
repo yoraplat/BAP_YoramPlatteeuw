@@ -11,6 +11,7 @@ import firebaseConfig from './Firebase/config'
 
 export default function App() {
 
+  Sentry.enableInExpoDevelopment = true
   Sentry.init({
     dsn: "https://a2fad81482694d9cbb34a2cecef73a9a@o473614.ingest.sentry.io/5695615",
     enableInExpoDevelopment: true,
