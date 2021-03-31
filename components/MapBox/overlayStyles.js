@@ -41,26 +41,27 @@ const overlayStyles = StyleSheet.create({
     width: '80%'
   },
   infoBuyList: {
-    alignItems: "flex-start",
-    alignContent: "flex-start",
-    flexWrap: "wrap",
+    // alignItems: "flex-start",
+    // alignContent: "flex-start",
+    // flexWrap: "wrap",
     flexDirection: 'row',
     width: '100%'
   },
   infoItem: {
-    width: "60%",
+    width: "100%",
+    backgroundColor:'red',
     marginTop: 10,
     fontFamily: "Poppins_500Medium",
     color: theme.PRIMARY_COLOR,
   },
   infoBuyItem: {
-    width: "90%",
-    marginTop: 10,
+    // width: "90%",
+    // marginTop: 5,
     fontFamily: "Poppins_500Medium",
     color: theme.PRIMARY_COLOR,
   },
   infoBuyItemImage: {
-    width: 200,
+    width: "100%",
     marginTop: 10,
     // backgroundColor: 'red',
     alignContent: 'flex-start'
@@ -92,11 +93,11 @@ const overlayStyles = StyleSheet.create({
     fontSize: 21,
   },
   description: {
-    fontSize: 12,
+    fontSize: 15,
     marginTop: 5,
     marginBottom: 5,
     fontFamily: 'Poppins_400Regular',
-    color: theme.GREY
+    color: theme.GREY,
   },
   infoList: {
     maxWidth: "80%",
@@ -117,7 +118,7 @@ const overlayStyles = StyleSheet.create({
   },
   info: {
     justifyContent: "space-around",
-    flexDirection: "row",
+    flexDirection: "column",
   },
   centeredView: {
     flex: 1,
@@ -129,7 +130,7 @@ const overlayStyles = StyleSheet.create({
     margin: 20,
     backgroundColor: theme.NEUTRAL_BACKGROUND,
     borderRadius: 20,
-    padding: 35,
+    padding: 25,
     // alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
@@ -139,6 +140,7 @@ const overlayStyles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    width: "90%"
   },
   submitButton: {
     backgroundColor: theme.PRIMARY_COLOR,
@@ -154,8 +156,8 @@ const overlayStyles = StyleSheet.create({
     fontFamily: "Poppins_400Regular",
   },
   contentImage: {
-    maxWidth: 200,
     height: 200,
+    width: 500,
     borderRadius: 10,
     // marginTop: 10
   }

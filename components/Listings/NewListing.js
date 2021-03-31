@@ -223,25 +223,34 @@ export function NewListing() {
                 <View style={styles.form}>
                     <View style={styles.formItem}>
                         <Text style={styles.title}>Beschrijving</Text>
-                        <TextInput
-                            style={styles.txtInput}
-                            placeholder="Titel"
-                            placeholderTextColor={theme.TEXT_PLACEHOLDER}
-                            // onChangeText={val => setTitle(val)}
-                            value={post.title}
-                            onChangeText={val => setPost({ ...post, title: val.trim() == '' ? null : val })}
-                            maxLength={30}
-                        />
+                            <View>
+                                <TextInput
+                                    style={styles.txtInput}
+                                    placeholder="Titel"
+                                    placeholderTextColor={theme.TEXT_PLACEHOLDER}
+                                    // onChangeText={val => setTitle(val)}
+                                    value={post.title}
+                                    onChangeText={val => setPost({ ...post, title: val.trim() == '' ? null : val })}
+                                    maxLength={30}
+                                />
+                                {/* Max characters counter */}
+                                <Text style={{position: 'absolute', right: 15, top: 22, color:theme.TEXT_PLACEHOLDER}}>{ post.title != null ? 30 - (post.title).length : null}</Text>
+                            </View>
 
-                        <TextInput
-                            style={styles.txtInput}
-                            placeholder="Korte Beschrijving"
-                            value={post.description}
-                            placeholderTextColor={theme.TEXT_PLACEHOLDER}
-                            // onChangeText={val => setDescription(val)}
-                            onChangeText={val => setPost({ ...post, description: val.trim() == '' ? null : val })}
-                            maxLength={90}
-                        />
+                            <View>
+
+                                <TextInput
+                                    style={styles.txtInput}
+                                    placeholder="Korte Beschrijving"
+                                    value={post.description}
+                                    placeholderTextColor={theme.TEXT_PLACEHOLDER}
+                                    // onChangeText={val => setDescription(val)}
+                                    onChangeText={val => setPost({ ...post, description: val.trim() == '' ? null : val })}
+                                    maxLength={90}
+                                />
+                                {/* Max characters counter */}
+                                <Text style={{position: 'absolute', right: 15, top: 22, color:theme.TEXT_PLACEHOLDER}}>{ post.description != null ? 90 - (post.description).length : null}</Text>
+                            </View>
                     </View>
                     <View style={styles.formItem}>
                         <View style={{ flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center' }}>
