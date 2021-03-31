@@ -4,8 +4,10 @@ import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Popp
 import AppLoading from 'expo-app-loading';
 import { ListItem } from './ListItem';
 import theme from '../../Theme/theme.style';
+// Calculate distance between coordinates
+import haversine from 'haversine';
 
-export default function ItemsList({ posts, selectedQuickFilter }) {
+export default function ItemsList({ posts, selectedQuickFilter, location }) {
     const [data, setData] = useState(null);
     const quickFilter = selectedQuickFilter
 
@@ -16,7 +18,19 @@ export default function ItemsList({ posts, selectedQuickFilter }) {
     const loadList = () => {
         const postList = [];
         // Create a post object from each array item
+
         posts.forEach((post) => {
+            // Calculate distance from user to offer location
+            const coordinates = {
+                latitude: post.coordinates.latitude,
+                longitude: post.coordinates.longitude
+            }
+            const currentLocation = {
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude
+            }
+            let calcDistance = haversine(coordinates, currentLocation, { unit: 'meter' })
+
             const postObject = {
                 title: post.title,
                 description: post.description,
@@ -31,7 +45,8 @@ export default function ItemsList({ posts, selectedQuickFilter }) {
                 address: post.address,
                 id: post.id,
                 image: post.image,
-                seller_id: post.seller_id
+                seller_id: post.seller_id,
+                distance: calcDistance
             };
 
             // Filtering for veggie/vegan meals/food
@@ -94,18 +109,25 @@ export default function ItemsList({ posts, selectedQuickFilter }) {
         });
 
         // Ordering
-        // Price
+        // Distance
         if (quickFilter[4] == true) {
+            function orderByDistance(a, b) {
+                return a.distance - b.distance
+            }
+            postList.sort(orderByDistance);
+        }
+
+        // Price
+        if (quickFilter[5] == true) {
             function orderByPrice(a, b) {
                 return (a.price != "Gratis" ? a.price : 0) - (b.price != "Gratis" ? b.price : 0)
             }
             postList.sort(orderByPrice);
         }
-        // Price
-        if (quickFilter[5] == true) {
-            console.log('sorting')
+        // Date
+        if (quickFilter[6] == true) {
             function orderByDate(a, b) {
-                return a.pickup.toMillis() - b.pickup.toMillis() 
+                return a.pickup.toMillis() - b.pickup.toMillis()
             }
             postList.sort(orderByDate);
         }
@@ -150,6 +172,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         alignSelf: 'center',
         paddingTop: StatusBar.currentHeight,
+        marginTop: -30
     },
     list: {
         width: "100%",

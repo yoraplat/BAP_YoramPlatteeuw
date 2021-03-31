@@ -10,7 +10,7 @@ import { useFirestore } from '../../Services';
 import { useAuth } from '../../Services';
 import theme from '../../Theme/theme.style';
 
-export function Map({ posts, selectedQuickFilter }) {
+export function Map({ posts, selectedQuickFilter, location }) {
 
   const generatedMapStyle = [
     {
@@ -83,7 +83,6 @@ export function Map({ posts, selectedQuickFilter }) {
   useEffect(() => {
     // setQuickFilter(selectedQuickFilter);
     posts != undefined ? loadCoordinates() : '';
-    console
   }, [posts, quickFilter]);
 
 
@@ -224,9 +223,15 @@ export function Map({ posts, selectedQuickFilter }) {
   return (
     <SafeAreaView style={styles.container}>
       <MapView
+        // initialRegion={{
+        //   latitude: 51.042479510131116,
+        //   longitude: 3.7239200737682174,
+        //   latitudeDelta: .05,
+        //   longitudeDelta: .005
+        // }}
         initialRegion={{
-          latitude: 51.042479510131116,
-          longitude: 3.7239200737682174,
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
           latitudeDelta: .05,
           longitudeDelta: .005
         }}

@@ -110,7 +110,7 @@ export const ChatScreen = () => {
               chats && chats.map((chat, index) => {
                 return (
                   <TouchableOpacity key={index} style={styles.headerItem} onPress={() => selectChat(index, chat.chat_id)}>
-                    { chat.last_message.sender_id != uid && chat.last_message.sender_id != null
+                    { chat.last_message.sender_id != uid && chat.last_message.sender_id !== null
                       ? <View style={styles.headerBadge}>
                         <Text style={styles.badgeTxt}>1</Text>
                       </View>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, View, Text, SafeAreaView, TouchableOpacity, ScrollView, Switch } from 'react-native';
+import { ActivityIndicator, View, Text, SafeAreaView, TouchableOpacity, ScrollView, Switch, Image, Alert } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
@@ -8,7 +8,7 @@ import { TextInput } from 'react-native-gesture-handler';
 import Slider from '@react-native-community/slider';
 import { CheckBox } from 'react-native-elements';
 import * as ImagePicker from 'expo-image-picker';
-import { faCalendarAlt, faCamera, faClock } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarAlt, faCamera, faClock, faTimes, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useFirestore } from '../../Services';
 import * as Location from 'expo-location';
@@ -113,7 +113,10 @@ export function NewListing() {
         if (!result.cancelled) {
             setPost({ ...post, image: result.uri })
         }
-    };
+    }
+    const clearImage = () => {
+        setPost({ ...post, image: null })
+    }
 
     let [fontsLoaded] = useFonts({
         Poppins_300Light,
@@ -184,6 +187,19 @@ export function NewListing() {
                         type: 'food'
                     })
 
+                    // Notify user if post has been created succesfully 
+                    Alert.alert(
+                        "Proficiat",
+                        `Je nieuwe aanbieding "${post.title}" is succesvol aangemaakt! \n Bedankt voor je bijdrage aan een betere wereld!`,
+                        [
+                            {
+                                text: "Verder gaan",
+                                onPress: () => navigation.navigate('Home'),
+                                style:'default'
+                            }
+                        ],
+                        { cancelable: false }
+                    )
                     // Navigate profile screen
                     // Pass parameter to got to the offerd tab
                     // navigation.navigate('Profile', {
@@ -214,7 +230,7 @@ export function NewListing() {
                             // onChangeText={val => setTitle(val)}
                             value={post.title}
                             onChangeText={val => setPost({ ...post, title: val.trim() == '' ? null : val })}
-                            maxLength={35}
+                            maxLength={30}
                         />
 
                         <TextInput
@@ -276,13 +292,25 @@ export function NewListing() {
                     }
                     <View style={styles.formItem}>
                         <Text style={styles.title}>Foto</Text>
-                        <TouchableOpacity style={styles.bigButton} onPress={pickImage}>
-                            {post.image != null
-                                ? <Text style={styles.bigButtonText}>Afbeelding Toegevoegd</Text>
-                                : <Text style={styles.bigButtonText}>Foto Toevoegen</Text>
-                            }
-                            <FontAwesomeIcon icon={faCamera} size={25} style={{ color: theme.TEXT_PLACEHOLDER }} />
-                        </TouchableOpacity>
+                        {post.image == null
+                            ? <TouchableOpacity style={styles.bigButton} onPress={pickImage}>
+                                {post.image != null
+                                    ? <Text style={styles.bigButtonText}>Afbeelding Toegevoegd</Text>
+                                    : <Text style={styles.bigButtonText}>Foto Toevoegen</Text>
+                                }
+                                <FontAwesomeIcon icon={faCamera} size={25} style={{ color: theme.TEXT_PLACEHOLDER }} />
+                            </TouchableOpacity>
+                            : null
+                        }
+                        {post.image != null
+                            ? <View style={{ marginTop: -15 }}>
+                                <TouchableOpacity style={{ zIndex: 1 }} onPress={() => clearImage()}>
+                                    <FontAwesomeIcon icon={faTimesCircle} size={20} style={{ color: theme.PRIMARY_COLOR, zIndex: 99, top: 12, left: 110, backgroundColor: theme.WHITE, borderRadius: 50 }} />
+                                </TouchableOpacity>
+                                <Image style={{ width: 120, height: 90 }} source={{ uri: post.image }} />
+                            </View>
+                            : null
+                        }
                     </View>
                     <View style={styles.formItem}>
                         <Text style={styles.title}>Voedingswijze</Text>

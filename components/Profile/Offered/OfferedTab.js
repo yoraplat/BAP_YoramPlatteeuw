@@ -18,7 +18,6 @@ export default function OfferedTab() {
         firebase.firestore().collection('users').doc(uid).onSnapshot(async res => {
             // data == list of post id's
             data = res.data().created_listings
-            console.log('List of ids: ' + JSON.stringify(data))
             // push all posts to posts array
             for (let i = 0; i < data.length; i++) {
                 await firebase.firestore().collection('posts').doc(data[i]).get().then(res => {

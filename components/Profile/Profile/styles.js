@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.SECONDARY_COLOR,
     marginTop: StatusBar.currentHeight,
-    paddingTop: 100,
+    paddingTop: 70,
     width: '100%'
   },
   list: {

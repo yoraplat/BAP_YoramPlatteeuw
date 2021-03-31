@@ -10,7 +10,6 @@ import theme from '../../../Theme/theme.style';
 
 export default function ProfileItemsList({ posts, type }) {
 
-    console.log('type: ' + type)
     let [fontsLoaded] = useFonts({
         Poppins_300Light,
         Poppins_400Regular,
@@ -65,8 +64,8 @@ export default function ProfileItemsList({ posts, type }) {
 const styles = StyleSheet.create({
     list: {
         width: "90%",
-        top: 120,
-        marginBottom: 120
+        top: 95,
+        marginBottom: 95
     },
     warningTxt: {
         textAlign: "center",

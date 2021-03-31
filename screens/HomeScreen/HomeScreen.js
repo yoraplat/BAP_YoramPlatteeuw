@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { SafeAreaView, Text, View, StatusBar, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faMap, faStream, faFilter, faSort } from '@fortawesome/free-solid-svg-icons'
+import { faMap, faStream, faFilter, faSort, faArrowDown, faCaretSquareDown, faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons'
 import { useNavigation } from '@react-navigation/native';
+import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
+import AppLoading from 'expo-app-loading';
 // Components
 import { Map } from "../../components/MapBox/Map";
 import ItemsList from "../../components/MapBox/ItemsList";
@@ -11,6 +13,9 @@ import theme from '../../Theme/theme.style';
 import { ScrollView } from "react-native-gesture-handler";
 import * as firebase from 'firebase';
 import 'firebase/firestore';
+
+// Location
+import * as Location from 'expo-location';
 
 // Notifications
 import * as Notifications from 'expo-notifications';
@@ -26,7 +31,9 @@ Notifications.setNotificationHandler({
 
 export const HomeScreen = () => {
   const navigation = useNavigation();
+  const [locationRes, setLocationRes] = useState();
   const [currentTab, setCurrentTab] = useState(1)
+  const [toggleFilter, setToggleFilter] = useState(0)
   const [selectedFilters, setSelectedFilters] = useState({
     "0": false,
     "1": false,
@@ -52,13 +59,42 @@ export const HomeScreen = () => {
     return firebase.auth().currentUser.uid
   }
 
-  useEffect(() => {
+  async function getLocation() {
+    let { status } = await Location.requestPermissionsAsync();
 
-    // Get user preferences
-    // (async () => {
-    //   const uid = firebase.auth().currentUser.uid
+    if (status !== 'granted') {
+      return;
+    }
+    // Check if a location has been set, this prevents hitting the Location rate limit
+    if (locationRes == null || undefined) {
+      try {
+        await Location.getCurrentPositionAsync({})
+          .then(location => {
+            setLocationRes(location);
+          })
+      } catch (e) {
+        console.log(e.message)
+        // Backup for testing purposes, Location doesn't work well on emulator
+        setLocationRes({
+          "timestamp": 1617121013162,
+          "mocked": false,
+          "coords": {
+            "altitude": 51.09091275651065,
+            "heading": 0,
+            "latitude": 51.0449596,
+            "longitude": 3.728977,
+            "altitudeAccuracy": 3,
+            "speed": 0,
+            "accuracy": 27.375
+          }
+        })
+      }
+    }
+  }
+
+  useEffect(() => {
     getUid().then(uid => {
-      console.log('uid: ' + uid)
+      getLocation()
       firebase.firestore().collection('/users').doc(uid).onSnapshot((res) => {
         if (res.data().settings.only_vegan == true) {
           setSelectedFilters({ ...selectedFilters, [1]: true })
@@ -66,7 +102,7 @@ export const HomeScreen = () => {
           setSelectedFilters({ ...selectedFilters, [0]: true })
         }
       })
-    }) 
+    })
     // })()
 
     const current_date = new Date
@@ -105,11 +141,21 @@ export const HomeScreen = () => {
   }, [])
 
 
+  let [fontsLoaded] = useFonts({
+    Poppins_300Light,
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_700Bold,
+  });
+  if (!fontsLoaded) {
+    return <SafeAreaView style={styles.container} ><AppLoading /></SafeAreaView>
+  }
   const selectTab = (id) => {
     if (currentTab == 2) {
       setCurrentTab(1)
     }
     setCurrentTab(id)
+    setToggleFilter(0)
     scrollToStart.current?.scrollTo({
       y: -1,
       animated: true
@@ -186,6 +232,20 @@ export const HomeScreen = () => {
     }
   }
 
+  const setFilterBg = (id) => {
+    if (toggleFilter == id) {
+      return {
+        backgroundColor: theme.PRIMARY_COLOR,
+        color: theme.PRIMARY_COLOR
+      }
+    } else {
+      return {
+        // backgroundColor: theme.BUTTON_BACKGROUND,
+        color: theme.WHITE
+      }
+    }
+  }
+
   async function registerForPushNotificationsAsync() {
     let token;
     if (Constants.isDevice) {
@@ -219,6 +279,27 @@ export const HomeScreen = () => {
     return token;
   }
 
+  const toggleAdvanced = (type) => {
+    if (type == 'filter') {
+      if (toggleFilter == 0) {
+        setToggleFilter(1)
+      } else if (toggleFilter == 2) {
+        setToggleFilter(1)
+      } else {
+        setToggleFilter(0)
+      }
+    }
+    if (type == 'sort') {
+      if (toggleFilter == 0) {
+        setToggleFilter(2)
+      } else if (toggleFilter == 1) {
+        setToggleFilter(2)
+      } else {
+        setToggleFilter(0)
+      }
+    }
+  }
+
   return (
     <SafeAreaView style={styles.container}>
 
@@ -231,45 +312,71 @@ export const HomeScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.filterContainer}>
-        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} ref={scrollToStart} style={styles.filterList}>
-          <FontAwesomeIcon icon={faFilter} style={styles.filterItemIcon} size={30} />
-          <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(0)}>
-            <Text style={[styles.filterItem, setBgColor(0)]}>Veggie</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(1)}>
-            <Text style={[styles.filterItem, setBgColor(1)]}>Vegan</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(2)}>
-            <Text style={[styles.filterItem, setBgColor(2)]}>Maaltijd</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(3)}>
-            <Text style={[styles.filterItem, setBgColor(3)]}>Voeding</Text>
-          </TouchableOpacity>
-          {currentTab == 1 ?
+        <View style={styles.filterBtnContainer}>
+          {currentTab != 2 ?
             <>
-              <FontAwesomeIcon icon={faSort} style={styles.filterItemIcon} size={30} />
-              <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(4)}>
-                <Text style={[styles.filterItem, setBgColor(4)]}>Prijs</Text>
+              <TouchableOpacity style={[styles.filterBtn, setFilterBg(1)]} onPress={() => toggleAdvanced('filter')}>
+                <Text style={styles.filterTxt}>Filteren</Text>
+                <FontAwesomeIcon icon={toggleFilter == 1 ? faAngleUp : faAngleDown} size={15} color={theme.WHITE} />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(5)}>
-                <Text style={[styles.filterItem, setBgColor(5)]}>Ophalen op</Text>
+              <TouchableOpacity style={[styles.filterBtn, setFilterBg(2)]} onPress={() => toggleAdvanced('sort')}>
+                <Text style={styles.filterTxt}>Sorteren</Text>
+                <FontAwesomeIcon icon={toggleFilter == 2 ? faAngleUp : faAngleDown} size={15} color={theme.WHITE} />
               </TouchableOpacity>
             </>
             : null
           }
-        </ScrollView>
+        </View>
+
+        <View style={styles.filterItemsContainer}>
+          {
+            toggleFilter == 1
+              ? <>
+                <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(0)}>
+                  <Text style={[styles.filterItem, setBgColor(0)]}>Veggie</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(1)}>
+                  <Text style={[styles.filterItem, setBgColor(1)]}>Vegan</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(2)}>
+                  <Text style={[styles.filterItem, setBgColor(2)]}>Maaltijd</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(3)}>
+                  <Text style={[styles.filterItem, setBgColor(3)]}>Voeding</Text>
+                </TouchableOpacity>
+              </>
+              : null
+          }
+
+          {
+            toggleFilter == 2
+              ? <>
+                <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(4)}>
+                  <Text style={[styles.filterItem, setBgColor(4)]}>Afstand</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(5)}>
+                  <Text style={[styles.filterItem, setBgColor(5)]}>Prijs</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(6)}>
+                  <Text style={[styles.filterItem, setBgColor(6)]}>Ophalen op</Text>
+                </TouchableOpacity>
+              </>
+              : null
+          }
+
+        </View>
+
       </View>
 
-      {/* <Text>{JSON.stringify(allPosts)}</Text> */}
       <View style={styles.listContainer}>
-        {allPosts == undefined
-          ? <Text style={styles.warningTxt}>Er zijn momenteel geen aanbiedingen, kom later eens terug</Text>
+        {allPosts == undefined || locationRes == undefined || locationRes == null
+          ? <Text style={styles.warningTxt}>{locationRes != null ? 'Er zijn momenteel geen aanbiedingen, kom later eens terug' : 'Er is een probleem opgetreden bij het ophalen van je locatie'}</Text>
           :
           currentTab == 1
             ?
-            <ItemsList posts={allPosts} selectedQuickFilter={selectedFilters} />
+            <ItemsList posts={allPosts} location={locationRes} selectedQuickFilter={selectedFilters} />
             : <>
-              <Map posts={allPosts} selectedQuickFilter={selectedFilters} />
+              <Map posts={allPosts} location={locationRes} selectedQuickFilter={selectedFilters} />
             </>
 
         }
@@ -287,19 +394,22 @@ const styles = StyleSheet.create({
   tabsContainer: {
     flexDirection: "row",
     width: '90%',
-
-    // top: StatusBar.currentHeight,
-    // position: "absolute",
     zIndex: 999,
-
-    marginBottom: 50
+    marginBottom: 35,
   },
 
+  // filterContainer: {
+  //   flexDirection: "column",
+  //   width: '95%',
+  //   alignSelf: "flex-end",
+  //   zIndex: 998
+  // },
   filterContainer: {
-    flexDirection: "column",
-    width: '95%',
-    alignSelf: "flex-end",
-    zIndex: 998
+    width: '90%',
+  },
+  filterBtnContainer: {
+    flexDirection: "row",
+    justifyContent: 'space-between',
   },
   filterItemIcon: {
     color: theme.PRIMARY_COLOR,
@@ -308,7 +418,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   },
   listContainer: {
-    // flex: 1,
     flexGrow: 2,
     width: '100%',
   },
@@ -318,15 +427,12 @@ const styles = StyleSheet.create({
     color: theme.PRIMARY_COLOR,
   },
   filterList: {
-    // marginTop: 10,
-    // marginBottom: 10,
   },
+
   filterItem: {
-    padding: 7,
-    // borderColor: theme.PRIMARY_COLOR,
-    // borderWidth: 2,
+    padding: 5,
     borderRadius: 5,
-    fontSize: 15,
+    fontSize: 13,
     textAlign: "center",
     backgroundColor: theme.TXT_INPUT_BACKGROUND,
     marginRight: 8,
@@ -338,17 +444,17 @@ const styles = StyleSheet.create({
 
   overlayTopMiddleRight: {
     marginTop: StatusBar.currentHeight,
-    top: 25,
+    top: 15,
     flexGrow: 1,
-    padding: 15,
+    padding: 7,
     borderTopRightRadius: 15,
     borderBottomRightRadius: 15,
 
   },
   overlayTopMiddleLeft: {
     marginTop: StatusBar.currentHeight,
-    top: 25,
-    padding: 15,
+    top: 15,
+    padding: 7,
     flexGrow: 1,
     borderTopLeftRadius: 15,
     borderBottomLeftRadius: 15,
@@ -364,5 +470,27 @@ const styles = StyleSheet.create({
     padding: 10,
     color: theme.PRIMARY_COLOR,
     top: 20
+  },
+
+  filterBtn: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    // backgroundColor: theme.PRIMARY_COLOR,
+    backgroundColor: theme.TEXT_PLACEHOLDER,
+    width: '49%',
+    alignItems: 'center',
+    // borderRadius: 15
+  },
+  filterTxt: {
+    color: theme.WHITE,
+    padding: 2.5,
+    fontSize: 15,
+    fontFamily: 'Poppins_500Medium',
+    marginRight: 10
+  },
+  filterItemsContainer: {
+    flexDirection: 'row',
+    marginTop: 12,
+    marginBottom: 15
   }
 });

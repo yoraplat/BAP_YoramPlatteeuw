@@ -34,7 +34,7 @@ export function ListItem({ messages }) {
                 return (
                     message.sender_id != 'system'
                         ?
-                        <View style={message.sender_id == user_id ? styles.chatItemUser : styles.chatItem} key={index}>
+                        <View style={message.sender_id == user_id() ? styles.chatItemUser : styles.chatItem} key={index}>
                             <Text style={styles.text}>{message.message}</Text>
                             <Text style={styles.details}>{moment((message.created_at).toDate()).format('DD/MM/YYYY' + ', ' + 'hh:mm')}</Text>
                         </View>
@@ -51,15 +51,15 @@ export function ListItem({ messages }) {
 
 const styles = StyleSheet.create({
     chatItem: {
-        backgroundColor: theme.SECONDARY_COLOR,
+        backgroundColor: '#d8d8d8',
         // backgroundColor: "#e5e5e5",
         padding: 15,
         borderRadius: 15,
         marginBottom: 15,
     },
     chatItemUser: {
-        // backgroundColor: theme.TAB_BACKGROUND,
-        backgroundColor: "#c7eddc",
+        backgroundColor: theme.SECONDARY_COLOR,
+        // backgroundColor: "#c7eddc",
         padding: 15,
         borderRadius: 15,
         alignItems: "flex-end",

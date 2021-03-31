@@ -12,11 +12,10 @@ import * as WebBrowser from 'expo-web-browser';
 import { ActivityIndicator } from 'react-native';
 import * as firebase from 'firebase';
 import 'firebase/firestore';
-import moment from 'moment/min/moment-with-locales'
-// import moment from 'moment';
-// import 'moment/locale/nl-be';
-// import 'moment/min/locales';
-// import 'moment/min/moment-with-locales';
+import moment from 'moment/min/moment-with-locales';
+
+// Calculate distance between coordinates
+import haversine from 'haversine';
 
 
 export function ListItem({ postData, count }) {
@@ -64,7 +63,7 @@ export function ListItem({ postData, count }) {
         price: postData.price > 0 ? "€" + postData.price : "Gratis",
         hasImage: postData.image ? true : false,
         seller_id: postData.seller_id,
-        // seller: user_id(),
+        distance: postData.distance
     }
 
     let [fontsLoaded] = useFonts({
@@ -148,12 +147,11 @@ export function ListItem({ postData, count }) {
                 {/* {data.hasImage
                     ? */}
                 <View style={styles.header}>
-                    <ImageBackground source={{ uri: imageUrl }} style={styles.backgroundImage} imageStyle={{borderTopLeftRadius: 15, borderTopRightRadius: 15}}>
+                    <ImageBackground source={{ uri: imageUrl }} style={styles.backgroundImage} imageStyle={{ borderTopLeftRadius: 15, borderTopRightRadius: 15 }}>
                         <View style={styles.overlay}>
                             <Text style={styles.title}>{data.title}</Text>
                             <Text style={styles.description}>{data.description}</Text>
                             <Text style={styles.description}>{data.amount} beschikbaar</Text>
-
                             <TouchableOpacity style={styles.imageSizeBtn} onPress={() => showImage()}>
                                 <FontAwesomeIcon icon={faExpand} style={{ color: theme.WHITE }} size={25} />
                             </TouchableOpacity>
@@ -162,9 +160,8 @@ export function ListItem({ postData, count }) {
                 </View>
                 <TouchableOpacity style={styles.info} onPress={() => buy()}>
                     <View style={styles.infoItem}>
-                        {/* <Text style={styles.infoTxt}>Ophalen op {moment((postData.pickup).toDate()).format('DD/MM/YYYY' + ', ' + 'hh:mm')}</Text> */}
                         <Text style={styles.infoTxt}>Ophalen op {moment((data.pickup).toDate()).format('D MMMM [om] HH:mm[u]')}</Text>
-                        <Text style={styles.infoTxt}>{data.address}</Text>
+                        <Text style={styles.infoTxt}>{data.address} ({(data.distance/1000).toFixed(1)} km)</Text>
                     </View>
                     <View style={styles.infoItem}>
                         <View style={styles.infoBtn}>

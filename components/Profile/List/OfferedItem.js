@@ -264,6 +264,8 @@ const styles = StyleSheet.create({
         color: theme.PRIMARY_COLOR,
         marginTop: 10,
         borderRadius: 10,
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
         minWidth: 100,
         textAlign: "center",
         paddingTop: 15
@@ -279,7 +281,10 @@ const styles = StyleSheet.create({
     validateBtn: {
         backgroundColor: theme.BUTTON_BACKGROUND,
         alignItems: 'center',
-        padding: 5
+        padding: 5,
+        // borderBottomLeftRadius: 15,
+        // borderBottomRightRadius: 15,
+        marginTop: 5
     },
     validateBtnTxt: {
         textAlign: 'center',

@@ -151,7 +151,7 @@ export function BoughtItem({ postData, indexKey, type }) {
                                     </View>
                                     {
                                         postData.bought_at
-                                            ? <Text style={[styles.infoItem, styles.regularFont]}>Toon deze code bij het afhalen van je aankoop</Text>
+                                            ? <Text style={[styles.infoItem, styles.regularFont]}>Toon deze code bij het afhalen van je aankoop, vergeet ook geen potjes mee te nemen om je maaltijd/voeding in te bewaren</Text>
                                             : <Text style={[styles.infoItem, styles.regularFont]}>Vraag de code aan de persoon die je aanbieding komt ophalen, vul deze code hier in</Text>
                                     }
                                 </View>
