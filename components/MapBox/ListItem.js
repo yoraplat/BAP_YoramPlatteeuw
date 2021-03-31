@@ -144,8 +144,6 @@ export function ListItem({ postData, count }) {
     return (
         <View style={styles.container}>
             <View style={styles.content}>
-                {/* {data.hasImage
-                    ? */}
                 <View style={styles.header}>
                     <ImageBackground source={{ uri: imageUrl }} style={styles.backgroundImage} imageStyle={{ borderTopLeftRadius: 15, borderTopRightRadius: 15 }}>
                         <View style={styles.overlay}>

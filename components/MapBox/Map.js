@@ -272,7 +272,7 @@ export function Map({ posts, selectedQuickFilter, location }) {
             <View style={overlayStyles.centeredView}>
               <View style={overlayStyles.modalView}>
                 <View style={overlayStyles.topLine}>
-                  <Text style={overlayStyles.title}>{modalData.title} <Text style={{ fontFamily: "Poppins_300Light", fontSize: 17 }}>({modalData.price})</Text></Text>
+                  <Text style={overlayStyles.title}>{modalData.title}</Text>
 
                   {modalData.veggie == true && modalData.vegan == false
                     ? <FontAwesomeIcon icon={faLeaf} style={{ color: 'green' }} size={30} />
@@ -289,12 +289,14 @@ export function Map({ posts, selectedQuickFilter, location }) {
                 </View>
                 <Text style={overlayStyles.description}>{modalData.description}</Text>
                 <View style={overlayStyles.info}>
-                  <View style={overlayStyles.infoBuyList}>
+                 
+                 <View style={overlayStyles.infoBuyList}>
                     <Text style={overlayStyles.infoBuyItem}>Prijs: {modalData.price}</Text>
-                    <Text style={overlayStyles.infoBuyItem}>Aantal: {modalData.amount}</Text>
-                    <Text style={overlayStyles.infoBuyItem}>Afhalen: {moment((modalData.pickup).toDate()).format('DD/MM/YYYY' + ', ' + 'hh:mm')}u</Text>
+                  </View>
+                  <Text style={overlayStyles.infoBuyItem}>Afhalen op: {moment((modalData.pickup).toDate()).format('DD/MM/YYYY [om] HH:mm')}u</Text>
                     <Text style={overlayStyles.infoBuyItem}>Adres: {modalData.address}</Text>
-                    {modalData.image != null
+                    
+                  {modalData.image != null
                       ? <Image
                         style={[overlayStyles.contentImage, overlayStyles.infoBuyItemImage]}
                         resizeMode={"contain"}
@@ -304,7 +306,6 @@ export function Map({ posts, selectedQuickFilter, location }) {
                       />
                       : null
                     }
-                  </View>
                 </View>
                 {modalData.seller_id != user_id()
                   ? <TouchableHighlight

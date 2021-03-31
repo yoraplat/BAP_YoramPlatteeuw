@@ -1,8 +1,5 @@
-
 HomeScreen: fix map item overlay layout and buy screen <----
 HomeScreen: New post image doesn't match correct image <----
-
-AddScreen count down in the input bar to max characters
 
 Chatscreen: update to remove notification when new message is read <----
 Fix momentjs locale on production <----
