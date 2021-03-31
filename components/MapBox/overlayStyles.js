@@ -6,7 +6,7 @@ const overlayStyles = StyleSheet.create({
     backgroundColor: theme.WHITE,
     // height: 150,
     borderRadius: 25,
-    padding: 15,
+    // padding: 15,
     width: '90%',
   },
   topLine: {
@@ -27,6 +27,7 @@ const overlayStyles = StyleSheet.create({
     fontFamily: "Poppins_300Light",
   },
   overlayDescription: {
+    fontSize: 15,
     textAlign: 'left',
     fontFamily: "Poppins_400Regular",
   },
@@ -100,7 +101,7 @@ const overlayStyles = StyleSheet.create({
     color: theme.GREY,
   },
   infoList: {
-    maxWidth: "80%",
+    maxWidth: "100%",
     alignItems: "flex-start",
     alignContent: "flex-start",
     flexWrap: "wrap",
@@ -108,9 +109,11 @@ const overlayStyles = StyleSheet.create({
 
   },
   infoItem: {
-    width: "50%",
-    marginTop: 10,
-    fontFamily: "Poppins_500Medium"
+    // width: "50%",
+    marginTop: 0,
+    margin: 5,
+    marginLeft: 0,
+    fontFamily: "Poppins_500Medium",
   },
   buttonList: {
     // backgroundColor:"green"
@@ -156,7 +159,7 @@ const overlayStyles = StyleSheet.create({
     fontFamily: "Poppins_400Regular",
   },
   contentImage: {
-    height: 200,
+    height: 250,
     width: 500,
     borderRadius: 10,
     // marginTop: 10

@@ -273,39 +273,37 @@ export function Map({ posts, selectedQuickFilter, location }) {
               <View style={overlayStyles.modalView}>
                 <View style={overlayStyles.topLine}>
                   <Text style={overlayStyles.title}>{modalData.title}</Text>
-
-                  {modalData.veggie == true && modalData.vegan == false
-                    ? <FontAwesomeIcon icon={faLeaf} style={{ color: 'green' }} size={30} />
-                    : <></>
-                  }
-                  {modalData.vegan == true
-                    ? <FontAwesomeIcon icon={faSeedling} style={{ color: 'green' }} size={30} />
-                    : <></>
-                  }
-
                   <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
                     <FontAwesomeIcon icon={faTimesCircle} style={{ color: theme.PRIMARY_COLOR }} size={30} />
                   </TouchableOpacity>
                 </View>
                 <Text style={overlayStyles.description}>{modalData.description}</Text>
                 <View style={overlayStyles.info}>
-                 
-                 <View style={overlayStyles.infoBuyList}>
-                    <Text style={overlayStyles.infoBuyItem}>Prijs: {modalData.price}</Text>
+
+                  <View style={overlayStyles.infoBuyItem}>
+                {modalData.veggie == true && modalData.vegan == false
+                    ? <Text style={overlayStyles.infoBuyItem}>Veggie</Text>
+                    : null
+                  }
+                  {modalData.vegan == true
+                    ? <Text style={overlayStyles.infoBuyItem}>Vegan</Text>
+                    : null
+                  }
+                    <Text style={overlayStyles.infoBuyItem}>Prijs: {modalData.price != 'Gratis' ? '€' + modalData.price : modalData.price}</Text>
                   </View>
                   <Text style={overlayStyles.infoBuyItem}>Afhalen op: {moment((modalData.pickup).toDate()).format('DD/MM/YYYY [om] HH:mm')}u</Text>
-                    <Text style={overlayStyles.infoBuyItem}>Adres: {modalData.address}</Text>
-                    
+                  <Text style={overlayStyles.infoBuyItem}>Adres: {modalData.address}</Text>
+
                   {modalData.image != null
-                      ? <Image
-                        style={[overlayStyles.contentImage, overlayStyles.infoBuyItemImage]}
-                        resizeMode={"contain"}
-                        source={{
-                          uri: modalData.image ? imageUrl : null
-                        }}
-                      />
-                      : null
-                    }
+                    ? <Image
+                      style={[overlayStyles.contentImage, overlayStyles.infoBuyItemImage]}
+                      resizeMode={"contain"}
+                      source={{
+                        uri: modalData.image ? imageUrl : null
+                      }}
+                    />
+                    : null
+                  }
                 </View>
                 {modalData.seller_id != user_id()
                   ? <TouchableHighlight
@@ -316,7 +314,7 @@ export function Map({ posts, selectedQuickFilter, location }) {
                     <Text style={overlayStyles.submitButtonTxt}>Voeding Redden</Text>
                   </TouchableHighlight>
                   : <Text>Je kan je eigen aanbiedingen niet kopen. Bedankt voor je bijdrage aan een betere wereld!</Text>
-              }
+                }
               </View>
             </View>
           </Modal>

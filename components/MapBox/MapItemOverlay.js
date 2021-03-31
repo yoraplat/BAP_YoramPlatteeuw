@@ -32,32 +32,35 @@ export function MapItemOverlay({ post, closeOverlayFunction, openModalFunction }
 
     return (
         <View style={overlayStyles.mapOverlay}>
-            <View style={overlayStyles.topLine}>
-                <Text style={overlayStyles.overlayTitle}>{post.title} <Text style={overlayStyles.overlaySubtitle}>({post.price != 'Gratis' ? '€' + post.price : post.price})</Text></Text>
-                <TouchableOpacity style={overlayStyles.closeBtn} onPress={() => closeOverlay()}>
-                    <FontAwesomeIcon icon={faTimesCircle} style={{ color: theme.PRIMARY_COLOR }} size={30} />
-                </TouchableOpacity>
-            </View>
-            <Text style={overlayStyles.overlayDescription}>{post.description}</Text>
+            <View style={{ padding: 15}}>
+                <View style={[overlayStyles.topLine, {marginBottom: 5}]}>
+                    <Text style={overlayStyles.overlayTitle}>{post.title} <Text style={overlayStyles.overlaySubtitle}>({post.price != 'Gratis' ? '€' + post.price : post.price})</Text></Text>
+                    <TouchableOpacity style={overlayStyles.closeBtn} onPress={() => closeOverlay()}>
+                        <FontAwesomeIcon icon={faTimesCircle} style={{ color: theme.PRIMARY_COLOR }} size={30} />
+                    </TouchableOpacity>
+                </View>
+                <Text style={overlayStyles.overlayDescription}>{post.description}</Text>
 
-            <View style={overlayStyles.info}>
-                {post.veggie == true && post.vegan == false
-                    ? <Text >Veggie</Text>
-                    : null
-                }
-                {post.vegan == true
-                    ? <Text >Vegan</Text>
-                    : null
-                }
-                <View style={overlayStyles.infoList}>
-                    <Text style={overlayStyles.infoItem}>Ophalen: {moment((post.pickup).toDate()).format('HH:mm[u] [op] DD/MM ')}</Text>
-                    <Text style={overlayStyles.infoItem}>{post.address}</Text>
-                    <Text style={[overlayStyles.infoItem,{fontFamily: 'Poppins_300Light'}]}>{post.amount} beschikbaar</Text>
-                {/* <TouchableOpacity style={overlayStyles.basketBtn} onPress={() => buyItem()}>
+                <View style={overlayStyles.info}>
+                    {post.veggie == true && post.vegan == false
+                        ? <Text >Veggie</Text>
+                        : null
+                    }
+                    {post.vegan == true
+                        ? <Text >Vegan</Text>
+                        : null
+                    }
+                    <Text style={overlayStyles.infoItem}>Ophalen op {moment((post.pickup).toDate()).format('DD/MM [om] HH:mm[u]')}</Text>
+                    <Text style={overlayStyles.infoItem}>Adres: {post.address}</Text>
+                    <Text style={[overlayStyles.infoItem, { fontFamily: 'Poppins_300Light' }]}>{post.amount} beschikbaar</Text>
+                    {/* <TouchableOpacity style={overlayStyles.basketBtn} onPress={() => buyItem()}>
                     <FontAwesomeIcon icon={faShoppingBasket} style={{ color: theme.BUTTON_TXT_COLOR }} size={30} />
                 </TouchableOpacity> */}
                 </View>
             </View>
+            <TouchableOpacity style={{ backgroundColor: theme.PRIMARY_COLOR, borderBottomLeftRadius: 15, borderBottomRightRadius: 15, padding: 10 }} onPress={() => buyItem()}>
+                <Text style={{ textAlign: 'center', color:theme.WHITE, fontSize: 15, fontFamily: 'Poppins_500Medium'}}>Reserveren</Text>
+            </TouchableOpacity>
         </View>
     );
 }
