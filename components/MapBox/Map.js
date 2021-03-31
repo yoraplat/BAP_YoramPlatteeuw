@@ -7,9 +7,10 @@ import overlayStyles from './overlayStyles'
 import { MapItemOverlay } from './MapItemOverlay';
 import moment from 'moment';
 import { useFirestore } from '../../Services';
+import { useAuth } from '../../Services';
 import theme from '../../Theme/theme.style';
 
-export function Map({ posts, selectedQuickFilter }) {
+export function Map({ posts, selectedQuickFilter, location }) {
 
   const generatedMapStyle = [
     {
@@ -71,28 +72,26 @@ export function Map({ posts, selectedQuickFilter }) {
   const [data, setData] = useState(null);
   const [modalData, setModalData] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
-  const [quickFilter, setQuickFilter] = useState(selectedQuickFilter);
+  // const [quickFilter, setQuickFilter] = useState(selectedQuickFilter);
+  const quickFilter = selectedQuickFilter
 
-  const { buyItem, checkAvailable, createPickupCode, imageDownloadUrl } = useFirestore();
+  const { buyItem, checkAvailable, createPickupCode, imageDownloadUrl } = useFirestore()
+  const { user_id } = useAuth()
 
   const fadeAnim = useRef(new Animated.Value(0.01)).current;
 
   useEffect(() => {
-    setQuickFilter(selectedQuickFilter);
+    // setQuickFilter(selectedQuickFilter);
     posts != undefined ? loadCoordinates() : '';
-  }, [posts]);
+  }, [posts, quickFilter]);
 
 
   const getDetails = async (index) => {
     setSelectedPost(index + 1)
 
-    // console.log("Index: " + index)
-
-    if (data[index].image != false) {
-      let id = data[index].id
-      const response = await imageDownloadUrl(id)
-      setImageUrl(response)
-    }
+    let id = data[index].id
+    const response = await imageDownloadUrl(id)
+    setImageUrl(response)
 
     Animated.timing(fadeAnim, {
       toValue: 1,
@@ -125,16 +124,16 @@ export function Map({ posts, selectedQuickFilter }) {
         // Create a pickup code
         await createPickupCode(listingId)
         console.log("Created pickup code")
-        
+
         // Buy the item
         await buyItem(listingId)
         console.log("Bought item")
-        
+
         // console.log("Creating code and buying item")
         setModalVisible(!modalVisible)
       }
-      
-      
+
+
     } catch (e) {
       console.log(e.message)
       setModalVisible(!modalVisible)
@@ -158,31 +157,81 @@ export function Map({ posts, selectedQuickFilter }) {
         longitude: parseFloat(post.coordinates.longitude),
         address: post.address,
         id: post.id,
-        image: post.image
+        image: post.image,
+        seller_id: post.seller_id
       };
 
+      // Filtering for veggie/vegan meals/food
+      // Veggie == vegan, vegan != veggie
+      if (quickFilter[0] == true && post.veggie == true) {
 
+        // meals
+        if (quickFilter[0] == true && post.veggie == true && quickFilter[2] == true && post.type == 'meal') {
+          coordinatesList.push(postObject)
+        }
+        // food
+        if (quickFilter[0] == true && post.veggie == true && quickFilter[3] == true && post.type == 'food') {
+          coordinatesList.push(postObject)
+        }
 
-      // Check if qfilter is veggie
-      if (quickFilter == 1 && post.veggie == true) {
-        coordinatesList.push(postObject)
-      } if (quickFilter == 2 && post.vegan == true) {
-        coordinatesList.push(postObject)
-      } if (quickFilter == 0) {
+        // All veggie/vegan
+        if (quickFilter[0] == true && quickFilter[2] == false && quickFilter[3] == false && post.veggie == true) {
+          coordinatesList.push(postObject)
+        }
+      }
+
+      // Filtering for vegan meals/food
+      if (quickFilter[1] == true && post.vegan == true) {
+
+        // meals
+        if (quickFilter[2] == true && post.type == 'meal') {
+          coordinatesList.push(postObject)
+        }
+        // food
+        if (quickFilter[3] == true && post.type == 'food') {
+          coordinatesList.push(postObject)
+        }
+
+        // All veggie/vegan
+        if (quickFilter[2] == false && quickFilter[3] == false) {
+          coordinatesList.push(postObject)
+        }
+      }
+
+      // only meals
+      if (quickFilter[0] == false && quickFilter[1] == false && quickFilter[2] == true && quickFilter[3] == false) {
+        if (post.type == 'meal') {
+          coordinatesList.push(postObject)
+        }
+      }
+
+      // only food
+      if (quickFilter[0] == false && quickFilter[1] == false && quickFilter[2] == false && quickFilter[3] == true) {
+        if (post.type == 'food') {
+          coordinatesList.push(postObject)
+        }
+      }
+
+      // No filters selected
+      if (quickFilter[0] == false && quickFilter[1] == false && quickFilter[2] == false && quickFilter[3] == false) {
         coordinatesList.push(postObject)
       }
     });
-
     setData(coordinatesList)
-
   }
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.container}>
       <MapView
+        // initialRegion={{
+        //   latitude: 51.042479510131116,
+        //   longitude: 3.7239200737682174,
+        //   latitudeDelta: .05,
+        //   longitudeDelta: .005
+        // }}
         initialRegion={{
-          latitude: 51.042479510131116,
-          longitude: 3.7239200737682174,
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
           latitudeDelta: .05,
           longitudeDelta: .005
         }}
@@ -257,13 +306,16 @@ export function Map({ posts, selectedQuickFilter }) {
                     }
                   </View>
                 </View>
-                <TouchableHighlight
-                  style={overlayStyles.submitButton}
-                  onPress={() => {
-                    confirmPurchase(modalData.id);
-                  }}>
-                  <Text style={overlayStyles.submitButtonTxt}>Voeding Redden</Text>
-                </TouchableHighlight>
+                {modalData.seller_id != user_id()
+                  ? <TouchableHighlight
+                    style={overlayStyles.submitButton}
+                    onPress={() => {
+                      confirmPurchase(modalData.id);
+                    }}>
+                    <Text style={overlayStyles.submitButtonTxt}>Voeding Redden</Text>
+                  </TouchableHighlight>
+                  : <Text>Je kan je eigen aanbiedingen niet kopen. Bedankt voor je bijdrage aan een betere wereld!</Text>
+              }
               </View>
             </View>
           </Modal>
@@ -277,17 +329,20 @@ export function Map({ posts, selectedQuickFilter }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.NEUTRAL_BACKGROUND,
-    alignItems: 'center',
-    justifyContent: 'center',
+    // backgroundColor: theme.NEUTRAL_BACKGROUND,
+    // alignItems: 'center',
+    // justifyContent: 'center',
   },
   map: {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
+    top: '-30%',
+    zIndex: 50,
   },
   overlayContainer: {
     flex: 1,
     bottom: 60,
+    zIndex: 51,
     position: 'absolute',
     width: '100%',
     alignItems: 'center'

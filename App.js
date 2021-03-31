@@ -1,8 +1,6 @@
 import { NavigationContainer } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-
-// import { LogBox } from 'react-native';
-
+import * as Sentry from 'sentry-expo';
 // Screens
 import AppScreen from './screens/AppScreen/AppScreen';
 
@@ -11,9 +9,16 @@ import { FirestoreProvider } from './Services';
 import { AuthProvider } from './Services';
 import firebaseConfig from './Firebase/config'
 
-export default function App() {
-  // firebase.initializeApp(firebaseConfig);
+Sentry.enableInExpoDevelopment = true
+Sentry.init({
+  dsn: "https://a2fad81482694d9cbb34a2cecef73a9a@o473614.ingest.sentry.io/5695615",
+  enableInExpoDevelopment: true,
+  debug: true
+})
 
+export default function App() {
+
+  // firebase.initializeApp(firebaseConfig);
   // LogBox.ignoreAllLogs()
 
   return (

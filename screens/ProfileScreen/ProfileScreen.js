@@ -9,11 +9,21 @@ import ProfileTab from '../../components/Profile/Profile/ProfileTab'
 import { useFirestore } from '../../Services';
 import theme from '../../Theme/theme.style';
 
-export const ProfileScreen = () => {
+export const ProfileScreen = ({ route }) => {
 
-    const { logout } = useAuth();
     const navigation = useNavigation();
+    const { logout } = useAuth();
     const [currentTab, setCurrentTab] = useState(1)
+    
+    useEffect(() => {
+        // If user is redirected by a notification, check the route param to redirect to the correct subtab
+        if (route.params && route.params.type == 'offered') {
+            setCurrentTab(2)
+        }
+        if (route.params && route.params.type == 'bought') {
+            setCurrentTab(1)
+        }
+    }, [route])
 
     const selectTab = (id) => {
         if (currentTab == 3) {
@@ -29,15 +39,15 @@ export const ProfileScreen = () => {
             }
         } if (id == 1 && buttonId == 2) {
             return {
-                backgroundColor: theme.WHITE,
+                backgroundColor: theme.TAB_BACKGROUND,
             }
         } if (id == 1 && buttonId == 3) {
             return {
-                backgroundColor: theme.WHITE,
+                backgroundColor: theme.TAB_BACKGROUND,
             }
         } if (id == 2 && buttonId == 1) {
             return {
-                backgroundColor: theme.WHITE,
+                backgroundColor: theme.TAB_BACKGROUND,
             }
         } if (id == 2 && buttonId == 2) {
             return {
@@ -45,15 +55,15 @@ export const ProfileScreen = () => {
             }
         } if (id == 2 && buttonId == 3) {
             return {
-                backgroundColor: theme.WHITE,
+                backgroundColor: theme.TAB_BACKGROUND,
             }
         } if (id == 3 && buttonId == 1) {
             return {
-                backgroundColor: theme.WHITE,
+                backgroundColor: theme.TAB_BACKGROUND,
             }
         } if (id == 3 && buttonId == 2) {
             return {
-                backgroundColor: theme.WHITE,
+                backgroundColor: theme.TAB_BACKGROUND,
             }
         } if (id == 3 && buttonId == 3) {
             return {
@@ -105,18 +115,16 @@ export const ProfileScreen = () => {
 
 
     const singOut = async () => {
-        // await logout();
-        // navigation.navigate('Login');
-        alert("Logging out")
+        logout()
     }
     return (
         <SafeAreaView style={styles.container}>
             {currentTab == 1
-                ? <BoughtTab/>
+                ? <BoughtTab />
                 : null
             }
             {currentTab == 2
-                ? <OfferedTab/>
+                ? <OfferedTab />
                 : null
             }
             {currentTab == 3
@@ -151,27 +159,27 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         position: 'absolute',
         width: '90%',
-        justifyContent: "space-between"
+        justifyContent: "space-between",
     },
     overlayTopMiddleRight: {
         marginTop: StatusBar.currentHeight,
-        top: 25,
+        top: 15,
         width: '30%',
-        padding: 15,
+        padding: 7,
         borderTopRightRadius: 15,
         borderBottomRightRadius: 15,
     },
     overlayTopMiddle: {
         marginTop: StatusBar.currentHeight,
-        top: 25,
+        top: 15,
         width: '37%',
-        padding: 15,
+        padding: 7,
     },
     overlayTopMiddleLeft: {
         marginTop: StatusBar.currentHeight,
-        top: 25,
+        top: 15,
         width: '30%',
-        padding: 15,
+        padding: 7,
         borderTopLeftRadius: 15,
         borderBottomLeftRadius: 15,
     },

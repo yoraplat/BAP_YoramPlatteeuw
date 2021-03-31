@@ -4,10 +4,11 @@ import theme from '../../Theme/theme.style';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.SECONDARY_COLOR,
+    // backgroundColor: theme.SECONDARY_COLOR,
+    // backgroundColor: theme.TERTIARY_COLOR,
     marginTop: StatusBar.currentHeight,
-    paddingTop: 100,
-    width: '100%'
+    paddingTop: 70,
+    width: '100%',
   },
   list: {
     alignItems: 'center',
@@ -17,7 +18,7 @@ const styles = StyleSheet.create({
     width: "90%",
     backgroundColor: theme.NEUTRAL_BACKGROUND,
     padding: 15,
-    borderRadius: 15,
+    borderRadius: 10,
     marginBottom: 20
   },
   formItem: {
@@ -27,6 +28,12 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins_700Bold",
     color: theme.PRIMARY_COLOR,
     fontSize: 21,
+  },
+  text: {
+    fontFamily: "Poppins_700Bold",
+    color: theme.PRIMARY_COLOR,
+    fontSize: 15,
+    paddingLeft: 5,
   },
 
   button: {
@@ -63,13 +70,15 @@ const styles = StyleSheet.create({
     fontSize: 16
   },
   submitButton: {
-    backgroundColor: theme.PRIMARY_COLOR,
+    // backgroundColor: theme.BUTTON_BACKGROUND,
+    backgroundColor: theme.WHITE,
     borderRadius: 15,
     padding: 10,
     marginBottom: 15
   },
   submitButtonTxt: {
-    color: theme.BUTTON_TXT_COLOR,
+    // color: theme.BUTTON_TXT_COLOR,
+    color: theme.PRIMARY_COLOR,
     textAlign: 'center',
     fontSize: 20,
     fontFamily: "Poppins_400Regular",

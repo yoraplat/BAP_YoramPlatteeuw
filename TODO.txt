@@ -1,25 +1,13 @@
-New post:   Check if address has specified a city
-            set max character for title and description
-            unable to set pickup date
 
-HomeScreen: Fix space between tabselectors [DONE]
-            itemsList: calculate distance to post address [MAYBE]
-            listen for updates in items, update map
+HomeScreen: fix map item overlay layout and buy screen <----
+HomeScreen: New post image doesn't match correct image <----
 
-            check if item is still available before finishing 
-            Set bought_at for post and add post id to users bought_posts
+AddScreen count down in the input bar to max characters
 
-            Prevent users to buy their own listings
+Chatscreen: update to remove notification when new message is read <----
+Fix momentjs locale on production <----
+deeplink first try crashes app in standalone app <----
 
-Logout button:  After logout redirect to login page
+All screens should be reloaded when focused <----
 
-
-load items within region
-
-ProfileScreen:  createdItems do not load on when created tab is opened
-
-REMODEL create page for meals, take care of amount in profile screens 
-
-Code only works for single food items, meals with amounts need do not work yet
-
-validate all forms input
+Daily pushnotifications to activate passive users <----

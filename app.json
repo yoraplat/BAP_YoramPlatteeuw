@@ -1,14 +1,18 @@
 {
   "expo": {
-    "name": "NoWasteV2",
-    "slug": "NoWasteV2",
-    "version": "1.0.0",
+    "name": "NoWaste",
+    "slug": "NoWaste",
+    "version": "1.1.0",
     "orientation": "portrait",
+    "scheme": "nowaste",
     "icon": "./assets/icon.png",
+    "notification": {
+      "icon": "./assets/icon.png"
+    },
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#fff9ed"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -21,13 +25,31 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#fff9ed"
       },
-      "package": "com.yoraplat.NoWasteV2"
+      "package": "com.yoraplat.NoWasteV2",
+      "config" : {
+        "googleMaps": {
+          "apiKey": "AIzaSyBt9AIE3Epq1sgwvg0cWTTj1uSYIxvhiZE"
+        }
+      },
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icon.png"
+    },
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "school-sg",
+            "project": "nowaste",
+            "authToken": "f9c42b5bc6a144bd90d5f49b33b4e089b1b1e82884904c6c86238aaf233bd8df"
+          }
+        }
+      ]
     }
   }
 }

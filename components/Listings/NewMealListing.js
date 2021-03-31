@@ -122,7 +122,7 @@ export function NewMealListing() {
                 // }
 
                 if (Object.keys(response).length > 0) {
-      
+
                     // Validate all fields
                     let validation = [];
                     for (let key in post) {
@@ -139,18 +139,21 @@ export function NewMealListing() {
                         console.log("All fields are filled in, creating post")
 
                         // updating object makes createPost very slow
-                        
-                        // let data = post
-                        // let dataToPost = { ...data, coordinates: response }
+
+                        let data = post
+                        let dataToPost = { ...data, coordinates: response[0] }
                         // console.log(dataToPost)
-                        
-                        let dataToPost = post
+
+                        // let dataToPost = post
 
                         // Takes too long if coordinates are added
-                        createPost(dataToPost).then(() => {
-                            setInProgress(false);
-                        })
+                        // createPost(dataToPost).then(() => {
+                        //     setInProgress(false);
+                        // })
+                        createPost(dataToPost)
+                        setInProgress(false);
                     }
+                    setInProgress(false);
 
                 } else {
                     alert("Dit adres kon niet gevonden worden.")
@@ -228,18 +231,18 @@ export function NewMealListing() {
                     <View style={styles.formItem}>
                         <Text style={styles.title}>Afhaal moment</Text>
                         <TouchableOpacity style={styles.bigButton} onPress={showDatepicker}>
-                            <Text style={styles.bigButtonText}>{post.date.getDate() + '/' + post.date.getMonth() + '/' + post.date.getFullYear()}</Text>
+                            <Text style={styles.bigButtonText}>{post.pickup.getDate() + '/' + post.pickup.getMonth() + '/' + post.pickup.getFullYear()}</Text>
                             <FontAwesomeIcon icon={faCalendarAlt} size={25} style={{ color: theme.TEXT_PLACEHOLDER }} />
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.bigButton} onPress={showTimepicker}>
-                            <Text style={styles.bigButtonText}>{post.date.getHours() + ':' + post.date.getMinutes()}</Text>
+                            <Text style={styles.bigButtonText}>{post.pickup.getHours() + ':' + post.pickup.getMinutes()}</Text>
                             <FontAwesomeIcon icon={faClock} size={25} style={{ color: theme.TEXT_PLACEHOLDER }} />
                         </TouchableOpacity>
                         <View>
                             {show && (
                                 <DateTimePicker
                                     testID="dateTimePicker"
-                                    value={post.date}
+                                    value={post.pickup}
                                     mode={mode}
                                     is24Hour={true}
                                     display="default"

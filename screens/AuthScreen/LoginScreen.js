@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { SafeAreaView, Text, StatusBar, Image, StyleSheet, View } from "react-native";
 import * as firebase from 'firebase';
-import logo from '../../assets/NoWaste_logo_big_logo_text.png';
+import logo from '../../assets/inscreen_logo.png';
 import { TextInput } from "react-native-gesture-handler";
 import { Button } from 'react-native-elements';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useAuth } from '../../Services';
-import { RegisterScreen } from './RegisterScreen';
-import AppScreen from "../AppScreen/AppScreen";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import theme from '../../Theme/theme.style';
 
-export const LoginScreen = () => {
-  const { currentUser } = useAuth();
+export const LoginScreen = ({ navigation }) => {
   const Stack = createStackNavigator();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState(null);
 
   let [fontsLoaded] = useFonts({
     Poppins_300Light,
@@ -28,14 +28,6 @@ export const LoginScreen = () => {
     return <SafeAreaView style={styles.container} ><AppLoading /></SafeAreaView>
   }
 
-
-
-  function Register() {
-    return (
-      <RegisterScreen />
-    );
-  }
-
   const storeData = async (data) => {
     try {
       await AsyncStorage.setItem('@NoWaste_User', JSON.stringify(data));
@@ -45,74 +37,84 @@ export const LoginScreen = () => {
     }
   }
 
-  function Login({ navigation }) {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-
-    const HandleLogin = () => {
+  const HandleLogin = () => {
+    if (email && password) {
       firebase.auth()
-        .signInWithEmailAndPassword(email.email, password.password)
-        .then(() => storeData(firebase.auth().currentUser), navigation.navigate('AppScreen'))
-        .catch(error => console.log(error))
+        .signInWithEmailAndPassword(email, password)
+        .then(() => {
+          storeData(firebase.auth().currentUser)
+          setErrorMsg(null)
+        })
+        .catch(e => {
+          console.log(e.code)
+          switch (e.code) {
+            case "auth/invalid-email":
+              setErrorMsg("Het email adres is niet geldig")
+              break
+            case "auth/user-not-found":
+              setErrorMsg("Geen gebruiker gevonden")
+              break
+            case "auth/wrong-password":
+              setErrorMsg("Email adres of wachtwoord is niet correct")
+              break
+          }
+        })
+    } else {
+      setErrorMsg('Vul je email adres en wachtwoord in')
     }
-
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.logoContainer}>
-          <Image style={styles.logo} source={logo} />
-        </View>
-        <View style={styles.formContainer}>
-          <TextInput
-            style={styles.input}
-            value={email.email}
-            onChangeText={email => setEmail({ email })}
-            placeholder={'Email'}
-            placeholderTextColor={'white'}
-          />
-          <TextInput
-            style={styles.input}
-            value={password.password}
-            onChangeText={password => setPassword({ password })}
-            placeholder={'Wachtwoord'}
-            secureTextEntry={true}
-            placeholderTextColor={'white'}
-          />
-          <Button
-            title={'Inloggen'}
-            buttonStyle={styles.loginBtn}
-            onPress={() => HandleLogin()}
-          />
-
-          <View style={styles.loginOptions}>
-            <Button
-              title='Registreren'
-              buttonStyle={styles.optionTxt}
-              type="clear"
-              onPress={() => navigation.navigate('Register')}
-            />
-            <Button
-              title='Wachtwoord vergeten'
-              buttonStyle={styles.optionTxt}
-              type="clear"
-            />
-          </View>
-        </View>
-      </SafeAreaView>
-    )
   }
 
+
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false
-      }}
-    >
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Register" component={Register} />
-      <Stack.Screen name="AppScreen" component={AppScreen} />
-    </Stack.Navigator>
-  );
-};
+    <SafeAreaView style={styles.container}>
+      <View style={styles.logoContainer}>
+        <Image style={styles.logo} source={logo} />
+      </View>
+      <View style={styles.formContainer}>
+        <TextInput
+          style={styles.input}
+          value={email}
+          onChangeText={email => setEmail(email.trim() == '' ? null : email)}
+          placeholder={'Email'}
+          placeholderTextColor={theme.TEXT_PLACEHOLDER}
+        />
+        <TextInput
+          style={styles.input}
+          value={password}
+          onChangeText={password => setPassword(password.trim() == '' ? null : password)}
+          placeholder={'Wachtwoord'}
+          secureTextEntry={true}
+          placeholderTextColor={theme.TEXT_PLACEHOLDER}
+        />
+        {
+          errorMsg
+            ? <Text>{errorMsg}</Text>
+            : null
+        }
+        <Button
+          title={'Inloggen'}
+          buttonStyle={styles.loginBtn}
+          onPress={() => HandleLogin()}
+        />
+
+        <View style={styles.loginOptions}>
+          <Button
+            title='Registreren'
+            buttonStyle={styles.optionTxt}
+            type="clear"
+            onPress={() => navigation.navigate('Register')}
+          />
+          <Button
+            title='Wachtwoord vergeten'
+            buttonStyle={styles.optionTxt}
+            type="clear"
+            onPress={() => navigation.navigate('Reset')}
+          />
+        </View>
+      </View>
+    </SafeAreaView>
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -123,12 +125,11 @@ const styles = StyleSheet.create({
   logoContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    top: '20%'
+    top: '20%',
   },
   logo: {
     width: 300,
     height: 300,
-
   },
   text: {
     marginTop: 100
@@ -145,8 +146,8 @@ const styles = StyleSheet.create({
     width: 300,
     padding: 10,
     borderWidth: 1,
-    backgroundColor: theme.TERTIARY_COLOR,
-    borderColor: theme.TERTIARY_COLOR,
+    backgroundColor: theme.NEUTRAL_BACKGROUND,
+    borderColor: theme.NEUTRAL_BACKGROUND,
     marginBottom: 15,
     fontFamily: 'Poppins_400Regular'
   },
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
   optionTxt: {
     fontFamily: 'Poppins_400Regular',
     color: theme.PRIMARY_COLOR,
-    borderColor: theme.TERTIARY_COLOR,
+    // borderColor: theme.TERTIARY_COLOR,
     borderWidth: 0,
     fontSize: 15
   }

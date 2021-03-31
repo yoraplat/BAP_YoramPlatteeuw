@@ -1,29 +1,165 @@
-import React, { useState, useEffect } from "react";
-import { SafeAreaView, Text, View, StatusBar, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { SafeAreaView, Text, View, StatusBar, StyleSheet, TouchableOpacity, Image } from "react-native";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faLeaf, faMap, faSlidersH, faStream, faFilter, faSeedling } from '@fortawesome/free-solid-svg-icons'
+import { faMap, faStream, faFilter, faSort, faArrowDown, faCaretSquareDown, faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons'
+import { useNavigation } from '@react-navigation/native';
+import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
+import AppLoading from 'expo-app-loading';
 // Components
 import { Map } from "../../components/MapBox/Map";
 import ItemsList from "../../components/MapBox/ItemsList";
-import { useFirestore } from '../../Services';
+import { useAuth } from '../../Services';
 import theme from '../../Theme/theme.style';
+import { ScrollView } from "react-native-gesture-handler";
+import * as firebase from 'firebase';
+import 'firebase/firestore';
+
+// Location
+import * as Location from 'expo-location';
+
+// Notifications
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
 export const HomeScreen = () => {
-
+  const navigation = useNavigation();
+  const [locationRes, setLocationRes] = useState();
   const [currentTab, setCurrentTab] = useState(1)
-  const { fetchAllPosts } = useFirestore();
-  const [allPosts, setAllPosts] = useState();
-  const [qFilter, setQFilter] = useState(0);
+  const [toggleFilter, setToggleFilter] = useState(0)
+  const [selectedFilters, setSelectedFilters] = useState({
+    "0": false,
+    "1": false,
+    "2": false,
+    "3": false,
+    "4": false,
+    "5": false,
+  })
+  const { user_id } = useAuth();
+  const [allPosts, setAllPosts] = useState(null);
+
+  const scrollToStart = useRef()
+  // useScrollToTop(scrollToStart)
+
+  // Notifications
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
+  // ---------------
+
+  async function getUid() {
+    return firebase.auth().currentUser.uid
+  }
+
+  async function getLocation() {
+    let { status } = await Location.requestPermissionsAsync();
+
+    if (status !== 'granted') {
+      return;
+    }
+    // Check if a location has been set, this prevents hitting the Location rate limit
+    if (locationRes == null || undefined) {
+      try {
+        await Location.getCurrentPositionAsync({})
+          .then(location => {
+            setLocationRes(location);
+          })
+      } catch (e) {
+        console.log(e.message)
+        // Backup for testing purposes, Location doesn't work well on emulator
+        setLocationRes({
+          "timestamp": 1617121013162,
+          "mocked": false,
+          "coords": {
+            "altitude": 51.09091275651065,
+            "heading": 0,
+            "latitude": 51.0449596,
+            "longitude": 3.728977,
+            "altitudeAccuracy": 3,
+            "speed": 0,
+            "accuracy": 27.375
+          }
+        })
+      }
+    }
+  }
 
   useEffect(() => {
-    setAllPosts(fetchAllPosts);
-  }, [fetchAllPosts]);
+    getUid().then(uid => {
+      getLocation()
+      firebase.firestore().collection('/users').doc(uid).onSnapshot((res) => {
+        if (res.data().settings.only_vegan == true) {
+          setSelectedFilters({ ...selectedFilters, [1]: true })
+        } else if (res.data().settings.only_veggie == true) {
+          setSelectedFilters({ ...selectedFilters, [0]: true })
+        }
+      })
+    })
+    // })()
 
+    const current_date = new Date
+    firebase.firestore().collection('/posts').where('bought_at', '==', false).onSnapshot((snapshot) => {
+      let food = []
+      snapshot.forEach((doc) => {
+        if (doc.data().pickup.toDate() > current_date) {
+          food.push({ ...doc.data() })
+        }
+      })
+      setAllPosts(food)
+    })
+
+    // Notifications
+    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      setNotification(notification);
+      // When app is active notifications will be catched here
+    })
+    // Interaction with a notification
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      // console.log(response)
+      // When notification is clicked, interaction happens here. Also catches notification when app is inactive
+      // Redirect user to the right screen
+      navigation.navigate(response.notification.request.content.data.screen, {
+        type: response.notification.request.content.data.type,
+        id: response.notification.request.content.data.item_id
+      })
+    })
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    }
+  }, [])
+
+
+  let [fontsLoaded] = useFonts({
+    Poppins_300Light,
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_700Bold,
+  });
+  if (!fontsLoaded) {
+    return <SafeAreaView style={styles.container} ><AppLoading /></SafeAreaView>
+  }
   const selectTab = (id) => {
     if (currentTab == 2) {
       setCurrentTab(1)
     }
     setCurrentTab(id)
+    setToggleFilter(0)
+    scrollToStart.current?.scrollTo({
+      y: -1,
+      animated: true
+    })
   }
 
   const getStyle = function (id, buttonId) {
@@ -33,11 +169,11 @@ export const HomeScreen = () => {
       }
     } if (id == 1 && buttonId == 2) {
       return {
-        backgroundColor: theme.WHITE,
+        backgroundColor: theme.TAB_BACKGROUND,
       }
     } if (id == 2 && buttonId == 1) {
       return {
-        backgroundColor: theme.WHITE,
+        backgroundColor: theme.TAB_BACKGROUND,
       }
     } if (id == 2 && buttonId == 2) {
       return {
@@ -67,60 +203,184 @@ export const HomeScreen = () => {
     }
   }
 
-  const quickFilter = () => {
-    if (qFilter == 2) {
-      setQFilter(0)
+  const selectFilter = (id) => {
+    let state
+    if (selectedFilters[id] == false || selectedFilters[id] == undefined) {
+      state = true
     } else {
-      setQFilter(qFilter + 1)
+      state = false
+    }
+    setSelectedFilters({ ...selectedFilters, [id]: state })
+  }
+
+  const setBgColor = (id) => {
+    if (selectedFilters[id] == false || selectedFilters[id] == undefined) {
+      return {
+        // backgroundColor: theme.NEUTRAL_BACKGROUND,
+        borderColor: theme.PRIMARY_COLOR,
+        borderWidth: 2,
+        color: theme.PRIMARY_COLOR
+      }
+    } else {
+      return {
+        // backgroundColor: theme.PRIMARY_COLOR,
+        borderColor: theme.BUTTON_BACKGROUND,
+        backgroundColor: theme.BUTTON_BACKGROUND,
+        borderWidth: 2,
+        color: theme.WHITE
+      }
+    }
+  }
+
+  const setFilterBg = (id) => {
+    if (toggleFilter == id) {
+      return {
+        backgroundColor: theme.PRIMARY_COLOR,
+        color: theme.PRIMARY_COLOR
+      }
+    } else {
+      return {
+        // backgroundColor: theme.BUTTON_BACKGROUND,
+        color: theme.WHITE
+      }
+    }
+  }
+
+  async function registerForPushNotificationsAsync() {
+    let token;
+    if (Constants.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!');
+        return;
+      }
+      token = (await Notifications.getExpoPushTokenAsync()).data;
+      // Add token to user data
+      firebase.firestore().collection('users').doc(user_id()).set(
+        { pushtoken: token },
+        { merge: true }
+      )
+    }
+
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+
+    return token;
+  }
+
+  const toggleAdvanced = (type) => {
+    if (type == 'filter') {
+      if (toggleFilter == 0) {
+        setToggleFilter(1)
+      } else if (toggleFilter == 2) {
+        setToggleFilter(1)
+      } else {
+        setToggleFilter(0)
+      }
+    }
+    if (type == 'sort') {
+      if (toggleFilter == 0) {
+        setToggleFilter(2)
+      } else if (toggleFilter == 1) {
+        setToggleFilter(2)
+      } else {
+        setToggleFilter(0)
+      }
     }
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      {currentTab == 1
-        ?
-        <>
-          <Map posts={allPosts} selectedQuickFilter={qFilter} />
-        </>
-        : <ItemsList posts={allPosts} />
-      }
 
-      <>
-        <View style={styles.tabsContainer}>
-          <TouchableOpacity style={[styles.overlayTopLeft, qFilter > 0 ? { backgroundColor: '#709B0B' } : null]} onPress={() => quickFilter()}>
-            {
-              qFilter == 0
-                ?
-                <FontAwesomeIcon icon={faFilter} style={{ color: theme.WHITE }} size={20} />
-                : null
-            }
-            {
-              qFilter == 1
-                ? <FontAwesomeIcon icon={faLeaf} style={{ color: theme.WHITE }} size={25} />
-                : null
-            }
-            {
-              qFilter == 2
-                ? <FontAwesomeIcon icon={faSeedling} style={{ color: theme.WHITE }} size={25} />
-                : null
-
-            }
-          </TouchableOpacity>
-
-          <View style={styles.tabsCenter}>
-            <TouchableOpacity style={[styles.overlayTopMiddleLeft, getStyle(currentTab, 1)]} onPress={() => selectTab(1)}>
-              <FontAwesomeIcon icon={faMap} style={getStyleColor(currentTab, 1)} size={35} />
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.overlayTopMiddleRight, getStyle(currentTab, 2)]} onPress={() => selectTab(2)}>
-              <FontAwesomeIcon icon={faStream} style={getStyleColor(currentTab, 2)} size={35} />
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity style={styles.overlayTopRight}>
-            <FontAwesomeIcon icon={faSlidersH} style={{ color: theme.PRIMARY_COLOR }} size={35} />
-          </TouchableOpacity>
+      <View style={styles.tabsContainer}>
+        <TouchableOpacity style={[styles.overlayTopMiddleLeft, getStyle(currentTab, 1)]} onPress={() => selectTab(1)}>
+          <FontAwesomeIcon icon={faStream} style={[getStyleColor(currentTab, 1), styles.icon]} size={25} />
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.overlayTopMiddleRight, getStyle(currentTab, 2)]} onPress={() => selectTab(2)}>
+          <FontAwesomeIcon icon={faMap} style={[getStyleColor(currentTab, 2), styles.icon]} size={25} />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.filterContainer}>
+        <View style={styles.filterBtnContainer}>
+          {currentTab != 2 ?
+            <>
+              <TouchableOpacity style={[styles.filterBtn, setFilterBg(1)]} onPress={() => toggleAdvanced('filter')}>
+                <Text style={styles.filterTxt}>Filteren</Text>
+                <FontAwesomeIcon icon={toggleFilter == 1 ? faAngleUp : faAngleDown} size={15} color={theme.WHITE} />
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.filterBtn, setFilterBg(2)]} onPress={() => toggleAdvanced('sort')}>
+                <Text style={styles.filterTxt}>Sorteren</Text>
+                <FontAwesomeIcon icon={toggleFilter == 2 ? faAngleUp : faAngleDown} size={15} color={theme.WHITE} />
+              </TouchableOpacity>
+            </>
+            : null
+          }
         </View>
-      </>
+
+        <View style={styles.filterItemsContainer}>
+          {
+            toggleFilter == 1
+              ? <>
+                <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(0)}>
+                  <Text style={[styles.filterItem, setBgColor(0)]}>Veggie</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(1)}>
+                  <Text style={[styles.filterItem, setBgColor(1)]}>Vegan</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(2)}>
+                  <Text style={[styles.filterItem, setBgColor(2)]}>Maaltijd</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(3)}>
+                  <Text style={[styles.filterItem, setBgColor(3)]}>Voeding</Text>
+                </TouchableOpacity>
+              </>
+              : null
+          }
+
+          {
+            toggleFilter == 2
+              ? <>
+                <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(4)}>
+                  <Text style={[styles.filterItem, setBgColor(4)]}>Afstand</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(5)}>
+                  <Text style={[styles.filterItem, setBgColor(5)]}>Prijs</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.filterBtnItem} onPress={() => selectFilter(6)}>
+                  <Text style={[styles.filterItem, setBgColor(6)]}>Ophalen op</Text>
+                </TouchableOpacity>
+              </>
+              : null
+          }
+
+        </View>
+
+      </View>
+
+      <View style={styles.listContainer}>
+        {allPosts == undefined || locationRes == undefined || locationRes == null
+          ? <Text style={styles.warningTxt}>{locationRes != null ? 'Er zijn momenteel geen aanbiedingen, kom later eens terug' : 'Er is een probleem opgetreden bij het ophalen van je locatie'}</Text>
+          :
+          currentTab == 1
+            ?
+            <ItemsList posts={allPosts} location={locationRes} selectedQuickFilter={selectedFilters} />
+            : <>
+              <Map posts={allPosts} location={locationRes} selectedQuickFilter={selectedFilters} />
+            </>
+
+        }
+      </View>
     </SafeAreaView>
   );
 };
@@ -128,65 +388,109 @@ export const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
   },
   tabsContainer: {
     flexDirection: "row",
-    // flexWrap: 'nowrap',
-    position: 'absolute',
-    width: '100%',
-    justifyContent: "space-between",
-    alignItems: "center",
-    top: StatusBar.currentHeight,
-  },
-  tabsCenter: {
-    width: '50%',
-    flexWrap: "nowrap",
-    flexDirection: "row",
-    justifyContent: "center"
-  },
-  overlayTopMiddleRight: {
-    top: 25,
-    padding: 15,
-    borderTopRightRadius: 15,
-    borderBottomRightRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  overlayTopMiddleLeft: {
-    top: 25,
-    padding: 15,
-    borderTopLeftRadius: 15,
-    borderBottomLeftRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  overlayTopLeft: {
-    top: 30,
-    left: '10%',
-    padding: 20,
-    width: 50,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 100,
-    backgroundColor: theme.PRIMARY_COLOR,
-  },
-  overlayTopRight: {
-    top: 30,
-    right: '10%',
-    padding: 10,
-    justifyContent: 'center',
+    width: '90%',
+    zIndex: 999,
+    marginBottom: 35,
   },
 
-  overlayBottom: {
-    position: 'absolute',
-    bottom: StatusBar.currentHeight,
-    backgroundColor: theme.WHITE,
+  // filterContainer: {
+  //   flexDirection: "column",
+  //   width: '95%',
+  //   alignSelf: "flex-end",
+  //   zIndex: 998
+  // },
+  filterContainer: {
+    width: '90%',
   },
-  textWhite: {
-    color: theme.WHITE
+  filterBtnContainer: {
+    flexDirection: "row",
+    justifyContent: 'space-between',
   },
-  textBlack: {
-    color: theme.BLACK
+  filterItemIcon: {
+    color: theme.PRIMARY_COLOR,
+    marginRight: 8,
+    textAlign: "center",
+    alignSelf: 'center'
   },
+  listContainer: {
+    flexGrow: 2,
+    width: '100%',
+  },
+  // Filter styling
+  title: {
+    fontSize: 20,
+    color: theme.PRIMARY_COLOR,
+  },
+  filterList: {
+  },
+
+  filterItem: {
+    padding: 5,
+    borderRadius: 5,
+    fontSize: 13,
+    textAlign: "center",
+    backgroundColor: theme.TXT_INPUT_BACKGROUND,
+    marginRight: 8,
+  },
+
+  filterBtnItem: {
+    marginRight: 2.5,
+  },
+
+  overlayTopMiddleRight: {
+    marginTop: StatusBar.currentHeight,
+    top: 15,
+    flexGrow: 1,
+    padding: 7,
+    borderTopRightRadius: 15,
+    borderBottomRightRadius: 15,
+
+  },
+  overlayTopMiddleLeft: {
+    marginTop: StatusBar.currentHeight,
+    top: 15,
+    padding: 7,
+    flexGrow: 1,
+    borderTopLeftRadius: 15,
+    borderBottomLeftRadius: 15,
+  },
+  icon: {
+    alignSelf: "center"
+  },
+  warningTxt: {
+    textAlign: "center",
+    fontSize: 15,
+    // fontFamily: 'Poppins_500Medium',
+    backgroundColor: theme.SECONDARY_COLOR,
+    padding: 10,
+    color: theme.PRIMARY_COLOR,
+    top: 20
+  },
+
+  filterBtn: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    // backgroundColor: theme.PRIMARY_COLOR,
+    backgroundColor: theme.TEXT_PLACEHOLDER,
+    width: '49%',
+    alignItems: 'center',
+    // borderRadius: 15
+  },
+  filterTxt: {
+    color: theme.WHITE,
+    padding: 2.5,
+    fontSize: 15,
+    fontFamily: 'Poppins_500Medium',
+    marginRight: 10
+  },
+  filterItemsContainer: {
+    flexDirection: 'row',
+    marginTop: 12,
+    marginBottom: 15
+  }
 });
