@@ -105,7 +105,14 @@ const FirestoreProvider = ({ children }) => {
   }
 
   const createPayment = async (data) => {
-    let parsedPrice = parseFloat(data.price.replace('€', '')).toFixed(2)
+    let parsedPrice
+
+    // Parse passed price to a 2 decimal number
+    if (typeof data.price == 'string') {
+      parsedPrice = parseFloat(data.price.replace('€', '')).toFixed(2)
+    } else {
+      parsedPrice = parseFloat(data.price).toFixed(2)
+    }
 
     // Used to create a callback id, the payment can be found in the db with the same doc id 
     let payment_uid = uuid();

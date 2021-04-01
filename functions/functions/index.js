@@ -17,14 +17,13 @@ const transporter = nodemailer.createTransport({
     }
 })
 
-// Moliie api
+// Mollie api
 const { createMollieClient } = require('@mollie/api-client');
 const mollieClient = createMollieClient({ apiKey: 'test_r8hU432gKuCvNcg5uBSDaAxmHaqHTd' });
 
 exports.mollieCallback = functions.https.onRequest((request, response) => {
     // Fetch the according payment document
     admin.firestore().collection('payments').doc(request.query.id).get().then((doc) => {
-
         // Find the payment id in the payment document and update the payment status
         mollieClient.payments.get(doc.data().payment_id).then(async (res) => {
             await admin.firestore().collection('payments').doc(request.query.id).update({
@@ -36,7 +35,6 @@ exports.mollieCallback = functions.https.onRequest((request, response) => {
             })
         })
     })
-
 })
 
 exports.mollieRedirect = functions.https.onRequest((request, response) => {

@@ -28,9 +28,7 @@ export function ListItem({ postData, count }) {
     const { buyItem, checkAvailable, createPickupCode, imageDownloadUrl, createPayment } = useFirestore();
     const { user_id } = useAuth();
     // Payment
-    const [awaitingPayment, setAwaitingPayment] = useState(false)
     const [paymentStatus, setPaymentStatus] = useState()
-    const [paymentId, setPaymentId] = useState(null)
 
     useEffect(() => {
         (async () => {
@@ -39,17 +37,7 @@ export function ListItem({ postData, count }) {
                 setImageUrl(response)
             }
         })()
-
-        if (paymentId) {
-            firebase.firestore().collection('payments').doc(paymentId).onSnapshot((doc) => {
-                const data = doc.data().status
-                setPaymentStatus(data)
-                if (data == 'paid') {
-                    finishPayment()
-                }
-            })
-        }
-    }, [paymentId, postData])
+    }, [postData])
 
     const data = {
         title: postData.title,
@@ -87,41 +75,43 @@ export function ListItem({ postData, count }) {
 
 
     const confirmPurchase = async (listingId, type) => {
-
         try {
-
             // Check if still available
             const available = await checkAvailable(listingId)
-
             if (available != false) {
                 // If transaction needed create payment and redirect user to payment url
                 if (type == 'paid') {
-                    setAwaitingPayment(true)
                     setPaymentStatus('open')
                     createPayment(data).then((res) => {
-                        console.log('status after creating payment: ' + res)
-                        setPaymentId(res)
+                        paymentListener(res)
                     })
                 } else {
                     // Create a pickup code
                     // Add payment id to code doc
                     await createPickupCode(listingId)
                     console.log("Created pickup code")
-
                     // Buy the item
                     await buyItem(listingId)
                     console.log("Bought item")
-
                     setConfirmVisible(false)
-
                 }
             }
         } catch (e) {
             console.log(e.message)
             setConfirmVisible(false)
-            setAwaitingPayment(false)
             alert("Item is niet meer beschikbaar.")
         }
+    }
+
+    const paymentListener = (id) => {
+        // Listen for change in payment status
+        firebase.firestore().collection('payments').doc(id).onSnapshot((doc) => {
+            const data = doc.data().status
+            setPaymentStatus(data)
+            if (data == 'paid') {
+                finishPayment()
+            }
+        })
     }
 
     const finishPayment = async () => {
@@ -159,7 +149,7 @@ export function ListItem({ postData, count }) {
                 <TouchableOpacity style={styles.info} onPress={() => buy()}>
                     <View style={styles.infoItem}>
                         <Text style={styles.infoTxt}>Ophalen op {moment((data.pickup).toDate()).format('D MMMM [om] HH:mm[u]')}</Text>
-                        <Text style={styles.infoTxt}>{data.address} ({(data.distance/1000).toFixed(1)} km)</Text>
+                        <Text style={styles.infoTxt}>{data.address} ({(data.distance / 1000).toFixed(1)} km)</Text>
                     </View>
                     <View style={styles.infoItem}>
                         <View style={styles.infoBtn}>
@@ -315,7 +305,7 @@ const styles = StyleSheet.create({
     title: {
         fontFamily: "Poppins_700Bold",
         color: theme.WHITE,
-        fontSize: 25
+        fontSize: 22
     },
     description: {
         fontFamily: "Poppins_400Regular",

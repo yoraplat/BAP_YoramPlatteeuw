@@ -223,6 +223,12 @@ export function Map({ posts, selectedQuickFilter, location }) {
   return (
     <SafeAreaView style={styles.container}>
       <MapView
+        // initialRegion={{
+        //   latitude: 51.042479510131116,
+        //   longitude: 3.7239200737682174,
+        //   latitudeDelta: .05,
+        //   longitudeDelta: .005
+        // }}
         initialRegion={{
           latitude: location.coords.latitude,
           longitude: location.coords.longitude,
@@ -232,7 +238,6 @@ export function Map({ posts, selectedQuickFilter, location }) {
         style={styles.map}
         provider={PROVIDER_GOOGLE}
         customMapStyle={generatedMapStyle}
-        toolbarEnabled={false}
       >
         {data && data.map((marker, index) => (
           <Marker
@@ -256,7 +261,65 @@ export function Map({ posts, selectedQuickFilter, location }) {
           : null
 
       }
-      
+      {
+        modalVisible
+          ?
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+          >
+            <View style={overlayStyles.centeredView}>
+              <View style={overlayStyles.modalView}>
+                <View style={overlayStyles.topLine}>
+                  <Text style={overlayStyles.title}>{modalData.title}</Text>
+                  <TouchableOpacity onPress={() => setModalVisible(!modalVisible)}>
+                    <FontAwesomeIcon icon={faTimesCircle} style={{ color: theme.PRIMARY_COLOR }} size={30} />
+                  </TouchableOpacity>
+                </View>
+                <Text style={overlayStyles.description}>{modalData.description}</Text>
+                <View style={overlayStyles.info}>
+
+                  <View style={overlayStyles.infoBuyItem}>
+                {modalData.veggie == true && modalData.vegan == false
+                    ? <Text style={overlayStyles.infoBuyItem}>Veggie</Text>
+                    : null
+                  }
+                  {modalData.vegan == true
+                    ? <Text style={overlayStyles.infoBuyItem}>Vegan</Text>
+                    : null
+                  }
+                    <Text style={overlayStyles.infoBuyItem}>Prijs: {modalData.price != 'Gratis' ? '€' + modalData.price : modalData.price}</Text>
+                  </View>
+                  <Text style={overlayStyles.infoBuyItem}>Afhalen op: {moment((modalData.pickup).toDate()).format('DD/MM/YYYY [om] HH:mm')}u</Text>
+                  <Text style={overlayStyles.infoBuyItem}>Adres: {modalData.address}</Text>
+
+                  {modalData.image != null
+                    ? <Image
+                      style={[overlayStyles.contentImage, overlayStyles.infoBuyItemImage]}
+                      resizeMode={"contain"}
+                      source={{
+                        uri: modalData.image ? imageUrl : null
+                      }}
+                    />
+                    : null
+                  }
+                </View>
+                {modalData.seller_id != user_id()
+                  ? <TouchableHighlight
+                    style={overlayStyles.submitButton}
+                    onPress={() => {
+                      confirmPurchase(modalData.id);
+                    }}>
+                    <Text style={overlayStyles.submitButtonTxt}>Voeding Redden</Text>
+                  </TouchableHighlight>
+                  : <Text>Je kan je eigen aanbiedingen niet kopen. Bedankt voor je bijdrage aan een betere wereld!</Text>
+                }
+              </View>
+            </View>
+          </Modal>
+          : null
+      }
 
     </SafeAreaView>
   );
@@ -277,10 +340,10 @@ const styles = StyleSheet.create({
   },
   overlayContainer: {
     flex: 1,
-    bottom: 30,
+    bottom: 60,
     zIndex: 51,
     position: 'absolute',
     width: '100%',
-    alignItems: 'center',
+    alignItems: 'center'
   },
 });

@@ -1,6 +1,5 @@
-HomeScreen: fix map item overlay layout and buy screen <----
-HomeScreen: New post image doesn't match correct image <---
 
+HomeScreen: New post image doesn't match correct image <----
 Chatscreen: update to remove notification when new message is read <----
 Fix momentjs locale on production <----
 deeplink first try crashes app in standalone app <----

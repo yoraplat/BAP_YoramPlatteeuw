@@ -3,10 +3,6 @@ import theme from '../../Theme/theme.style';
 
 const overlayStyles = StyleSheet.create({
   mapOverlay: {
-    backgroundColor: theme.WHITE,
-    // height: 150,
-    borderRadius: 25,
-    // padding: 15,
     width: '90%',
   },
   topLine: {
@@ -16,13 +12,13 @@ const overlayStyles = StyleSheet.create({
   },
   overlayTitle: {
     textAlign: 'left',
-    color: theme.PRIMARY_COLOR,
+    color: theme.WHITE,
     fontSize: 20,
     fontFamily: "Poppins_700Bold",
   },
   overlaySubtitle: {
     // textAlign: 'right',
-    color: theme.PRIMARY_COLOR,
+    color: theme.WHITE,
     fontSize: 15,
     fontFamily: "Poppins_300Light",
   },
@@ -30,6 +26,7 @@ const overlayStyles = StyleSheet.create({
     fontSize: 15,
     textAlign: 'left',
     fontFamily: "Poppins_400Regular",
+    color: theme.WHITE,
   },
   overlayVeggieIcon: {
     color: 'green',
@@ -50,10 +47,10 @@ const overlayStyles = StyleSheet.create({
   },
   infoItem: {
     width: "100%",
-    backgroundColor:'red',
+    backgroundColor: 'red',
     marginTop: 10,
     fontFamily: "Poppins_500Medium",
-    color: theme.PRIMARY_COLOR,
+    color: theme.WHITE,
   },
   infoBuyItem: {
     // width: "90%",
@@ -85,12 +82,13 @@ const overlayStyles = StyleSheet.create({
   },
   closeBtn: {
     alignItems: 'flex-end',
-    borderRadius: 100,
+    // borderRadius: 100,
+    // backgroundColor: theme.WHITE,
   },
 
   title: {
     fontFamily: "Poppins_700Bold",
-    color: theme.PRIMARY_COLOR,
+    color: theme.WHITE,
     fontSize: 21,
   },
   description: {
@@ -98,7 +96,7 @@ const overlayStyles = StyleSheet.create({
     marginTop: 5,
     marginBottom: 5,
     fontFamily: 'Poppins_400Regular',
-    color: theme.GREY,
+    color: theme.WHITE,
   },
   infoList: {
     maxWidth: "100%",
@@ -114,6 +112,7 @@ const overlayStyles = StyleSheet.create({
     margin: 5,
     marginLeft: 0,
     fontFamily: "Poppins_500Medium",
+    color: theme.WHITE
   },
   buttonList: {
     // backgroundColor:"green"
@@ -163,6 +162,12 @@ const overlayStyles = StyleSheet.create({
     width: 500,
     borderRadius: 10,
     // marginTop: 10
+  },
+
+  overlay: {
+    backgroundColor: theme.TRANSPARENT_POPUP,
+    height: '100%',
+    borderRadius: 25
   }
 
 });
