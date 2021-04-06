@@ -167,7 +167,7 @@ const overlayStyles = StyleSheet.create({
   overlay: {
     backgroundColor: theme.TRANSPARENT_POPUP,
     height: '100%',
-    borderRadius: 25
+    borderRadius: 15
   }
 
 });

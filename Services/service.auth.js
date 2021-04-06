@@ -44,9 +44,13 @@ const AuthProvider = ({ children }) => {
     return uid
   }
 
-  const logout = () => {
+  const logout = async () => {
+    const uid = firebase.auth().currentUser.uid
     AsyncStorage.removeItem('@NoWaste_User');
-    firebase.auth().signOut();
+    // Clear pushtoken from user
+    await firebase.firestore().collection('users').doc(uid).update({ pushtoken: null }).then(() => {
+      firebase.auth().signOut();
+    })
   }
 
   const userPreferences = async () => {

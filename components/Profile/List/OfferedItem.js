@@ -189,6 +189,7 @@ const styles = StyleSheet.create({
         padding: 20,
         borderRadius: 15,
         marginBottom: 20,
+        top: 20
     },
     disabledOverlay: {
         position: 'absolute',

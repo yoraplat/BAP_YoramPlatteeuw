@@ -81,9 +81,9 @@ export function MapItemOverlay({ post, closeOverlayFunction, openModalFunction }
     const paymentListener = (id) => {
         // Listen for change in payment status
         firebase.firestore().collection('payments').doc(id).onSnapshot((doc) => {
-            const data = doc.data().status
-            setPaymentStatus(data)
-            if (data == 'paid') {
+            const data = doc.data()
+            setPaymentStatus(data.status)
+            if (data.status == 'paid') {
                 finishPayment()
             }
         })
@@ -300,6 +300,5 @@ const styles = StyleSheet.create({
         flex: 1,
         resizeMode: "cover",
         justifyContent: "center",
-        borderRadius: 25
     }
 });

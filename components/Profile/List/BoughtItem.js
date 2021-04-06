@@ -115,11 +115,11 @@ export function BoughtItem({ postData, indexKey, type }) {
                                 <View style={styles.infoList}>
                                     <Text style={styles.infoItem}>{moment((postData.pickup).toDate()).format('DD/MM/YYYY' + ', ' + 'HH:mm[u]')}</Text>
                                     <Text style={styles.infoItem}>{postData.address}</Text>
-                                    <Text style={styles.infoItem}>Type: {postData.type}</Text>
-                                    {postData.amount > 1
+                                    <Text style={styles.infoItem}>Type: {postData.type == 'meal' ? 'Maaltijd' : 'Voeding'}</Text>
+                                    {/* {postData.amount > 1
                                         ? <Text style={[styles.infoItem, { fontFamily: 'Poppins_300Light' }]}>Aantal: {postData.amount}</Text>
                                         : null
-                                    }
+                                    } */}
                                     <View style={styles.infoItemCode}>
                                         {type == 'bought'
                                             ? <Text style={styles.infoCode}>
@@ -150,9 +150,7 @@ export function BoughtItem({ postData, indexKey, type }) {
                                         }
                                     </View>
                                     {
-                                        postData.bought_at
-                                            ? <Text style={[styles.infoItem, styles.regularFont]}>Toon deze code bij het afhalen van je aankoop, vergeet ook geen potjes mee te nemen om je maaltijd/voeding in te bewaren</Text>
-                                            : <Text style={[styles.infoItem, styles.regularFont]}>Vraag de code aan de persoon die je aanbieding komt ophalen, vul deze code hier in</Text>
+                                        <Text style={[styles.infoItem, styles.regularFont]}>Toon deze code bij het afhalen van je aankoop, vergeet ook geen potjes mee te nemen om je maaltijd/voeding in te bewaren</Text>
                                     }
                                 </View>
                             </View>
@@ -203,6 +201,7 @@ const styles = StyleSheet.create({
         padding: 20,
         borderRadius: 15,
         marginBottom: 20,
+        top: 20
     },
     disabledOverlay: {
         position: 'absolute',

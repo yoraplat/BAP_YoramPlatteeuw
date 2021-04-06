@@ -22,7 +22,7 @@ export default function ProfileItemsList({ posts, type }) {
     }
 
     return (
-        <ScrollView style={styles.list}>
+        <ScrollView keyboardShouldPersistTaps='handled' style={styles.list}>
             { posts && posts[0] == undefined
                 ? <Text style={styles.warningTxt}>{type == 'bought' ? 'Hier kan je gekochte aanbiedingen terug vinden' : 'Hier kan je jouw aangeboden items terug vinden' }</Text>
                 : type == 'offered'

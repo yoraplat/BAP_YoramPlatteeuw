@@ -14,11 +14,7 @@ import * as firebase from 'firebase';
 import 'firebase/firestore';
 import moment from 'moment/min/moment-with-locales';
 
-// Calculate distance between coordinates
-import haversine from 'haversine';
-
-
-export function ListItem({ postData, count }) {
+export function ListItem({ postData }) {
     moment.locale('nl-be');
 
     const [imageUrl, setImageUrl] = useState(null)
@@ -31,12 +27,12 @@ export function ListItem({ postData, count }) {
     const [paymentStatus, setPaymentStatus] = useState()
 
     useEffect(() => {
-        (async () => {
-            if (postData.image != false) {
-                const response = await imageDownloadUrl(postData.id)
+        const fetchImage = () => {
+            imageDownloadUrl(postData.id).then(response => {
                 setImageUrl(response)
-            }
-        })()
+            })
+        }
+        fetchImage()
     }, [postData])
 
     const data = {
@@ -89,10 +85,8 @@ export function ListItem({ postData, count }) {
                     // Create a pickup code
                     // Add payment id to code doc
                     await createPickupCode(listingId)
-                    console.log("Created pickup code")
                     // Buy the item
                     await buyItem(listingId)
-                    console.log("Bought item")
                     setConfirmVisible(false)
                 }
             }
@@ -105,13 +99,18 @@ export function ListItem({ postData, count }) {
 
     const paymentListener = (id) => {
         // Listen for change in payment status
-        firebase.firestore().collection('payments').doc(id).onSnapshot((doc) => {
-            const data = doc.data().status
-            setPaymentStatus(data)
-            if (data == 'paid') {
-                finishPayment()
-            }
-        })
+        try {
+            firebase.firestore().collection('payments').doc(id).onSnapshot((doc) => {
+                // TypeError: undefined is not an object (evaluating 't.data().status')
+                const data = doc.data()
+                if (data.status == 'paid') {
+                    setPaymentStatus(data.status)
+                    finishPayment()
+                }
+            })
+        } catch (e) {
+            console.log(e.message)
+        }
     }
 
     const finishPayment = async () => {
@@ -274,7 +273,7 @@ export function ListItem({ postData, count }) {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: theme.NEUTRAL_BACKGROUND,
+        // backgroundColor: theme.NEUTRAL_BACKGROUND,
         marginBottom: 20,
     },
     backgroundImage: {
@@ -299,8 +298,8 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'space-between',
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
+        borderTopLeftRadius: 15,
+        borderTopRightRadius: 15,
     },
     title: {
         fontFamily: "Poppins_700Bold",

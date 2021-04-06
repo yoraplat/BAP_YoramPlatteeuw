@@ -164,7 +164,8 @@ const styles = StyleSheet.create({
     overlayTopMiddleRight: {
         marginTop: StatusBar.currentHeight,
         top: 15,
-        width: '30%',
+        // width: '30%',
+        flexGrow: 1,
         padding: 7,
         borderTopRightRadius: 15,
         borderBottomRightRadius: 15,
@@ -172,13 +173,15 @@ const styles = StyleSheet.create({
     overlayTopMiddle: {
         marginTop: StatusBar.currentHeight,
         top: 15,
-        width: '37%',
+        // width: '37%',
+        flexGrow: 1,
         padding: 7,
     },
     overlayTopMiddleLeft: {
         marginTop: StatusBar.currentHeight,
         top: 15,
-        width: '30%',
+        // width: '30%',
+        flexGrow: 1,
         padding: 7,
         borderTopLeftRadius: 15,
         borderBottomLeftRadius: 15,

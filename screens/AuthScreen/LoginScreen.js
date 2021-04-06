@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, Text, StatusBar, Image, StyleSheet, View } from "react-native";
+import { SafeAreaView, Text, StatusBar, Image, StyleSheet, View, ScrollView } from "react-native";
 import * as firebase from 'firebase';
 import logo from '../../assets/inscreen_logo.png';
 import { TextInput } from "react-native-gesture-handler";
@@ -31,9 +31,9 @@ export const LoginScreen = ({ navigation }) => {
   const storeData = async (data) => {
     try {
       await AsyncStorage.setItem('@NoWaste_User', JSON.stringify(data));
-      console.log(data.uid)
+      // console.log(data.uid)
     } catch (error) {
-      alert(error)
+      throw new Error(error.message)
     }
   }
 
@@ -67,51 +67,55 @@ export const LoginScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.logoContainer}>
-        <Image style={styles.logo} source={logo} />
-      </View>
-      <View style={styles.formContainer}>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={email => setEmail(email.trim() == '' ? null : email)}
-          placeholder={'Email'}
-          placeholderTextColor={theme.TEXT_PLACEHOLDER}
-        />
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={password => setPassword(password.trim() == '' ? null : password)}
-          placeholder={'Wachtwoord'}
-          secureTextEntry={true}
-          placeholderTextColor={theme.TEXT_PLACEHOLDER}
-        />
-        {
-          errorMsg
-            ? <Text>{errorMsg}</Text>
-            : null
-        }
-        <Button
-          title={'Inloggen'}
-          buttonStyle={styles.loginBtn}
-          onPress={() => HandleLogin()}
-        />
-
-        <View style={styles.loginOptions}>
-          <Button
-            title='Registreren'
-            buttonStyle={styles.optionTxt}
-            type="clear"
-            onPress={() => navigation.navigate('Register')}
-          />
-          <Button
-            title='Wachtwoord vergeten'
-            buttonStyle={styles.optionTxt}
-            type="clear"
-            onPress={() => navigation.navigate('Reset')}
-          />
+      <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps={'handled'}>
+        <View style={styles.logoContainer}>
+          <Image style={styles.logo} source={logo} />
         </View>
-      </View>
+        <View style={styles.formContainer}>
+          <TextInput
+            style={styles.input}
+            value={email}
+            onChangeText={email => setEmail(email.trim() == '' ? null : email)}
+            placeholder={'Email'}
+            placeholderTextColor={theme.TEXT_PLACEHOLDER}
+          />
+          <TextInput
+            style={styles.input}
+            value={password}
+            onChangeText={password => setPassword(password.trim() == '' ? null : password)}
+            placeholder={'Wachtwoord'}
+            secureTextEntry={true}
+            placeholderTextColor={theme.TEXT_PLACEHOLDER}
+          />
+
+          {
+            errorMsg
+              ? <Text>{errorMsg}</Text>
+              : null
+          }
+          <Button
+            title={'Inloggen'}
+            buttonStyle={styles.loginBtn}
+            onPress={() => HandleLogin()}
+          />
+
+          <View style={styles.loginOptions}>
+            <Button
+              title='Registreren'
+              buttonStyle={styles.optionTxt}
+              type="clear"
+              onPress={() => navigation.navigate('Register')}
+            />
+            <Button
+              title='Wachtwoord vergeten'
+              buttonStyle={styles.optionTxt}
+              type="clear"
+              onPress={() => navigation.navigate('Reset')}
+            />
+          </View>
+        </View>
+
+      </ScrollView>
     </SafeAreaView>
   )
 }
@@ -157,7 +161,7 @@ const styles = StyleSheet.create({
     padding: 10,
     textAlign: 'center',
     backgroundColor: theme.PRIMARY_COLOR,
-    fontFamily: 'Poppins_700Bold'
+    fontFamily: 'Poppins_700Bold',
   },
   loginOptions: {
     width: 300,
@@ -171,6 +175,11 @@ const styles = StyleSheet.create({
     // borderColor: theme.TERTIARY_COLOR,
     borderWidth: 0,
     fontSize: 15
+  },
+  list: {
+    // flex: 1,
+    width: '90%',
+    paddingBottom: 120
   }
 
 });

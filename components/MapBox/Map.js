@@ -106,39 +106,12 @@ export function Map({ posts, selectedQuickFilter, location }) {
   }
 
   const openModal = () => {
-    setModalData(data[selectedPost - 1]);
+    // setModalData(data[selectedPost - 1]);
 
     // console.log("Selected post: " + (selectedPost - 1))
 
     closeOverlay();
-    setModalVisible(true)
-  }
-
-  const confirmPurchase = async (listingId) => {
-    try {
-      // Check if still available
-      console.log("Checking if available")
-      const available = await checkAvailable(listingId)
-
-      if (available != false) {
-        // Create a pickup code
-        await createPickupCode(listingId)
-        console.log("Created pickup code")
-
-        // Buy the item
-        await buyItem(listingId)
-        console.log("Bought item")
-
-        // console.log("Creating code and buying item")
-        setModalVisible(!modalVisible)
-      }
-
-
-    } catch (e) {
-      console.log(e.message)
-      setModalVisible(!modalVisible)
-      // alert("Item is niet meer beschikbaar.")
-    }
+    // setModalVisible(true)
   }
 
   const loadCoordinates = () => {
@@ -161,61 +134,7 @@ export function Map({ posts, selectedQuickFilter, location }) {
         seller_id: post.seller_id
       };
 
-      // Filtering for veggie/vegan meals/food
-      // Veggie == vegan, vegan != veggie
-      if (quickFilter[0] == true && post.veggie == true) {
-
-        // meals
-        if (quickFilter[0] == true && post.veggie == true && quickFilter[2] == true && post.type == 'meal') {
-          coordinatesList.push(postObject)
-        }
-        // food
-        if (quickFilter[0] == true && post.veggie == true && quickFilter[3] == true && post.type == 'food') {
-          coordinatesList.push(postObject)
-        }
-
-        // All veggie/vegan
-        if (quickFilter[0] == true && quickFilter[2] == false && quickFilter[3] == false && post.veggie == true) {
-          coordinatesList.push(postObject)
-        }
-      }
-
-      // Filtering for vegan meals/food
-      if (quickFilter[1] == true && post.vegan == true) {
-
-        // meals
-        if (quickFilter[2] == true && post.type == 'meal') {
-          coordinatesList.push(postObject)
-        }
-        // food
-        if (quickFilter[3] == true && post.type == 'food') {
-          coordinatesList.push(postObject)
-        }
-
-        // All veggie/vegan
-        if (quickFilter[2] == false && quickFilter[3] == false) {
-          coordinatesList.push(postObject)
-        }
-      }
-
-      // only meals
-      if (quickFilter[0] == false && quickFilter[1] == false && quickFilter[2] == true && quickFilter[3] == false) {
-        if (post.type == 'meal') {
-          coordinatesList.push(postObject)
-        }
-      }
-
-      // only food
-      if (quickFilter[0] == false && quickFilter[1] == false && quickFilter[2] == false && quickFilter[3] == true) {
-        if (post.type == 'food') {
-          coordinatesList.push(postObject)
-        }
-      }
-
-      // No filters selected
-      if (quickFilter[0] == false && quickFilter[1] == false && quickFilter[2] == false && quickFilter[3] == false) {
-        coordinatesList.push(postObject)
-      }
+    coordinatesList.push(postObject)
     });
     setData(coordinatesList)
   }
@@ -272,7 +191,8 @@ const styles = StyleSheet.create({
   map: {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
-    top: '-30%',
+    // top: '-30%',
+    top: -150,
     zIndex: 50,
   },
   overlayContainer: {

@@ -167,7 +167,7 @@ export function NewMealListing() {
 
     return (
         <SafeAreaView style={styles.container} >
-            <ScrollView contentContainerStyle={styles.list}>
+            <ScrollView keyboardShouldPersistTaps='handled' contentContainerStyle={styles.list}>
                 <View style={styles.form}>
                     <View style={styles.formItem}>
                         <Text style={styles.title}>Beschrijving</Text>

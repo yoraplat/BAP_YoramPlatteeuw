@@ -21,7 +21,11 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yoraplat.NoWasteV2",
+      "config" : {
+        "googleMapsApiKey": "AIzaSyBQIHOADn4oewQYW7RfljPhZ6Z5s3XQepA"
+      }
     },
     "android": {
       "adaptiveIcon": {

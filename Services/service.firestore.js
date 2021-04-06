@@ -13,14 +13,6 @@ const FirestoreProvider = ({ children }) => {
 
   const [allMeals, setAllMeals] = useState([]);
   const [allFood, setAllFood] = useState([]);
-  const [allPosts, setAllPosts] = useState([]);
-  const [boughtItemsId, setBoughtItemsId] = useState([]);
-  const [boughtItems, setBoughtItems] = useState([]);
-  const [createdItemsId, setCreatedItemsId] = useState([]);
-  const [createdItems, setCreatedItems] = useState([]);
-  // Chat
-  const [boughtChats, setBoughtChats] = useState([]);
-  const [offeredChats, setOfferedChats] = useState([]);
 
   // Payments
   const [status, setStatus] = useState(null);
@@ -39,7 +31,9 @@ const FirestoreProvider = ({ children }) => {
     // if (postData.image != false) {
     const imageResponse = await fetch(postData.image)
     const blob = await imageResponse.blob()
-    firebase.storage().ref().child("images/" + newId + ".jpg").put(blob)
+
+    // Wait for image upload to finish creating the post
+    await firebase.storage().ref().child("images/" + newId + ".jpg").put(blob)
     // }
 
     // console.log("Creating post with id: " + newId)
@@ -284,7 +278,11 @@ const FirestoreProvider = ({ children }) => {
       title: details.title,
       chat_id: id,
       finished: false,
-      image_url: image
+      image_url: image,
+      last_message: {
+        message_id: null,
+        sender_id: null,
+      }
     })
 
     // Update USER data with id added to chats

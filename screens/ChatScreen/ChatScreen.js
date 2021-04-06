@@ -12,9 +12,9 @@ import { useFirestore } from '../../Services';
 import * as firebase from 'firebase';
 import 'firebase/firestore';
 
-export const ChatScreen = () => {
+export const ChatScreen = ({ navigation }) => {
 
-  const { fetchAllChats, fetchChat, sendMessage, checkUnread } = useFirestore()
+  const { sendMessage } = useFirestore()
   const [chats, setChats] = useState(null)
   const [loadingChats, setLoadingChats] = useState(true)
   const [selectedChat, setSelectedChat] = useState(null)
@@ -22,43 +22,38 @@ export const ChatScreen = () => {
   const [newMessage, setNewMessage] = useState(null)
   const [uid, setUid] = useState(null)
 
-  // useEffect(() => {
-  //   // Load all chats belonging to the user
-  //   const uid = firebase.auth().currentUser.uid
-  //   setUid(uid)
-  //   firebase.firestore().collection('users').doc(uid).onSnapshot(async (res) => {
-  //     const userChats = []
-  //     for (const chat of res.data().chats) {
-  //       await firebase.firestore().collection('chats').doc(chat).get().then((res) => {
-  //         if (res.data().finished != true) {
-  //           userChats.push(res.data())
-  //         }
-  //       })
-  //     }
-  //     setChats(userChats)
-  //     setLoadingChats(false)
-  //   })
-  // }, [])
-
   useEffect(() => {
+    // Reload page when new chat is added
+    const unsubscribe = navigation.addListener('focus', () => {
     let data
     const userChats = []
     const uid = firebase.auth().currentUser.uid
+    // setUid(uid)
     firebase.firestore().collection('users').doc(uid).onSnapshot(async res => {
-        data = res.data().chats
-        if (data != null) {
-          for (let i = 0; i < data.length; i++) {
-              await firebase.firestore().collection('chats').doc(data[i]).get().then(res => {
-                if (res.data().finished != true) {
-                  userChats.push(res.data())
-                }  
-              })
-          }
+      data = res.data().chats
+      // console.log(data)
+      if (data != null) {
+        for (let i = 0; i < data.length; i++) {
+          await firebase.firestore().collection('chats').doc(data[i]).get().then(res => {
+            if (res.data().finished != true) {
+              userChats.push(res.data())
+            }
+          })
         }
-        setChats(userChats)
+        if (userChats.length === 0) {
+          setChats(null)
+        } else {
+          setChats(userChats)
+        }
         setLoadingChats(false)
+      } else {
+        setLoadingChats(false)
+      }
     })
-}, []);
+  })
+  return unsubscribe
+  // }, [isFocused]);
+  }, [navigation]);
 
   let [fontsLoaded] = useFonts({
     Poppins_300Light,
@@ -102,14 +97,16 @@ export const ChatScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.chatContainer}>
+      <ScrollView keyboardShouldPersistTaps='handled' horizontal={true} showsHorizontalScrollIndicator={false} style={styles.chatContainer}>
         <View style={styles.headerContainer}>
           {loadingChats
             ? <ActivityIndicator size="large" color={theme.PRIMARY_COLOR} />
-            : chats.length != 0 ?
-              chats && chats.map((chat, index) => {
+            // Check if chats is null or undefined
+            : chats !== null
+              ? chats && chats.map((chat, index) => {
                 return (
                   <TouchableOpacity key={index} style={styles.headerItem} onPress={() => selectChat(index, chat.chat_id)}>
+                    {/* TypeError: undefined is not an object (evaluating 't.last_message.sender_id') */}
                     { chat.last_message.sender_id != uid && chat.last_message.sender_id !== null
                       ? <View style={styles.headerBadge}>
                         <Text style={styles.badgeTxt}>1</Text>
@@ -135,7 +132,7 @@ export const ChatScreen = () => {
               : <Text style={{ color: theme.WHITE }}>Kies een gesprek</Text>
           }
         </View>
-        <ScrollView horizontal={false} showsVerticalScrollIndicator={false} style={styles.contentChat}>
+        <ScrollView keyboardShouldPersistTaps='handled' horizontal={false} showsVerticalScrollIndicator={false} style={styles.contentChat}>
           {loadingChats
             ? <ActivityIndicator size="large" color={theme.PRIMARY_COLOR} />
             : selectedChat != null

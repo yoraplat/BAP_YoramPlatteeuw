@@ -19,10 +19,12 @@ export default function BoughtTab() {
                 // data == list of post id's
                 data = res.data().bought_listings
                 // push all posts to posts array
-                for (let i = 0; i < data.length; i++) {
-                    await firebase.firestore().collection('posts').doc(data[i]).get().then(res => {
-                        posts.push(res.data())
-                    })
+                if (data != null) {
+                    for (let i = 0; i < data.length; i++) {
+                        await firebase.firestore().collection('posts').doc(data[i]).get().then(res => {
+                            posts.push(res.data())
+                        })
+                    }
                 }
                 setData(posts)
             })

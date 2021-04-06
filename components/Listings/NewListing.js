@@ -37,15 +37,12 @@ export function NewListing() {
         coordinates: false,
         type: 'food'
     });
-
     const navigation = useNavigation();
     const [selectedAmount, setSelectedAmount] = useState(1);
     const [isMeal, setIsMeal] = useState(false);
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
-
     const [inProgress, setInProgress] = useState(false);
-
     const { createPost } = useFirestore();
 
     useEffect(() => {
@@ -154,7 +151,7 @@ export function NewListing() {
         // Continue if validation is successful
         if (validation.every(isValid)) {
             // Fetch address geo data
-            await Location.geocodeAsync(post.address).then((result) => {
+            await Location.geocodeAsync(post.address).then(async (result) => {
                 const response = result
 
                 if (Object.keys(response).length > 0) {
@@ -166,46 +163,49 @@ export function NewListing() {
                         dataToPost = { ...data, coordinates: response[0] }
                     }
 
-                    createPost(dataToPost).then(() => {
+                    await createPost(dataToPost).then(() => {
                         setInProgress(false);
-                    })
-                    setInProgress(false);
+                        // Clear all inputs
+                        setPost({
+                            price: 0,
+                            image: null,
+                            pickup: current_date,
+                            title: null,
+                            address: null,
+                            description: null,
+                            veggie: false,
+                            vegan: false,
+                            terms: null,
+                            bought_at: false,
+                            coordinates: false,
+                            type: 'food'
+                        })
+                        setSelectedAmount(0)
+                        setIsMeal(false)
 
-                    // Clear all inputs
-                    setPost({
-                        price: 0,
-                        image: null,
-                        pickup: new Date(),
-                        title: null,
-                        address: null,
-                        description: null,
-                        veggie: false,
-                        vegan: false,
-                        terms: null,
-                        bought_at: false,
-                        coordinates: false,
-                        type: 'food'
+                        // Notify user if post has been created succesfully 
+                        Alert.alert(
+                            "Proficiat",
+                            `Je nieuwe aanbieding "${post.title}" is succesvol aangemaakt! \n Bedankt voor je bijdrage aan een betere wereld!`,
+                            [
+                                {
+                                    text: "Verder gaan",
+                                    onPress: () => navigation.navigate('Home', { type: 'refresh' }),
+                                    style: 'default'
+                                }
+                            ],
+                            { cancelable: false }
+                        )
                     })
+                    // setInProgress(false);
 
-                    // Notify user if post has been created succesfully 
-                    Alert.alert(
-                        "Proficiat",
-                        `Je nieuwe aanbieding "${post.title}" is succesvol aangemaakt! \n Bedankt voor je bijdrage aan een betere wereld!`,
-                        [
-                            {
-                                text: "Verder gaan",
-                                onPress: () => navigation.navigate('Home'),
-                                style:'default'
-                            }
-                        ],
-                        { cancelable: false }
-                    )
                     // Navigate profile screen
                     // Pass parameter to got to the offerd tab
                     // navigation.navigate('Profile', {
                     //     type: 'offered'
                     // })
                     // BUG data in profile screen is being added to the existing data without updating the items list
+
                 } else {
                     alert("Dit adres kon niet gevonden worden.")
                     setInProgress(false);
@@ -219,38 +219,38 @@ export function NewListing() {
     }
     return (
         <SafeAreaView style={styles.container} >
-            <ScrollView contentContainerStyle={styles.list}>
+            <ScrollView keyboardShouldPersistTaps='handled' contentContainerStyle={styles.list}>
                 <View style={styles.form}>
                     <View style={styles.formItem}>
                         <Text style={styles.title}>Beschrijving</Text>
-                            <View>
-                                <TextInput
-                                    style={styles.txtInput}
-                                    placeholder="Titel"
-                                    placeholderTextColor={theme.TEXT_PLACEHOLDER}
-                                    // onChangeText={val => setTitle(val)}
-                                    value={post.title}
-                                    onChangeText={val => setPost({ ...post, title: val.trim() == '' ? null : val })}
-                                    maxLength={30}
-                                />
-                                {/* Max characters counter */}
-                                <Text style={{position: 'absolute', right: 15, top: 22, color:theme.TEXT_PLACEHOLDER}}>{ post.title != null ? 30 - (post.title).length : null}</Text>
-                            </View>
+                        <View>
+                            <TextInput
+                                style={styles.txtInput}
+                                placeholder="Titel"
+                                placeholderTextColor={theme.TEXT_PLACEHOLDER}
+                                // onChangeText={val => setTitle(val)}
+                                value={post.title}
+                                onChangeText={val => setPost({ ...post, title: val.trim() == '' ? null : val })}
+                                maxLength={30}
+                            />
+                            {/* Max characters counter */}
+                            <Text style={{ position: 'absolute', right: 15, top: 22, color: theme.TEXT_PLACEHOLDER }}>{post.title != null ? 30 - (post.title).length : null}</Text>
+                        </View>
 
-                            <View>
+                        <View>
 
-                                <TextInput
-                                    style={styles.txtInput}
-                                    placeholder="Korte Beschrijving"
-                                    value={post.description}
-                                    placeholderTextColor={theme.TEXT_PLACEHOLDER}
-                                    // onChangeText={val => setDescription(val)}
-                                    onChangeText={val => setPost({ ...post, description: val.trim() == '' ? null : val })}
-                                    maxLength={90}
-                                />
-                                {/* Max characters counter */}
-                                <Text style={{position: 'absolute', right: 15, top: 22, color:theme.TEXT_PLACEHOLDER}}>{ post.description != null ? 90 - (post.description).length : null}</Text>
-                            </View>
+                            <TextInput
+                                style={styles.txtInput}
+                                placeholder="Korte Beschrijving"
+                                value={post.description}
+                                placeholderTextColor={theme.TEXT_PLACEHOLDER}
+                                // onChangeText={val => setDescription(val)}
+                                onChangeText={val => setPost({ ...post, description: val.trim() == '' ? null : val })}
+                                maxLength={90}
+                            />
+                            {/* Max characters counter */}
+                            <Text style={{ position: 'absolute', right: 15, top: 22, color: theme.TEXT_PLACEHOLDER }}>{post.description != null ? 90 - (post.description).length : null}</Text>
+                        </View>
                     </View>
                     <View style={styles.formItem}>
                         <View style={{ flexDirection: 'row', flexWrap: 'nowrap', alignItems: 'center' }}>
@@ -274,6 +274,7 @@ export function NewListing() {
                             step={0.5}
                             onValueChange={val => setPost({ ...post, price: val })}
                             minimumValue={0}
+                            value={post.price}
                             maximumValue={10}
                             thumbTintColor={theme.PRIMARY_COLOR}
                             minimumTrackTintColor={theme.PRIMARY_COLOR}
@@ -289,6 +290,7 @@ export function NewListing() {
                                 style={styles.slider}
                                 step={1}
                                 onValueChange={val => setSelectedAmount(val)}
+                                value={selectedAmount}
                                 minimumValue={1}
                                 maximumValue={10}
                                 thumbTintColor={theme.PRIMARY_COLOR}

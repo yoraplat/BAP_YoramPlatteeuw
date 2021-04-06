@@ -3,13 +3,23 @@
   <component name="ChangeListManager">
     <list default="true" id="b1897c40-3a16-45e4-bafe-fe3ff8630b7a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/service.auth.js" beforeDir="false" afterPath="$PROJECT_DIR$/Services/service.auth.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Services/service.firestore.js" beforeDir="false" afterPath="$PROJECT_DIR$/Services/service.firestore.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/TODO.txt" beforeDir="false" afterPath="$PROJECT_DIR$/TODO.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/app.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Listings/NewListing.js" beforeDir="false" afterPath="$PROJECT_DIR$/components/Listings/NewListing.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/MapBox/ListItem.js" beforeDir="false" afterPath="$PROJECT_DIR$/components/MapBox/ListItem.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/MapBox/Map.js" beforeDir="false" afterPath="$PROJECT_DIR$/components/MapBox/Map.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/MapBox/MapItemOverlay.js" beforeDir="false" afterPath="$PROJECT_DIR$/components/MapBox/MapItemOverlay.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/MapBox/overlayStyles.js" beforeDir="false" afterPath="$PROJECT_DIR$/components/MapBox/overlayStyles.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/functions/functions/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/functions/functions/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Profile/Bought/BoughtTab.js" beforeDir="false" afterPath="$PROJECT_DIR$/components/Profile/Bought/BoughtTab.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Profile/List/BoughtItem.js" beforeDir="false" afterPath="$PROJECT_DIR$/components/Profile/List/BoughtItem.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/Profile/List/OfferedItem.js" beforeDir="false" afterPath="$PROJECT_DIR$/components/Profile/List/OfferedItem.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/screens/AuthScreen/LoginScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/screens/AuthScreen/LoginScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/screens/ChatScreen/ChatScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/screens/ChatScreen/ChatScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/screens/HomeScreen/HomeScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/screens/HomeScreen/HomeScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/screens/ProfileScreen/ProfileScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/screens/ProfileScreen/ProfileScreen.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,7 +39,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="AndroidSdkUpdater" />
+    <property name="settings.editor.selected.configurable" value="project.propDebugger" />
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -48,23 +58,23 @@
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.js" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="2071" y="96" width="774" height="393" key="AVDManager" timestamp="1617278541319">
-      <screen x="1920" y="0" width="1920" height="1040" />
+    <state x="1030" y="404" width="774" height="393" key="AVDManager" timestamp="1617548370188">
+      <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="799" y="94" width="774" height="735" key="AVDManager/0.0.1920.1040/1920.0.1366.728@0.0.1920.1040" timestamp="1609681584829" />
-    <state x="2071" y="96" width="774" height="393" key="AVDManager/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1617278541319" />
+    <state x="1030" y="404" width="774" height="393" key="AVDManager/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1617548370188" />
     <state x="1118" y="242" width="774" height="400" key="AVDManager/0.0.1920.1040/1920.264.1366.728@0.0.1920.1040" timestamp="1614259369683" />
     <state x="999" y="132" width="774" height="400" key="AVDManager/0.0.1920.1040/1920.305.1366.728@0.0.1920.1040" timestamp="1616150757499" />
     <state x="101" y="49" width="774" height="735" key="AVDManager/0.0.1920.1040@0.0.1920.1040" timestamp="1609429090176" />
-    <state x="922" y="168" key="SettingsEditor" timestamp="1608621185870">
+    <state x="82" y="125" key="SettingsEditor" timestamp="1617283976108">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="922" y="168" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1608621185870" />
-    <state x="1103" y="230" width="672" height="678" key="search.everywhere.popup" timestamp="1617203468902">
+    <state x="82" y="125" key="SettingsEditor/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1617283976108" />
+    <state x="1103" y="230" width="672" height="678" key="search.everywhere.popup" timestamp="1617533816985">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="1103" y="230" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.0.1366.728@0.0.1920.1040" timestamp="1609671930610" />
-    <state x="1103" y="230" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1617203468902" />
+    <state x="1103" y="230" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.0.1920.1040@0.0.1920.1040" timestamp="1617533816985" />
     <state x="1103" y="230" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.264.1366.728@0.0.1920.1040" timestamp="1614164301595" />
     <state x="1103" y="230" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040/1920.305.1366.728@0.0.1920.1040" timestamp="1616055250650" />
     <state x="1103" y="230" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1609262289617" />

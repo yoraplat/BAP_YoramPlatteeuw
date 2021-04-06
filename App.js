@@ -9,9 +9,8 @@ import { FirestoreProvider } from './Services';
 import { AuthProvider } from './Services';
 import firebaseConfig from './Firebase/config'
 
-Sentry.enableInExpoDevelopment = true
 Sentry.init({
-  dsn: "https://a2fad81482694d9cbb34a2cecef73a9a@o473614.ingest.sentry.io/5695615",
+  dsn: "https://9ddff79d729145a4a8bcf32941037497@o473614.ingest.sentry.io/5695623",
   enableInExpoDevelopment: true,
   debug: true
 })
@@ -21,13 +20,18 @@ export default function App() {
   // firebase.initializeApp(firebaseConfig);
   // LogBox.ignoreAllLogs()
 
-  return (
-    <NavigationContainer>
-      <FirestoreProvider>
-        <AuthProvider>
-          <AppScreen />
-        </AuthProvider>
-      </FirestoreProvider>
-    </NavigationContainer>
-  );
+  try {
+    return (
+      <NavigationContainer>
+        <FirestoreProvider>
+          <AuthProvider>
+            <AppScreen />
+          </AuthProvider>
+        </FirestoreProvider>
+      </NavigationContainer>
+    );
+  } catch (e) {
+    throw new Error(e.message)
+  }
+  
 }

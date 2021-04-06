@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, Text, StatusBar, Image, StyleSheet, View } from "react-native";
+import { SafeAreaView, Text, StatusBar, Image, StyleSheet, View, ScrollView } from "react-native";
 import logo from '../../assets/inscreen_logo.png';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
@@ -81,6 +81,7 @@ export const RegisterScreen = () => {
   return (
 
     <SafeAreaView style={styles.container}>
+      <ScrollView keyboardShouldPersistTaps={'handled'} contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
       <View style={styles.logoContainer}>
         <Image style={styles.logo} source={logo} />
       </View>
@@ -140,6 +141,7 @@ export const RegisterScreen = () => {
           />
         </View>
       </View>
+      </ScrollView>
     </SafeAreaView>
   )
 };
@@ -149,7 +151,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.SECONDARY_COLOR,
     alignItems: 'center',
-    marginTop: -70
   },
   logoContainer: {
     flexDirection: 'row',
@@ -159,6 +160,8 @@ const styles = StyleSheet.create({
   logo: {
     width: 300,
     height: 300,
+    // width: 150,
+    // height: 150,
 
   },
   text: {
@@ -169,7 +172,8 @@ const styles = StyleSheet.create({
     width: '90%',
     top: '15%',
     flexDirection: 'column',
-    alignItems: 'center'
+    alignItems: 'center',
+    // paddingBottom: 150
   },
   input: {
     // backgroundColor:'lightgray'
@@ -201,6 +205,11 @@ const styles = StyleSheet.create({
     borderColor: '#D94849',
     borderWidth: 0,
     fontSize: 15
+  },
+  list: {
+    // flex: 1,
+    width: '100%',
+    paddingBottom: 120
   }
 
 });

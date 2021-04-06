@@ -148,7 +148,7 @@ export default function ItemsList({ posts, selectedQuickFilter, location }) {
 
     return (
         <SafeAreaView style={styles.container} >
-            <ScrollView style={styles.list}>
+            <ScrollView keyboardShouldPersistTaps='handled' style={styles.list}>
                 {posts != undefined && posts.length != 0
                     ?
                     data && data.map((post, index) => (

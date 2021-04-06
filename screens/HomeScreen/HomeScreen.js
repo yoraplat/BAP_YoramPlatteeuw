@@ -13,6 +13,7 @@ import theme from '../../Theme/theme.style';
 import { ScrollView } from "react-native-gesture-handler";
 import * as firebase from 'firebase';
 import 'firebase/firestore';
+import * as Sentry from 'sentry-expo';
 
 // Location
 import * as Location from 'expo-location';
@@ -21,6 +22,12 @@ import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 
+Sentry.enableInExpoDevelopment = true
+Sentry.init({
+  dsn: "https://9ddff79d729145a4a8bcf32941037497@o473614.ingest.sentry.io/5695623",
+  enableInExpoDevelopment: true,
+  debug: true
+})
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -29,7 +36,8 @@ Notifications.setNotificationHandler({
   }),
 });
 
-export const HomeScreen = () => {
+export const HomeScreen = ({ route }) => {
+
   const navigation = useNavigation();
   const [locationRes, setLocationRes] = useState();
   const [currentTab, setCurrentTab] = useState(1)
@@ -53,6 +61,7 @@ export const HomeScreen = () => {
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
+  const routeParam = route.params;
   // ---------------
 
   async function getUid() {
@@ -93,28 +102,46 @@ export const HomeScreen = () => {
   }
 
   useEffect(() => {
-    getUid().then(uid => {
-      getLocation()
-      firebase.firestore().collection('/users').doc(uid).onSnapshot((res) => {
-        if (res.data().settings.only_vegan == true) {
-          setSelectedFilters({ ...selectedFilters, [1]: true })
-        } else if (res.data().settings.only_veggie == true) {
-          setSelectedFilters({ ...selectedFilters, [0]: true })
-        }
-      })
-    })
-    // })()
+    // Reload items on focus. Without refresh, new posts don't have the matching image
+    // const unsubscribe = navigation.addListener('focus', () => {
+    //     setAllPosts(null)
+    //     loadPosts()
+    // })
 
-    const current_date = new Date
-    firebase.firestore().collection('/posts').where('bought_at', '==', false).onSnapshot((snapshot) => {
-      let food = []
-      snapshot.forEach((doc) => {
-        if (doc.data().pickup.toDate() > current_date) {
-          food.push({ ...doc.data() })
-        }
+    // const loadPosts = () => {
+      try {
+        getUid().then(uid => {
+          getLocation()
+          firebase.firestore().collection('/users').doc(uid).onSnapshot((res) => {
+            // TypeError: undefined is not an object (evaluating 't.data().settings.only_vegan')
+            let res_data = res.data()
+            try {
+              if (res_data.settings.only_vegan == true) {
+                setSelectedFilters({ ...selectedFilters, [1]: true })
+              } else if (res_data.settings.only_veggie == true) {
+                setSelectedFilters({ ...selectedFilters, [0]: true })
+              }
+            } catch (e) {
+              console.log(e.message)
+            }
+          })
+        })
+      } catch (e) {
+        console.log(e.message)
+      }
+
+      const current_date = new Date
+      firebase.firestore().collection('/posts').where('bought_at', '==', false).onSnapshot((snapshot) => {
+        let food = []
+        snapshot.forEach((doc) => {
+          if (doc.data().pickup.toDate() > current_date) {
+            food.push({ ...doc.data() })
+          }
+        })
+        setAllPosts(food)
       })
-      setAllPosts(food)
-    })
+    // }
+    // loadPosts()
 
     // Notifications
     registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
@@ -125,7 +152,6 @@ export const HomeScreen = () => {
     })
     // Interaction with a notification
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      // console.log(response)
       // When notification is clicked, interaction happens here. Also catches notification when app is inactive
       // Redirect user to the right screen
       navigation.navigate(response.notification.request.content.data.screen, {
@@ -137,7 +163,9 @@ export const HomeScreen = () => {
     return () => {
       Notifications.removeNotificationSubscription(notificationListener.current);
       Notifications.removeNotificationSubscription(responseListener.current);
+      // unsubscribe
     }
+
   }, [])
 
 
@@ -204,13 +232,25 @@ export const HomeScreen = () => {
   }
 
   const selectFilter = (id) => {
-    let state
-    if (selectedFilters[id] == false || selectedFilters[id] == undefined) {
-      state = true
+    // Only allow one sorting option
+    if (id == 4 || id == 5 || id == 6) {
+      if (selectedFilters[id] == false || selectedFilters[id] == undefined) {
+        id == 4 ? setSelectedFilters({ ...selectedFilters, 4: true, 5: false, 6: false }) : null
+        id == 5 ? setSelectedFilters({ ...selectedFilters, 4: false, 5: true, 6: false }) : null
+        id == 6 ? setSelectedFilters({ ...selectedFilters, 4: false, 5: false, 6: true }) : null
+      } else {
+        setSelectedFilters({ ...selectedFilters, 4: false, 5: false, 6: false })
+      }
     } else {
-      state = false
+      // For filters
+      let state
+      if (selectedFilters[id] == false || selectedFilters[id] == undefined) {
+        state = true
+      } else {
+        state = false
+      }
+      setSelectedFilters({ ...selectedFilters, [id]: state })
     }
-    setSelectedFilters({ ...selectedFilters, [id]: state })
   }
 
   const setBgColor = (id) => {
