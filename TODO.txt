@@ -10,16 +10,16 @@ profile bought and offered text don't match //
 
 FEEDBACK V2
 Authscreen: 
-    enable scrolling on page
-    enable scrolling when keyboard is open
+    enable scrolling on page ??
+    enable scrolling when keyboard is open ??
 Profilescreen:
-    text when no items not styled correctly
+    text when no items not styled correctly ??
     bought item doesn't gray-out when picked up
 Homescreen:
     "reserveren" slider fix ux
     after paying item fix ux (close button resembles cancel button)
 Chatscreen:
-    prevent sending empty messages
+    prevent sending empty messages ??
 Notifications:
     screen should reload when redirected by a notification
 

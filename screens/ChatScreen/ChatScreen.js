@@ -90,7 +90,9 @@ export const ChatScreen = ({ navigation }) => {
   const createMessage = () => {
     const id = chats[selectedChat].chat_id
     const message = newMessage
-    sendMessage(id, message)
+    if (message) {
+      sendMessage(id, message)
+    }
     // Clear input
     setNewMessage(null)
   }
@@ -142,7 +144,7 @@ export const ChatScreen = ({ navigation }) => {
         </ScrollView>
         {/* Disable input when no chat is selected */}
         <View style={styles.submit}>
-          <TextInput style={styles.chatInput} placeholderTextColor={theme.WHITE} placeholder={'Type je bericht hier'} value={newMessage} onChangeText={(val) => setNewMessage(val)} />
+          <TextInput style={styles.chatInput} multiline={true} placeholderTextColor={theme.WHITE} placeholder={'Type je bericht hier'} value={newMessage} onChangeText={(val) => setNewMessage(val)} />
           <TouchableOpacity disabled={selectedChat == null ? true : false} onPress={() => createMessage()}>
             <FontAwesomeIcon icon={faPaperPlane} size={20} style={{ color: theme.WHITE }} />
           </TouchableOpacity>

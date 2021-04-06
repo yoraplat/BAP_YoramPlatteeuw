@@ -244,6 +244,7 @@ export function NewListing() {
                                 placeholder="Korte Beschrijving"
                                 value={post.description}
                                 placeholderTextColor={theme.TEXT_PLACEHOLDER}
+                                multiline={true}
                                 // onChangeText={val => setDescription(val)}
                                 onChangeText={val => setPost({ ...post, description: val.trim() == '' ? null : val })}
                                 maxLength={90}

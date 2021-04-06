@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
         backgroundColor: theme.SECONDARY_COLOR,
         padding: 10,
         color: theme.PRIMARY_COLOR,
-        top: 20
+        top: 20,
+        height: 100,
     }
 });
