@@ -1,6 +1,7 @@
 export default {
     // PRIMARY COLORS
-    PRIMARY_COLOR: "#DE7047",
+    // PRIMARY_COLOR: "#DE7047",
+    PRIMARY_COLOR: "#f77a4c",
     SECONDARY_COLOR: '#f9f0ed',
     TERTIARY_COLOR: '#3c7556',
     // -----------------------------------

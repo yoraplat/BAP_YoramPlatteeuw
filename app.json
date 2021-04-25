@@ -24,7 +24,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.yoraplat.NoWasteV2",
       "config" : {
-        "googleMapsApiKey": "AIzaSyBQIHOADn4oewQYW7RfljPhZ6Z5s3XQepA"
+        "googleMapsApiKey": "AIzaSyDNvEV4pwBD3lmTNhWG_L9MLZcJUCedwic"
       }
     },
     "android": {

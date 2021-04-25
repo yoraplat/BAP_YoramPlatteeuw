@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.TXT_INPUT_BACKGROUND,
     color: theme.PRIMARY_COLOR,
     fontFamily: "Poppins_400Regular",
+    marginRight: 10
   },
   bigButton: {
     flexDirection: 'row',

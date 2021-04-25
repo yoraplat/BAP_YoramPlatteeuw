@@ -178,7 +178,7 @@ export function ListItem({ postData }) {
                                     <FontAwesomeIcon icon={faChevronCircleRight} style={{ color: theme.PRIMARY_COLOR, backgroundColor: theme.WHITE }} size={30} />
                                 }
                             >
-                                <Text style={{ fontSize: 15 }}>Reserveren</Text>
+                                <Text style={{ fontSize: 15 }}>Swipe om te reserveren</Text>
                             </Slider>
                         </View>
                         : <Text style={styles.warningTxt}>Je kan je eigen aanbiedingen niet kopen. Bedankt voor je bijdrage aan een betere wereld!</Text>

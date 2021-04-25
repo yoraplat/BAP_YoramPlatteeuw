@@ -16,7 +16,7 @@ Profilescreen:
     text when no items not styled correctly ??
     bought item doesn't gray-out when picked up
 Homescreen:
-    "reserveren" slider fix ux
+    "reserveren" slider fix ux ??
     after paying item fix ux (close button resembles cancel button)
 Chatscreen:
     prevent sending empty messages ??
@@ -36,3 +36,6 @@ Occurs sometimes without real reason (might be because of attempted chat creatio
 Chatscreen doesn't load new chats //
 ListItem:
 After payment: TypeError: undefined is not an object (evaluating 't.data().status') (occurs on first try being paid item) !!
+
+Create seeders for the database (use db export for seeding?)
+List user accounts in docs
