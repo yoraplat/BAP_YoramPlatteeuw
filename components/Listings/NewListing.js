@@ -15,7 +15,6 @@ import * as Location from 'expo-location';
 import theme from '../../Theme/theme.style';
 import { useNavigation } from '@react-navigation/native';
 import moment from 'moment/min/moment-with-locales';
-import * as firebase from 'firebase';
 
 export function NewListing() {
 
@@ -51,7 +50,6 @@ export function NewListing() {
                 let { mediaPermission } = await ImagePicker.requestMediaLibraryPermissionsAsync();
                 let { locationPermission } = await Location.requestPermissionsAsync();
                 if (mediaPermission || locationPermission !== 'granted') {
-                    //   alert('Om deze app te kunnen gebruiken hebben we toegang nodig tot je locatie en foto\'s');
                 }
             }
         })();
@@ -100,7 +98,6 @@ export function NewListing() {
 
     const pickImage = async () => {
         try{
-            // let result = await ImagePicker.launchImageLibraryAsync({
             let result = await ImagePicker.launchCameraAsync({
                 mediaTypes: ImagePicker.MediaTypeOptions.All,
                 allowsEditing: true,
@@ -201,15 +198,6 @@ export function NewListing() {
                             { cancelable: false }
                         )
                     })
-                    // setInProgress(false);
-
-                    // Navigate profile screen
-                    // Pass parameter to got to the offerd tab
-                    // navigation.navigate('Profile', {
-                    //     type: 'offered'
-                    // })
-                    // BUG data in profile screen is being added to the existing data without updating the items list
-
                 } else {
                     alert("Dit adres kon niet gevonden worden.")
                     setInProgress(false);
@@ -232,7 +220,6 @@ export function NewListing() {
                                 style={styles.txtInput}
                                 placeholder="Titel"
                                 placeholderTextColor={theme.TEXT_PLACEHOLDER}
-                                // onChangeText={val => setTitle(val)}
                                 value={post.title}
                                 onChangeText={val => setPost({ ...post, title: val.trim() == '' ? null : val })}
                                 maxLength={30}
@@ -249,7 +236,6 @@ export function NewListing() {
                                 value={post.description}
                                 placeholderTextColor={theme.TEXT_PLACEHOLDER}
                                 multiline={true}
-                                // onChangeText={val => setDescription(val)}
                                 onChangeText={val => setPost({ ...post, description: val.trim() == '' ? null : val })}
                                 maxLength={90}
                             />
@@ -381,7 +367,6 @@ export function NewListing() {
                             style={styles.txtInput}
                             placeholder="Adres"
                             placeholderTextColor={theme.TEXT_PLACEHOLDER}
-                            // onChangeText={val => setAddress(val)}
                             value={post.address}
                             onChangeText={val => setPost({ ...post, address: val.trim() == '' ? null : val })}
                         />

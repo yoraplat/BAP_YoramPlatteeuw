@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, SafeAreaView, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { StyleSheet, View, Text, SafeAreaView } from 'react-native';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
 import moment from 'moment';
 import theme from '../../Theme/theme.style';
 import { useAuth } from '../../Services';
-
 
 export function ListItem({ messages }) {
     const [currentMessages, setCurrentMessages] = useState(messages)
@@ -42,7 +40,6 @@ export function ListItem({ messages }) {
                         <View style={styles.chatItemSystem} key={index}>
                             <Text style={styles.text}>{message.message}</Text>
                         </View>
-
                 )
             })}
         </>
@@ -52,23 +49,18 @@ export function ListItem({ messages }) {
 const styles = StyleSheet.create({
     chatItem: {
         backgroundColor: '#d8d8d8',
-        // backgroundColor: "#e5e5e5",
         padding: 15,
         borderRadius: 15,
         marginBottom: 15,
     },
     chatItemUser: {
         backgroundColor: theme.SECONDARY_COLOR,
-        // backgroundColor: "#c7eddc",
         padding: 15,
         borderRadius: 15,
         alignItems: "flex-end",
         marginBottom: 15,
     },
     chatItemSystem: {
-        // backgroundColor: theme.TXT_INPUT_BACKGROUND,
-        // padding: 15,
-        // borderRadius: 15,
         alignItems: "center",
         marginBottom: 15,
     },

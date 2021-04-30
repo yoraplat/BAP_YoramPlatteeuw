@@ -67,21 +67,16 @@ export function Map({ posts, selectedQuickFilter, location }) {
     }
   ]
   const [imageUrl, setImageUrl] = useState(null);
-
   const [modalVisible, setModalVisible] = useState(false);
   const [data, setData] = useState(null);
   const [modalData, setModalData] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
-  // const [quickFilter, setQuickFilter] = useState(selectedQuickFilter);
   const quickFilter = selectedQuickFilter
 
-  const { buyItem, checkAvailable, createPickupCode, imageDownloadUrl } = useFirestore()
-  const { user_id } = useAuth()
-
+  const { imageDownloadUrl } = useFirestore()
   const fadeAnim = useRef(new Animated.Value(0.01)).current;
 
   useEffect(() => {
-    // setQuickFilter(selectedQuickFilter);
     posts != undefined ? loadCoordinates() : '';
   }, [posts, quickFilter]);
 
@@ -100,18 +95,12 @@ export function Map({ posts, selectedQuickFilter, location }) {
     }).start();
   }
 
-
   const closeOverlay = () => {
     setSelectedPost(null)
   }
 
   const openModal = () => {
-    // setModalData(data[selectedPost - 1]);
-
-    // console.log("Selected post: " + (selectedPost - 1))
-
-    closeOverlay();
-    // setModalVisible(true)
+       closeOverlay();
   }
 
   const loadCoordinates = () => {
@@ -176,7 +165,6 @@ export function Map({ posts, selectedQuickFilter, location }) {
 
       }
       
-
     </SafeAreaView>
   );
 }
@@ -184,14 +172,10 @@ export function Map({ posts, selectedQuickFilter, location }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // backgroundColor: theme.NEUTRAL_BACKGROUND,
-    // alignItems: 'center',
-    // justifyContent: 'center',
   },
   map: {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
-    // top: '-30%',
     top: -150,
     zIndex: 50,
   },

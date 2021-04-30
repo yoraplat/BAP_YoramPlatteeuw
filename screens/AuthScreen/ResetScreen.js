@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, {  useState } from "react";
 import { SafeAreaView, Text, StyleSheet, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { Button } from 'react-native-elements';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
-import { useAuth, useFirestore } from '../../Services';
+import { useFirestore } from '../../Services';
 import theme from '../../Theme/theme.style';
 
-export const ResetScreen = ({ navigation }) => {
-  const { currentUser } = useAuth();
+export const ResetScreen = () => {
   const { resetPassword } = useFirestore();
 
   const [email, setEmail] = useState('')

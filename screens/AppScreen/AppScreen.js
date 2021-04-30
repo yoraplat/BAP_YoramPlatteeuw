@@ -3,7 +3,7 @@ import { View, Text, ActivityIndicator } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faComment, faCommentAlt, faMap, faPlusSquare, faRegistered, faSignInAlt, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faCommentAlt, faMap, faPlusSquare, faUser } from '@fortawesome/free-solid-svg-icons';
 import theme from '../../Theme/theme.style';
 import * as firebase from 'firebase';
 // Screens
@@ -22,8 +22,6 @@ const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 export default function AppScreen() {
-
-  const { currentUser, logout } = useAuth();
 
   const [user, setUser] = useState(undefined);
 

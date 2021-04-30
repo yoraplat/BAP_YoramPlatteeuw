@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { SafeAreaView, Text, StatusBar, Image, StyleSheet, View, ScrollView } from "react-native";
+import React, { useState } from "react";
+import { SafeAreaView, Text, Image, StyleSheet, View, ScrollView } from "react-native";
 import logo from '../../assets/inscreen_logo.png';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
-import { TextInput, TouchableHighlight, TouchableOpacity } from "react-native-gesture-handler";
+import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { Button } from 'react-native-elements';
 import * as firebase from 'firebase';
 import { useNavigation } from '@react-navigation/native';
@@ -11,10 +11,6 @@ import theme from '../../Theme/theme.style';
 import { CheckBox } from 'react-native-elements';
 import * as WebBrowser from 'expo-web-browser';
 
-// Firebase
-// import 'firebase/firestore';
-// import 'firebase/auth';
-// import uuid from 'uuid-random';
 
 export const RegisterScreen = () => {
   const [email, setEmail] = useState(null);

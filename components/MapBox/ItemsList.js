@@ -131,7 +131,6 @@ export default function ItemsList({ posts, selectedQuickFilter, location }) {
             }
             postList.sort(orderByDate);
         }
-
         setData(postList)
     }
 

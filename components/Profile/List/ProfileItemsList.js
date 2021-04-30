@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { StyleSheet, SafeAreaView, ActivityIndicator, ScrollView, Text } from 'react-native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import React from "react";
+import { StyleSheet, SafeAreaView, ScrollView, Text } from 'react-native';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
-// import { ProfileListItem } from './ProfileListItem';
 import { OfferedItem } from './OfferedItem';
 import { BoughtItem } from './BoughtItem';
 import theme from '../../../Theme/theme.style';
@@ -43,20 +41,6 @@ export default function ProfileItemsList({ posts, type }) {
                         />
                     ))
             }
-
-            {/* { posts === null
-                ? <ActivityIndicator size="large" color={theme.PRIMARY_COLOR} />
-                : posts == undefined
-                    ? <Text style={styles.warningTxt}>{type == 'bought' ? 'Hier kan je gekochte aanbiedingen terug vinden' : 'Hier kan je jouw aangeboden items terug vinden' }</Text>
-                    : posts && posts.map((post, index) => (
-                        <ProfileListItem
-                            postData={post}
-                            indexKey={index}
-                            key={index}
-                            type={type}
-                        />
-                    ))
-            } */}
         </ScrollView>
     );
 }

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Image, StyleSheet, View, Text, SafeAreaView, TouchableOpacity, Modal, ImageBackground } from 'react-native';
+import { StyleSheet, View, Text, SafeAreaView, TouchableOpacity, Modal, ImageBackground } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
-import { faSeedling, faLeaf, faShoppingBasket, faTimesCircle, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faShoppingBasket, faTimesCircle, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons'
 import AppLoading from 'expo-app-loading';
 import moment from 'moment';
 import overlayStyles from './overlayStyles'
@@ -12,7 +12,7 @@ import { useFirestore } from '../../Services';
 import { ActivityIndicator } from 'react-native';
 import * as firebase from 'firebase';
 
-export function MapItemOverlay({ post, closeOverlayFunction, openModalFunction }) {
+export function MapItemOverlay({ post, closeOverlayFunction }) {
 
     const { buyItem, checkAvailable, createPickupCode, imageDownloadUrl, createPayment } = useFirestore();
     const [confirmVisible, setConfirmVisible] = useState(false)
@@ -45,7 +45,6 @@ export function MapItemOverlay({ post, closeOverlayFunction, openModalFunction }
     }
 
     const buy = () => {
-        // openModalFunction()
         setConfirmVisible(true)
     }
 
@@ -92,9 +91,7 @@ export function MapItemOverlay({ post, closeOverlayFunction, openModalFunction }
     const finishPayment = async () => {
         await createPickupCode(post.id)
         await buyItem(post.id)
-        // closeOverlay()
     }
-
 
     return (
         <View style={overlayStyles.mapOverlay}>
@@ -210,19 +207,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     centeredViewConfirm: {
-        // backgroundColor: theme.TRANSPARENT_POPUP,
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        // marginTop: -20
     },
 
     modalViewConfirm: {
-        // backgroundColor: theme.PRIMARY_COLOR,
         backgroundColor: theme.NEUTRAL_BACKGROUND,
     },
     freeItem: {
-        // height: 300,
         width: 320,
     },
     freeItemTxt: {
@@ -288,7 +281,6 @@ const styles = StyleSheet.create({
     imagePreview: {
         width: '100%',
         height: 250,
-        // marginBottom: 7,
         marginTop: 10
     },
     confirmDetailsBig: {

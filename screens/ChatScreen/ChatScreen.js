@@ -28,10 +28,8 @@ export const ChatScreen = ({ navigation }) => {
     let data
     const userChats = []
     const uid = firebase.auth().currentUser.uid
-    // setUid(uid)
     firebase.firestore().collection('users').doc(uid).onSnapshot(async res => {
       data = res.data().chats
-      // console.log(data)
       if (data != null) {
         for (let i = 0; i < data.length; i++) {
           await firebase.firestore().collection('chats').doc(data[i]).get().then(res => {
@@ -52,7 +50,6 @@ export const ChatScreen = ({ navigation }) => {
     })
   })
   return unsubscribe
-  // }, [isFocused]);
   }, [navigation]);
 
   let [fontsLoaded] = useFonts({

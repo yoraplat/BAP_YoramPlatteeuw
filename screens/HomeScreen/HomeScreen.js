@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { SafeAreaView, Text, View, StatusBar, StyleSheet, TouchableOpacity, Image } from "react-native";
+import { SafeAreaView, Text, View, StatusBar, StyleSheet, TouchableOpacity } from "react-native";
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faMap, faStream, faFilter, faSort, faArrowDown, faCaretSquareDown, faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons'
+import { faMap, faStream, faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons'
 import { useNavigation } from '@react-navigation/native';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
@@ -10,7 +10,6 @@ import { Map } from "../../components/MapBox/Map";
 import ItemsList from "../../components/MapBox/ItemsList";
 import { useAuth } from '../../Services';
 import theme from '../../Theme/theme.style';
-import { ScrollView } from "react-native-gesture-handler";
 import * as firebase from 'firebase';
 import 'firebase/firestore';
 import * as Sentry from 'sentry-expo';
@@ -54,7 +53,6 @@ export const HomeScreen = ({ route }) => {
   const [allPosts, setAllPosts] = useState(null);
 
   const scrollToStart = useRef()
-  // useScrollToTop(scrollToStart)
 
   // Notifications
   const [expoPushToken, setExpoPushToken] = useState('');
@@ -103,12 +101,6 @@ export const HomeScreen = ({ route }) => {
 
   useEffect(() => {
     // Reload items on focus. Without refresh, new posts don't have the matching image
-    // const unsubscribe = navigation.addListener('focus', () => {
-    //     setAllPosts(null)
-    //     loadPosts()
-    // })
-
-    // const loadPosts = () => {
       try {
         getUid().then(uid => {
           getLocation()
@@ -140,8 +132,6 @@ export const HomeScreen = ({ route }) => {
         })
         setAllPosts(food)
       })
-    // }
-    // loadPosts()
 
     // Notifications
     registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
@@ -165,7 +155,6 @@ export const HomeScreen = ({ route }) => {
       Notifications.removeNotificationSubscription(responseListener.current);
       // unsubscribe
     }
-
   }, [])
 
 
@@ -256,14 +245,12 @@ export const HomeScreen = ({ route }) => {
   const setBgColor = (id) => {
     if (selectedFilters[id] == false || selectedFilters[id] == undefined) {
       return {
-        // backgroundColor: theme.NEUTRAL_BACKGROUND,
         borderColor: theme.PRIMARY_COLOR,
         borderWidth: 2,
         color: theme.PRIMARY_COLOR
       }
     } else {
       return {
-        // backgroundColor: theme.PRIMARY_COLOR,
         borderColor: theme.BUTTON_BACKGROUND,
         backgroundColor: theme.BUTTON_BACKGROUND,
         borderWidth: 2,
@@ -280,7 +267,6 @@ export const HomeScreen = ({ route }) => {
       }
     } else {
       return {
-        // backgroundColor: theme.BUTTON_BACKGROUND,
         color: theme.WHITE
       }
     }

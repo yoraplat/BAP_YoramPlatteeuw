@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ActivityIndicator, View, Text, SafeAreaView, Dimensions, StatusBar, TouchableOpacity, ScrollView } from 'react-native';
+import { ActivityIndicator, View, Text, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
@@ -12,7 +12,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useFirestore } from '../../Services/service.firestore';
 import * as Location from 'expo-location';
 import * as ImagePicker from 'expo-image-picker';
-import Geocoder from 'react-native-geocoding';
 import theme from '../../Theme/theme.style';
 
 export function NewMealListing() {
@@ -35,9 +34,7 @@ export function NewMealListing() {
 
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
-
     const [inProgress, setInProgress] = useState(false);
-
     const { createPost } = useFirestore();
 
 
@@ -47,7 +44,6 @@ export function NewMealListing() {
                 let { mediaPermission } = await ImagePicker.requestMediaLibraryPermissionsAsync();
                 let { locationPermission } = await Location.requestPermissionsAsync();
                 if (mediaPermission || locationPermission !== 'granted') {
-                    //   alert('Om deze app te kunnen gebruiken ');
                 }
             }
         })();
@@ -109,18 +105,8 @@ export function NewMealListing() {
         setInProgress(true);
         try {
             await Location.geocodeAsync(post.address).then((result) => {
-                // Quick fix for testing purposes, geocode doesn't always work on virtual device
+              
                 const response = result
-                // const response = {
-                //     "accuracy": 0,
-                //     "altitude": 0,
-                //     "altitudeAccuracy": 0,
-                //     "heading": 0,
-                //     "latitude": 51.0323236,
-                //     "longitude": 3.7077646,
-                //     "speed": 0,
-                // }
-
                 if (Object.keys(response).length > 0) {
 
                     // Validate all fields
@@ -138,18 +124,9 @@ export function NewMealListing() {
                     if (isValid(validation)) {
                         console.log("All fields are filled in, creating post")
 
-                        // updating object makes createPost very slow
-
                         let data = post
                         let dataToPost = { ...data, coordinates: response[0] }
-                        // console.log(dataToPost)
 
-                        // let dataToPost = post
-
-                        // Takes too long if coordinates are added
-                        // createPost(dataToPost).then(() => {
-                        //     setInProgress(false);
-                        // })
                         createPost(dataToPost)
                         setInProgress(false);
                     }
@@ -258,7 +235,6 @@ export function NewMealListing() {
                             style={styles.txtInput}
                             placeholder="Adres"
                             placeholderTextColor={theme.TEXT_PLACEHOLDER}
-                            // value='Muinkkaai 20, 9000 Gent'
                             onChangeText={val => setPost({ ...post, address: val })}
                         />
                     </View>

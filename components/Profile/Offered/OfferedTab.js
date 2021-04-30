@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, SafeAreaView, StatusBar, Text } from 'react-native';
+import { StyleSheet, SafeAreaView, StatusBar } from 'react-native';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
 import ProfileItemsList from '../List/ProfileItemsList'
@@ -50,7 +50,6 @@ const styles = StyleSheet.create({
         backgroundColor: theme.SECONDARY_COLOR,
         alignItems: 'center',
         justifyContent: 'flex-start',
-        // marginTop: StatusBar.currentHeight,
         paddingTop: StatusBar.currentHeight,
         paddingBottom: 120,
     },

@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, Text, StatusBar, Image, StyleSheet, View, ScrollView } from "react-native";
+import { SafeAreaView, Text, Image, StyleSheet, View, ScrollView } from "react-native";
 import * as firebase from 'firebase';
 import logo from '../../assets/inscreen_logo.png';
 import { TextInput } from "react-native-gesture-handler";
 import { Button } from 'react-native-elements';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
-import { createStackNavigator } from '@react-navigation/stack';
-import { useAuth } from '../../Services';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import theme from '../../Theme/theme.style';
 
 export const LoginScreen = ({ navigation }) => {
-  const Stack = createStackNavigator();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState(null);
@@ -31,7 +28,6 @@ export const LoginScreen = ({ navigation }) => {
   const storeData = async (data) => {
     try {
       await AsyncStorage.setItem('@NoWaste_User', JSON.stringify(data));
-      // console.log(data.uid)
     } catch (error) {
       throw new Error(error.message)
     }
@@ -63,7 +59,6 @@ export const LoginScreen = ({ navigation }) => {
       setErrorMsg('Vul je email adres en wachtwoord in')
     }
   }
-
 
   return (
     <SafeAreaView style={styles.container}>

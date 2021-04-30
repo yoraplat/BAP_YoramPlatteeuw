@@ -69,7 +69,6 @@ export function ListItem({ postData }) {
         }
     }
 
-
     const confirmPurchase = async (listingId, type) => {
         try {
             // Check if still available
@@ -273,7 +272,6 @@ export function ListItem({ postData }) {
 
 const styles = StyleSheet.create({
     container: {
-        // backgroundColor: theme.NEUTRAL_BACKGROUND,
         marginBottom: 20,
     },
     backgroundImage: {
@@ -359,7 +357,7 @@ const styles = StyleSheet.create({
         height: 270,
     },
 
-    // // Modal Styling
+    // Modal Styling
     centeredView: {
         backgroundColor: theme.TRANSPARENT_POPUP,
         flex: 1,
@@ -374,11 +372,9 @@ const styles = StyleSheet.create({
     },
 
     modalViewConfirm: {
-        // backgroundColor: theme.NEUTRAL_BACKGROUND,
         backgroundColor: theme.TXT_INPUT_BACKGROUND,
     },
     freeItem: {
-        // height: 300,
         width: 320,
     },
     freeItemTxt: {

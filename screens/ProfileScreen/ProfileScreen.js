@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, Text, StatusBar, View, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
+import { SafeAreaView, Text, StatusBar, View, StyleSheet, TouchableOpacity } from "react-native";
 import { useAuth } from '../../Services/service.auth';
-import * as firebase from 'firebase';
 import { useNavigation } from '@react-navigation/native';
 import BoughtTab from '../../components/Profile/Bought/BoughtTab'
 import OfferedTab from '../../components/Profile/Offered/OfferedTab'
 import ProfileTab from '../../components/Profile/Profile/ProfileTab'
-import { useFirestore } from '../../Services';
 import theme from '../../Theme/theme.style';
 
 export const ProfileScreen = ({ route }) => {
-
     const navigation = useNavigation();
     const { logout } = useAuth();
     const [currentTab, setCurrentTab] = useState(1)

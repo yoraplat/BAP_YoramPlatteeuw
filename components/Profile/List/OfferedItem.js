@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, SafeAreaView, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, SafeAreaView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faSeedling, faLeaf, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
@@ -8,9 +8,8 @@ import moment from 'moment';
 import { TextInput } from 'react-native-gesture-handler';
 import { useFirestore } from '../../../Services';
 import theme from '../../../Theme/theme.style';
-import { firebase } from '@react-native-firebase/functions';
 
-export function OfferedItem({ postData, indexKey, type }) {
+export function OfferedItem({ postData, type }) {
 
     const { checkCode, updateCodeState, fetchCodes, checkPickup } = useFirestore();
 
@@ -28,7 +27,6 @@ export function OfferedItem({ postData, indexKey, type }) {
                 const data = await fetchCodes(postData.id)
                 setCodeList(data)
             }
-            // fetch()
             if (codeList == null || codeList.length < 1) {
                 fetch();
             }
@@ -38,15 +36,12 @@ export function OfferedItem({ postData, indexKey, type }) {
     const confirmPickup = async () => {
         try {
             setCheckingCode(true)
-
             await checkCode(code).then((response) => {
-
                 if (response != false && response.is_used != true && response.listing_id == postData.id) {
                     setCheckResult(response)
                     updateCodeState(code, true)
                 } else {
                     setCheckResult(false)
-                    console.log("Code is not valid for this post")
                 }
                 setCheckingCode(false)
             })

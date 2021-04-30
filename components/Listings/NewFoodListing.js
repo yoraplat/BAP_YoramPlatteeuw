@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ActivityIndicator, View, Text, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
+import { ActivityIndicator, View, Text, SafeAreaView, TouchableOpacity, ScrollView } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
@@ -13,10 +13,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useFirestore } from '../../Services';
 import * as Location from 'expo-location';
 import theme from '../../Theme/theme.style';
-
-// Firestore
-import * as firebase from 'firebase';
-import 'firebase/firestore';
 
 export function NewFoodListing() {
 
@@ -48,7 +44,6 @@ export function NewFoodListing() {
                 let { mediaPermission } = await ImagePicker.requestMediaLibraryPermissionsAsync();
                 let { locationPermission } = await Location.requestPermissionsAsync();
                 if (mediaPermission || locationPermission !== 'granted') {
-                    //   alert('Om deze app te kunnen gebruiken hebben we toegang nodig tot je locatie en foto\'s');
                 }
             }
         })();
@@ -96,7 +91,6 @@ export function NewFoodListing() {
     };
 
     const pickImage = async () => {
-        // let result = await ImagePicker.launchImageLibraryAsync({
         let result = await ImagePicker.launchCameraAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
@@ -122,20 +116,7 @@ export function NewFoodListing() {
     const makePost = async () => {
         setInProgress(true);
             await Location.geocodeAsync(post.address).then((result) => {
-                // Quick fix for testing purposes, geocode doesn't always work on virtual device
-                console.log(result)
                 const response = result
-
-                // const response = {
-                //     "accuracy": 0,
-                //     "altitude": 0,
-                //     "altitudeAccuracy": 0,
-                //     "heading": 0,
-                //     "latitude": 51.0547962,
-                //     "longitude": 3.7077666,
-                //     "speed": 0,
-                // }
-
 
                 if (Object.keys(response).length > 0) {
                     // Validate all fields
@@ -156,11 +137,7 @@ export function NewFoodListing() {
 
                         let data = post
                         let dataToPost = { ...data, coordinates: response[0] }
-                        // console.log(dataToPost)
 
-                        // let dataToPost = post
-
-                        // Takes too long if coordinates are added
                         createPost(dataToPost).then(() => {
                             setInProgress(false);
                         })
@@ -183,7 +160,6 @@ export function NewFoodListing() {
                             style={styles.txtInput}
                             placeholder="Titel"
                             placeholderTextColor={theme.TEXT_PLACEHOLDER}
-                            // onChangeText={val => setTitle(val)}
                             onChangeText={val => setPost({ ...post, title: val })}
                         />
 
@@ -191,7 +167,6 @@ export function NewFoodListing() {
                             style={styles.txtInput}
                             placeholder="Korte Beschrijving"
                             placeholderTextColor={theme.TEXT_PLACEHOLDER}
-                            // onChangeText={val => setDescription(val)}
                             onChangeText={val => setPost({ ...post, description: val })}
                         />
                     </View>
@@ -265,7 +240,6 @@ export function NewFoodListing() {
                             style={styles.txtInput}
                             placeholder="Adres"
                             placeholderTextColor={theme.TEXT_PLACEHOLDER}
-                            // onChangeText={val => setAddress(val)}
                             onChangeText={val => setPost({ ...post, address: val })}
                         />
                     </View>
@@ -283,9 +257,6 @@ export function NewFoodListing() {
                             : <Text style={styles.submitButtonTxt}>Voeding Aanbieden</Text>
                         }
                     </TouchableOpacity>
-
-
-
                 </View>
             </ScrollView>
         </SafeAreaView>

@@ -1,9 +1,7 @@
 import * as React from 'react';
-import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
-import { StyleSheet, Text, SafeAreaView, Dimensions, TouchableOpacity, StatusBar, GestureResponderEvent } from 'react-native';
+import { StyleSheet, TouchableOpacity, StatusBar } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faLeaf, faMap, faSlidersH, faStream } from '@fortawesome/free-solid-svg-icons'
-import { useState } from 'react';
+import { faLeaf, faSlidersH } from '@fortawesome/free-solid-svg-icons'
 
 export function OverlayButtons() {
 
@@ -13,19 +11,9 @@ export function OverlayButtons() {
         <FontAwesomeIcon icon={faLeaf} style={{ color: 'rgba(255, 255, 255, 1)' }} size={25} />
       </TouchableOpacity>
 
-      {/* <TouchableOpacity style={styles.overlayTopMiddleLeft} onPress={() => selectTab(1)}>
-            <FontAwesomeIcon icon={ faMap } style={{color: 'rgba(255, 255, 255, 1)'}} size={35} />
-          </TouchableOpacity>
-              <TouchableOpacity style={styles.overlayTopMiddleRight} onPress={() => selectTab(2)}>
-              <FontAwesomeIcon icon={ faStream } style={{color: 'rgba(148, 2, 3, 1)'}} size={35} />
-            </TouchableOpacity>  */}
-
       <TouchableOpacity style={styles.overlayTopRight}>
         <FontAwesomeIcon icon={faSlidersH} style={{ color: 'rgba(148, 2, 3, 1)' }} size={35} />
       </TouchableOpacity>
-      {/* <TouchableOpacity style={styles.overlayBottom}>
-                <Text style={styles.textBlack}>Bottom Button</Text>
-          </TouchableOpacity> */}
     </>
   );
 }
@@ -51,7 +39,6 @@ const styles = StyleSheet.create({
     right: '5%',
     padding: 10,
     justifyContent: 'center',
-    // backgroundColor: 'rgba(255, 255, 255, 1)',
   },
 
   overlayTopMiddleRight: {

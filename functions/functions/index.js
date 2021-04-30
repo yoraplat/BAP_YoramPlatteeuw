@@ -189,7 +189,6 @@ exports.passwordReset = functions.https.onCall((data, context) => {
                 if (error) {
                     console.log(error)
                 } else {
-                    // return { "result": info.response }
                     console.log(info.response)
                 }
             })

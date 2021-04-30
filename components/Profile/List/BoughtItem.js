@@ -8,9 +8,8 @@ import moment from 'moment';
 import { TextInput } from 'react-native-gesture-handler';
 import { useFirestore } from '../../../Services';
 import theme from '../../../Theme/theme.style';
-import { firebase } from '@react-native-firebase/functions';
 
-export function BoughtItem({ postData, indexKey, type }) {
+export function BoughtItem({ postData, type }) {
 
     const { checkCode, updateCodeState, fetchCodes, checkPickup } = useFirestore();
     const [code, setCode] = useState(null)
@@ -27,7 +26,6 @@ export function BoughtItem({ postData, indexKey, type }) {
                 const data = await fetchCodes(postData.id)
                 setCodeList(data)
             }
-            // fetch()
             if (codeList == null || codeList.length < 1) {
                 fetch();
             }
@@ -37,7 +35,6 @@ export function BoughtItem({ postData, indexKey, type }) {
     const confirmPickup = async () => {
         try {
             setCheckingCode(true)
-
             await checkCode(code).then((response) => {
 
                 if (response != false && response.is_used != true && response.listing_id == postData.id) {
@@ -116,10 +113,6 @@ export function BoughtItem({ postData, indexKey, type }) {
                                     <Text style={styles.infoItem}>{moment((postData.pickup).toDate()).format('DD/MM/YYYY' + ', ' + 'HH:mm[u]')}</Text>
                                     <Text style={styles.infoItem}>{postData.address}</Text>
                                     <Text style={styles.infoItem}>Type: {postData.type == 'meal' ? 'Maaltijd' : 'Voeding'}</Text>
-                                    {/* {postData.amount > 1
-                                        ? <Text style={[styles.infoItem, { fontFamily: 'Poppins_300Light' }]}>Aantal: {postData.amount}</Text>
-                                        : null
-                                    } */}
                                     <View style={styles.infoItemCode}>
                                         {type == 'bought'
                                             ? <Text style={styles.infoCode}>
@@ -179,9 +172,7 @@ export function BoughtItem({ postData, indexKey, type }) {
                                 <View style={styles.infoList}>
                                     <Text style={styles.infoItem}>{moment((postData.pickup).toDate()).format('DD/MM/YYYY' + ', ' + 'hh:mm')}</Text>
                                     <Text style={styles.infoItem}>{postData.address}</Text>
-
                                     <Text style={[styles.infoItem, styles.regularFont]}>Dit item is niet meer beschikbaar</Text>
-
                                 </View>
                             </View>
                             <View style={styles.disabledOverlay}>

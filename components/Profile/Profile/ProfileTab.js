@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { TextInput, View, Button, Text, SafeAreaView, ActivityIndicator, TouchableOpacity, Image, ScrollView, Alert, Modal, Dimensions } from 'react-native';
+import { TextInput, View,  Text, SafeAreaView, ActivityIndicator, TouchableOpacity, Image, ScrollView, Alert, Modal, Dimensions } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import logo from '../../../assets/ahs_logo.png';
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
@@ -30,7 +30,6 @@ export default function ProfileTab({ callLogoutFunction }) {
         newRepeat: null
     });
 
-
     useEffect(() => {
         const fetchCurrent = async () => {
             await fetchUser().then((response) => {
@@ -54,7 +53,6 @@ export default function ProfileTab({ callLogoutFunction }) {
         }
 
         if (onlyVegan == true) {
-            // setOnlyVeggie(true)
             setOnlyVegan(false)
         }
     }
@@ -82,7 +80,6 @@ export default function ProfileTab({ callLogoutFunction }) {
             only_veggie: onlyVeggie,
         }
 
-        // console.log(data)
         await updateUser(data).then(() => {
             setInpProgress(false)
         })
@@ -97,7 +94,6 @@ export default function ProfileTab({ callLogoutFunction }) {
     }
 
     const savePassword = async () => {
-        const uid = await firebase.auth().currentUser.uid
         const currentPassword = passwordUpdate.current
         const newPassword = passwordUpdate.new
         const newRepeat = passwordUpdate.newRepeat
@@ -116,7 +112,6 @@ export default function ProfileTab({ callLogoutFunction }) {
         } else {
             alert("Gelieve alle velden in te vullen")
         }
-        
     }
 
     let [fontsLoaded] = useFonts({
@@ -199,12 +194,10 @@ export default function ProfileTab({ callLogoutFunction }) {
                     </View>
 
                     <TouchableOpacity disabled={inProgress ? true : false} style={styles.submitButton} onPress={() => saveAccount()}>
-                        {/* <TouchableOpacity style={styles.submitButton}> */}
                         {inProgress
                             ? <ActivityIndicator size="large" color="white" />
                             : <Text style={styles.submitButtonTxt}>Opslaan</Text>
                         }
-                        {/* <Text style={styles.submitButtonTxt}>Opslaan</Text> */}
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.submitButton} onPress={() => logout()}>
                         <Text style={styles.submitButtonTxt}>Uitloggen</Text>

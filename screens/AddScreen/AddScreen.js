@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import { SafeAreaView, Text, StatusBar, View, StyleSheet } from "react-native";
-// import { useNavigation } from '@react-navigation/native';
 import { NewListing } from "../../components/Listings/NewListing";
 import { useFonts, Poppins_500Medium, Poppins_300Light, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import AppLoading from 'expo-app-loading';
@@ -26,7 +25,6 @@ export const AddScreen = () => {
           <Text style={styles.title}>Nieuw item toevoegen</Text>
         </View>
       </>
-
     </SafeAreaView>
   );
 };
