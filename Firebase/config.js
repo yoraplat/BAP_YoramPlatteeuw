@@ -2,7 +2,7 @@ import * as firebase from 'firebase';
 import "firebase/functions";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBl6zWFris6_TTWE2Bljxu07VmpR9-MAmU",
+    apiKey: "",
     authDomain: "nowaste-58a45.firebaseapp.com",
     projectId: "nowaste-58a45",
     storageBucket: "nowaste-58a45.appspot.com",

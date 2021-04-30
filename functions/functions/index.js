@@ -9,8 +9,8 @@ admin.initializeApp();
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-        user: 'nowaste.mailer@gmail.com',
-        pass: 'a3UQ0sBacf'
+        user: '',
+        pass: ''
     },
     tls: {
         rejectUnauthorized: false
@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
 
 // Mollie api
 const { createMollieClient } = require('@mollie/api-client');
-const mollieClient = createMollieClient({ apiKey: 'test_r8hU432gKuCvNcg5uBSDaAxmHaqHTd' });
+const mollieClient = createMollieClient({ apiKey: '' });
 
 exports.mollieCallback = functions.https.onRequest((request, response) => {
     // Fetch the according payment document

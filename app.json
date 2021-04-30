@@ -24,7 +24,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.yoraplat.NoWasteV2",
       "config" : {
-        "googleMapsApiKey": "AIzaSyDNvEV4pwBD3lmTNhWG_L9MLZcJUCedwic"
+        "googleMapsApiKey": ""
       }
     },
     "android": {
@@ -35,7 +35,7 @@
       "package": "com.yoraplat.NoWasteV2",
       "config" : {
         "googleMaps": {
-          "apiKey": "AIzaSyBt9AIE3Epq1sgwvg0cWTTj1uSYIxvhiZE"
+          "apiKey": ""
         }
       },
       "googleServicesFile": "./google-services.json"
@@ -50,7 +50,7 @@
           "config": {
             "organization": "school-sg",
             "project": "nowaste",
-            "authToken": "f9c42b5bc6a144bd90d5f49b33b4e089b1b1e82884904c6c86238aaf233bd8df"
+            "authToken": ""
           }
         }
       ]
