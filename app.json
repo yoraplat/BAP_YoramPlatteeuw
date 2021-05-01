@@ -1,0 +1,59 @@
+{
+  "expo": {
+    "name": "NoWaste",
+    "slug": "NoWaste",
+    "version": "1.1.0",
+    "orientation": "portrait",
+    "scheme": "nowaste",
+    "icon": "./assets/icon.png",
+    "notification": {
+      "icon": "./assets/icon.png"
+    },
+    "splash": {
+      "image": "./assets/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#fff9ed"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yoraplat.NoWasteV2",
+      "config" : {
+        "googleMapsApiKey": ""
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#fff9ed"
+      },
+      "package": "com.yoraplat.NoWasteV2",
+      "config" : {
+        "googleMaps": {
+          "apiKey": ""
+        }
+      },
+      "googleServicesFile": "./google-services.json"
+    },
+    "web": {
+      "favicon": "./assets/icon.png"
+    },
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "sentry-expo/upload-sourcemaps",
+          "config": {
+            "organization": "school-sg",
+            "project": "nowaste",
+            "authToken": ""
+          }
+        }
+      ]
+    }
+  }
+}

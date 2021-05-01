@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1049752723648",
+    "firebase_url": "https://nowaste-58a45-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "nowaste-58a45",
+    "storage_bucket": "nowaste-58a45.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1049752723648:android:e26e7ce54c99e6667bcd25",
+        "android_client_info": {
+          "package_name": "com.yoraplat.NoWasteV2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1049752723648-de42c6d8aigfsqjc2b4cmrdm5aeglth4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": ""
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1049752723648-de42c6d8aigfsqjc2b4cmrdm5aeglth4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

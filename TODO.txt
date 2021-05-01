@@ -1,0 +1,41 @@
+HomeScreen: buying (paid) item first time doesn't work //
+HomeScreen: New post image doesn't match correct image //
+
+FEEDBACK V1
+borderRadius on item cards //
+MapView doesn't fill screen //
+Sort options, limit to one //
+profile top buttons style (radius and height) ??
+profile bought and offered text don't match //
+
+FEEDBACK V2
+Authscreen: 
+    enable scrolling on page ??
+    enable scrolling when keyboard is open ??
+Profilescreen:
+    text when no items not styled correctly ??
+    bought item doesn't gray-out when picked up
+Homescreen:
+    "reserveren" slider fix ux ??
+    after paying item fix ux (close button resembles cancel button)
+Chatscreen:
+    prevent sending empty messages ??
+Notifications:
+    screen should reload when redirected by a notification
+
+
+Clear pushtoken when user logs out, set pushtoken when user logs in //
+
+STANDALONE DEBUG
+HomeScreen:
+On screen load: TypeError: undefined is not an object (evaluating 't.data().settings.only_vegan') !
+When new item is added: new post doesn't have the correct image !!
+Chatscreen:
+On screen load: TypeError: undefined is not an object (evaluating 't.last_message.sender_id') //
+Occurs sometimes without real reason (might be because of attempted chat creation (buying offer) but failed and created an empty chat document) //
+Chatscreen doesn't load new chats //
+ListItem:
+After payment: TypeError: undefined is not an object (evaluating 't.data().status') (occurs on first try being paid item) !!
+
+Create seeders for the database (use db export for seeding?)
+List user accounts in docs
